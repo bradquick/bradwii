@@ -1,0 +1,340 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 42;
+	objects = {
+
+/* Begin PBXFileReference section */
+		A2110E4314F140A700842B0E /* lib_serial.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = lib_serial.cpp; path = "../Avr Libraries/lib_serial.cpp"; sourceTree = SOURCE_ROOT; };
+		A2110E7014F1431700842B0E /* lib_timers.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = lib_timers.h; path = "../Avr Libraries/lib_timers.h"; sourceTree = SOURCE_ROOT; };
+		A2110E8114F1442800842B0E /* lib_digitalio.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = lib_digitalio.h; path = "../Avr Libraries/lib_digitalio.h"; sourceTree = SOURCE_ROOT; };
+		A2110E9814F145C900842B0E /* lib_pwm.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = lib_pwm.h; path = "../Avr Libraries/lib_pwm.h"; sourceTree = SOURCE_ROOT; };
+		A216479A174312660043F3D3 /* autotune.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = autotune.h; sourceTree = "<group>"; };
+		A216479B174312660043F3D3 /* autotune.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = autotune.cpp; sourceTree = "<group>"; };
+		A22542E816C7E8B2003E96D8 /* projectsettings.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = projectsettings.h; sourceTree = "<group>"; };
+		A242CC6A14DB64CA00605F36 /* lib_i2c.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = lib_i2c.cpp; path = "../Avr Libraries/lib_i2c.cpp"; sourceTree = SOURCE_ROOT; };
+		A242CC7114DB66B100605F36 /* lib_timers.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = lib_timers.cpp; path = "../Avr Libraries/lib_timers.cpp"; sourceTree = SOURCE_ROOT; };
+		A242CCA214DB68BC00605F36 /* lib_digitalio.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = lib_digitalio.cpp; path = "../Avr Libraries/lib_digitalio.cpp"; sourceTree = SOURCE_ROOT; };
+		A27328C114D9F0BB00E39B15 /* main.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
+		A27328C514D9F0BB00E39B15 /* Makefile */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.make; path = Makefile; sourceTree = "<group>"; };
+		A276EDB616CD2E05001CADD5 /* defs.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = defs.h; sourceTree = "<group>"; };
+		A276EDB916CD2E21001CADD5 /* config.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = config.h; sourceTree = "<group>"; };
+		A28282FC16E27ADF00C02D78 /* checkboxes.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = checkboxes.h; sourceTree = "<group>"; };
+		A28282FD16E27ADF00C02D78 /* checkboxes.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = checkboxes.cpp; sourceTree = "<group>"; };
+		A282851916E38CC500C02D78 /* compass.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = compass.h; sourceTree = "<group>"; };
+		A282851A16E38CC500C02D78 /* compass.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = compass.cpp; sourceTree = "<group>"; };
+		A298E91016D2E8C700C1E049 /* gyro.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = gyro.h; sourceTree = "<group>"; };
+		A298E91116D2E8C700C1E049 /* gyro.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = gyro.cpp; sourceTree = "<group>"; };
+		A298E98916D319BF00C1E049 /* accelerometer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = accelerometer.h; sourceTree = "<group>"; };
+		A298E98A16D319BF00C1E049 /* accelerometer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = accelerometer.cpp; sourceTree = "<group>"; };
+		A2AF078F16CD7C34009F9A0E /* rx.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = rx.h; sourceTree = "<group>"; };
+		A2AF079016CD7C34009F9A0E /* rx.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = rx.cpp; sourceTree = "<group>"; };
+		A2AF08D316CDAA6C009F9A0E /* serial.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = serial.h; sourceTree = "<group>"; };
+		A2AF08D416CDAA6C009F9A0E /* serial.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = serial.cpp; sourceTree = "<group>"; };
+		A2AF0B0416CFE2D3009F9A0E /* output.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = output.h; sourceTree = "<group>"; };
+		A2AF0B0516CFE2D3009F9A0E /* output.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = output.cpp; sourceTree = "<group>"; };
+		A2BE92A016DECC870058337F /* baro.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = baro.h; sourceTree = "<group>"; };
+		A2BE92A116DECC870058337F /* baro.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = baro.cpp; sourceTree = "<group>"; };
+		A2C278D416D8394200D8F9CE /* main.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = main.h; sourceTree = "<group>"; };
+		A2C27A2916D94AA200D8F9CE /* imu.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = imu.h; sourceTree = "<group>"; };
+		A2C27A2A16D94AA200D8F9CE /* imu.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = imu.cpp; sourceTree = "<group>"; };
+		A2D5C27F1708823D00130BA2 /* vectors.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = vectors.h; sourceTree = "<group>"; };
+		A2D5C2801708823D00130BA2 /* vectors.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = vectors.cpp; sourceTree = "<group>"; };
+		A2D5C2D01709AE9F00130BA2 /* pilotcontrol.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = pilotcontrol.h; sourceTree = "<group>"; };
+		A2D5C2D11709AE9F00130BA2 /* pilotcontrol.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = pilotcontrol.cpp; sourceTree = "<group>"; };
+		A2D5C44B171771AE000E4300 /* options.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = options.h; sourceTree = "<group>"; };
+		A2D5C8E1171C2A92000E4300 /* lib_usb.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = lib_usb.cpp; path = "../Avr Libraries/lib_usb.cpp"; sourceTree = "<group>"; };
+		A2E59E7114DEEC6900AB62EF /* lib_pwm.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = lib_pwm.cpp; path = "../Avr Libraries/lib_pwm.cpp"; sourceTree = SOURCE_ROOT; };
+		A2E5CDD116EAB2E200C91811 /* eeprom.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = eeprom.h; sourceTree = "<group>"; };
+		A2E5CDD216EAB2E200C91811 /* eeprom.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = eeprom.cpp; sourceTree = "<group>"; };
+		A2E5D1FA16EBEFB800C91811 /* gps.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = gps.h; sourceTree = "<group>"; };
+		A2E5D1FB16EBEFB800C91811 /* gps.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = gps.cpp; sourceTree = "<group>"; };
+		A2E5E1DA16EFECE800C91811 /* navigation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = navigation.h; sourceTree = "<group>"; };
+		A2E5E1DB16EFECE800C91811 /* navigation.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = navigation.cpp; sourceTree = "<group>"; };
+		A2E82CA0168C978B00E4FE71 /* lib_i2c.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = lib_i2c.h; path = "../Avr Libraries/lib_i2c.h"; sourceTree = SOURCE_ROOT; };
+		A2E82CA1168C978B00E4FE71 /* lib_serial.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = lib_serial.h; path = "../Avr Libraries/lib_serial.h"; sourceTree = SOURCE_ROOT; };
+		A2E82EAD1690A20D00E4FE71 /* lib_fp.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = lib_fp.h; path = "../Avr Libraries/lib_fp.h"; sourceTree = SOURCE_ROOT; };
+		A2E82EAE1690A20D00E4FE71 /* lib_fp.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = lib_fp.cpp; path = "../Avr Libraries/lib_fp.cpp"; sourceTree = SOURCE_ROOT; };
+/* End PBXFileReference section */
+
+/* Begin PBXGroup section */
+		4079523B0CEA382200E202DC = {
+			isa = PBXGroup;
+			children = (
+				A242CC6714DB64A200605F36 /* Libraries */,
+				A27328C014D9F0BB00E39B15 /* project files */,
+			);
+			sourceTree = "<group>";
+		};
+		A242CC6714DB64A200605F36 /* Libraries */ = {
+			isa = PBXGroup;
+			children = (
+				A2E82CA0168C978B00E4FE71 /* lib_i2c.h */,
+				A242CC6A14DB64CA00605F36 /* lib_i2c.cpp */,
+				A2110E7014F1431700842B0E /* lib_timers.h */,
+				A242CC7114DB66B100605F36 /* lib_timers.cpp */,
+				A2E82CA1168C978B00E4FE71 /* lib_serial.h */,
+				A2110E4314F140A700842B0E /* lib_serial.cpp */,
+				A2110E9814F145C900842B0E /* lib_pwm.h */,
+				A2E59E7114DEEC6900AB62EF /* lib_pwm.cpp */,
+				A2110E8114F1442800842B0E /* lib_digitalio.h */,
+				A242CCA214DB68BC00605F36 /* lib_digitalio.cpp */,
+				A2E82EAD1690A20D00E4FE71 /* lib_fp.h */,
+				A2E82EAE1690A20D00E4FE71 /* lib_fp.cpp */,
+				A2D5C8E1171C2A92000E4300 /* lib_usb.cpp */,
+			);
+			name = Libraries;
+			sourceTree = "<group>";
+		};
+		A27328C014D9F0BB00E39B15 /* project files */ = {
+			isa = PBXGroup;
+			children = (
+				A2D5C44B171771AE000E4300 /* options.h */,
+				A276EDB916CD2E21001CADD5 /* config.h */,
+				A276EDB616CD2E05001CADD5 /* defs.h */,
+				A22542E816C7E8B2003E96D8 /* projectsettings.h */,
+				A2E5E1DA16EFECE800C91811 /* navigation.h */,
+				A2E5E1DB16EFECE800C91811 /* navigation.cpp */,
+				A2C278D416D8394200D8F9CE /* main.h */,
+				A27328C114D9F0BB00E39B15 /* main.cpp */,
+				A2D5C27F1708823D00130BA2 /* vectors.h */,
+				A2D5C2801708823D00130BA2 /* vectors.cpp */,
+				A2D5C2D01709AE9F00130BA2 /* pilotcontrol.h */,
+				A2D5C2D11709AE9F00130BA2 /* pilotcontrol.cpp */,
+				A298E98916D319BF00C1E049 /* accelerometer.h */,
+				A298E98A16D319BF00C1E049 /* accelerometer.cpp */,
+				A282851916E38CC500C02D78 /* compass.h */,
+				A282851A16E38CC500C02D78 /* compass.cpp */,
+				A2BE92A016DECC870058337F /* baro.h */,
+				A2BE92A116DECC870058337F /* baro.cpp */,
+				A298E91016D2E8C700C1E049 /* gyro.h */,
+				A298E91116D2E8C700C1E049 /* gyro.cpp */,
+				A2E5CDD116EAB2E200C91811 /* eeprom.h */,
+				A2E5CDD216EAB2E200C91811 /* eeprom.cpp */,
+				A28282FC16E27ADF00C02D78 /* checkboxes.h */,
+				A28282FD16E27ADF00C02D78 /* checkboxes.cpp */,
+				A2C27A2916D94AA200D8F9CE /* imu.h */,
+				A2C27A2A16D94AA200D8F9CE /* imu.cpp */,
+				A2AF0B0416CFE2D3009F9A0E /* output.h */,
+				A2AF0B0516CFE2D3009F9A0E /* output.cpp */,
+				A2E5D1FA16EBEFB800C91811 /* gps.h */,
+				A2E5D1FB16EBEFB800C91811 /* gps.cpp */,
+				A2AF08D316CDAA6C009F9A0E /* serial.h */,
+				A2AF08D416CDAA6C009F9A0E /* serial.cpp */,
+				A2AF078F16CD7C34009F9A0E /* rx.h */,
+				A2AF079016CD7C34009F9A0E /* rx.cpp */,
+				A216479A174312660043F3D3 /* autotune.h */,
+				A216479B174312660043F3D3 /* autotune.cpp */,
+				A27328C514D9F0BB00E39B15 /* Makefile */,
+			);
+			path = "project files";
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXLegacyTarget section */
+		407952600CEA391500E202DC /* compile only */ = {
+			isa = PBXLegacyTarget;
+			buildArgumentsString = "";
+			buildConfigurationList = 407952610CEA393300E202DC /* Build configuration list for PBXLegacyTarget "compile only" */;
+			buildPhases = (
+			);
+			buildToolPath = make;
+			buildWorkingDirectory = "project files";
+			dependencies = (
+			);
+			name = "compile only";
+			passBuildSettingsInEnvironment = 1;
+			productName = "Build All";
+		};
+		A2851D78175EB4B700A602D7 /* compile and flash 328p2 */ = {
+			isa = PBXLegacyTarget;
+			buildArgumentsString = install;
+			buildConfigurationList = A2851D79175EB4B700A602D7 /* Build configuration list for PBXLegacyTarget "compile and flash 328p2" */;
+			buildPhases = (
+			);
+			buildToolPath = make;
+			buildWorkingDirectory = "project files";
+			dependencies = (
+			);
+			name = "compile and flash 328p2";
+			passBuildSettingsInEnvironment = 1;
+			productName = "Build All";
+		};
+		A2A8B4CA14D8D32C00FBBCCD /* compile and flash 2560 */ = {
+			isa = PBXLegacyTarget;
+			buildArgumentsString = install;
+			buildConfigurationList = A2A8B4CB14D8D32C00FBBCCD /* Build configuration list for PBXLegacyTarget "compile and flash 2560" */;
+			buildPhases = (
+			);
+			buildToolPath = make;
+			buildWorkingDirectory = "project files";
+			dependencies = (
+			);
+			name = "compile and flash 2560";
+			passBuildSettingsInEnvironment = 1;
+			productName = "Build All";
+		};
+		A2D5C1F417079CBD00130BA2 /* compile and flash 328p */ = {
+			isa = PBXLegacyTarget;
+			buildArgumentsString = install;
+			buildConfigurationList = A2D5C1F517079CBD00130BA2 /* Build configuration list for PBXLegacyTarget "compile and flash 328p" */;
+			buildPhases = (
+			);
+			buildToolPath = make;
+			buildWorkingDirectory = "project files";
+			dependencies = (
+			);
+			name = "compile and flash 328p";
+			passBuildSettingsInEnvironment = 1;
+			productName = "Build All";
+		};
+		A2D5C78E171B1EDB000E4300 /* compile and flash 32u4 */ = {
+			isa = PBXLegacyTarget;
+			buildArgumentsString = install;
+			buildConfigurationList = A2D5C78F171B1EDB000E4300 /* Build configuration list for PBXLegacyTarget "compile and flash 32u4" */;
+			buildPhases = (
+			);
+			buildToolPath = make;
+			buildWorkingDirectory = "project files";
+			dependencies = (
+			);
+			name = "compile and flash 32u4";
+			passBuildSettingsInEnvironment = 1;
+			productName = "Build All";
+		};
+/* End PBXLegacyTarget section */
+
+/* Begin PBXProject section */
+		4079523D0CEA382200E202DC /* Project object */ = {
+			isa = PBXProject;
+			buildConfigurationList = 4079523E0CEA382200E202DC /* Build configuration list for PBXProject "Project" */;
+			compatibilityVersion = "Xcode 2.4";
+			developmentRegion = English;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+			);
+			mainGroup = 4079523B0CEA382200E202DC;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				407952600CEA391500E202DC /* compile only */,
+				A2A8B4CA14D8D32C00FBBCCD /* compile and flash 2560 */,
+				A2D5C1F417079CBD00130BA2 /* compile and flash 328p */,
+				A2D5C78E171B1EDB000E4300 /* compile and flash 32u4 */,
+				A2851D78175EB4B700A602D7 /* compile and flash 328p2 */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin XCBuildConfiguration section */
+		407952400CEA382200E202DC /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COPY_PHASE_STRIP = YES;
+			};
+			name = Release;
+		};
+		407952630CEA393300E202DC /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				DEVICE = atmega2560;
+				PATH = "$(PATH):$(PROJECT_DIR)/../Avr_Tools/bin:$(PROJECT_DIR)'/../Avr Libraries':$(PROJECT_DIR)";
+			};
+			name = Release;
+		};
+		A2851D7A175EB4B700A602D7 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				DEVICE = atmega328p;
+				PATH = "$(PATH):$(PROJECT_DIR)/../Avr_Tools/bin";
+				PRODUCT_NAME = "compile and flash 328p2";
+				PROGRAMMER = "-c  arduino -P/dev/cu.usbserial-A601UWAV -b57600 -D";
+			};
+			name = Release;
+		};
+		A2A8B4CC14D8D32C00FBBCCD /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				DEVICE = atmega2560;
+				PATH = "$(PATH):$(PROJECT_DIR)/../Avr_Tools/bin";
+				PROGRAMMER = "-c wiring -P/dev/cu.SLAB_USBtoUART -b115200 -D";
+			};
+			name = Release;
+		};
+		A2D5C1F617079CBD00130BA2 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				DEVICE = atmega328p;
+				PATH = "$(PATH):$(PROJECT_DIR)/../Avr_Tools/bin";
+				PROGRAMMER = "-c  arduino -P/dev/cu.usbserial-A601UWAV -b57600 -D";
+			};
+			name = Release;
+		};
+		A2D5C790171B1EDB000E4300 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				DEVICE = atmega32u4;
+				PATH = "$(PATH):$(PROJECT_DIR)/../Avr_Tools/bin";
+				PROGRAMMER = "-cavr109 -P/dev/cu.usbmodem1421 -b57600 -D";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		4079523E0CEA382200E202DC /* Build configuration list for PBXProject "Project" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				407952400CEA382200E202DC /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		407952610CEA393300E202DC /* Build configuration list for PBXLegacyTarget "compile only" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				407952630CEA393300E202DC /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		A2851D79175EB4B700A602D7 /* Build configuration list for PBXLegacyTarget "compile and flash 328p2" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				A2851D7A175EB4B700A602D7 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		A2A8B4CB14D8D32C00FBBCCD /* Build configuration list for PBXLegacyTarget "compile and flash 2560" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				A2A8B4CC14D8D32C00FBBCCD /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		A2D5C1F517079CBD00130BA2 /* Build configuration list for PBXLegacyTarget "compile and flash 328p" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				A2D5C1F617079CBD00130BA2 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		A2D5C78F171B1EDB000E4300 /* Build configuration list for PBXLegacyTarget "compile and flash 32u4" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				A2D5C790171B1EDB000E4300 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 4079523D0CEA382200E202DC /* Project object */;
+}
