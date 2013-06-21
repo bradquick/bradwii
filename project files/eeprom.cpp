@@ -17,7 +17,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <avr/eeprom.h>
 #include "eeprom.h"
-#include "main.h"
+#include "bradwii.h"
 
 extern usersettingsstruct usersettings;
 extern globalstruct global;

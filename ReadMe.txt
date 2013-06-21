@@ -16,7 +16,7 @@ Features:
 
 - Multi-Wii Config compatible (including bluetooth apps, etc).  Works on any (and multiple) serial ports.
 
-- Simplified settings means there are fewer things that need to be adjusted.
+- Simplified settings means there are fewer things (especially PID) that need to be adjusted.
 
 - Auto PID tuning.
 
@@ -34,9 +34,11 @@ Features:
 
 - Uncrashability Mode - Takes over when you get below critical attitude or get too far away.  Practice those Acro maneuvers without being able to dumb-thumb it!
 
-- The project doesn't rely on any Arduino libraries which means that it can be easily developed on other development systems.  Brad-Wii was originally developed on a Mac using Xcode.
+- The project doesn't rely on any Arduino libraries which means that it can be easily developed on other development systems.  Brad-Wii was originally developed on a Mac using Xcode.  The Xcode project can be cloned from here: https://github.com/bradquick/bradwii
 
-- Well commented, logically laid out code.  It is designed to be easy to add additional sensors and control boards.  Developers should find this code a good starting point for various projects.  The curious will find it easier to understand what makes their multi-rotor tick.
+- Well commented, logically laid out code.  It is designed to be easy to add additional sensors and control boards.  Developers should find this code a good starting point for various projects.  The curious will find it easier to understand what makes their multi-rotors tick.
+
+Operating Instructions:
 
 Config:
 

@@ -19,7 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "output.h"
 #include "lib_pwm.h"
 #include "projectsettings.h"
-#include "main.h"
+#include "bradwii.h"
 #include "lib_timers.h"
 
 extern globalstruct global;

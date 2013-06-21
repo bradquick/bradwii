@@ -16,7 +16,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 #include "vectors.h"
-#include "main.h"
+#include "bradwii.h"
 
 extern globalstruct global;
 

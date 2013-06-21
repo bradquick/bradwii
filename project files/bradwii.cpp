@@ -74,7 +74,7 @@ m
 #include "lib_fp.h" 
 
 // project file headers
-#include "main.h"
+#include "bradwii.h"
 #include "rx.h"
 #include "serial.h"
 #include "output.h"
@@ -92,7 +92,7 @@ m
 globalstruct global; // global variables
 usersettingsstruct usersettings; // user editable variables
 
-fixedpointnum desiredaltitude;
+fixedpointnum altitudeholddesiredaltitude;
 fixedpointnum integratedaltitudeerror; // for pid control
 
 fixedpointnum integratedangleerror[3];
@@ -251,18 +251,23 @@ int main(void)
 			autotune(angleerror,AUTOTUNESTOPPING);
 #endif
 
-		// get the user's throttle component
+		// get the pilot's throttle component
 		// convert from fixedpoint -1 to 1 to fixedpoint 0 to 1
 		fixedpointnum throttleoutput=(global.rxvalues[THROTTLEINDEX]>>1)+FIXEDPOINTCONSTANT(.5);
 
-      // uncrashability
-      #define UNCRASHABLELOOKAHEADTIME FIXEDPOINTONE // look ahead one second to see if we are going to be in a bad area
-      #define UNCRASHABLERECOVERYANGLE FIXEDPOINTCONSTANT(15) // don't let the pilot pitch or roll more than 20 degrees
-      #define FPUNCRASHABLERADIUS FIXEDPOINTCONSTANT(UNCRAHSABLE_RADIUS) 
+      // keep a flag to indicate whether we shoud apply altitude hold.  The pilot can turn it on or
+      // uncrashability mode can turn it on.
+      unsigned char altitudeholdactive=0;
+      
+      // uncrashability mode
+      #define UNCRASHABLELOOKAHEADTIME FIXEDPOINTONE // look ahead one second to see if we are going to be at a bad altitude
+      #define UNCRASHABLERECOVERYANGLE FIXEDPOINTCONSTANT(15) // don't let the pilot pitch or roll more than 20 degrees when altitude is too low.
+      #define FPUNCRASHABLE_RADIUS FIXEDPOINTCONSTANT(UNCRAHSABLE_RADIUS) 
+      #define FPUNCRAHSABLE_MAX_ALTITUDE_OFFSET FIXEDPOINTCONSTANT(UNCRAHSABLE_MAX_ALTITUDE_OFFSET)
 #if (GPS_TYPE!=NO_GPS)
       static unsigned char doinguncrashablenavigationflag=0;
 #endif
-      unsigned char altitudeholdactive=0;
+      static fixedpointnum uncrasabilityminimumaltitude;
       
       if (global.activecheckboxitems & CHECKBOXMASKUNCRASHABLE) // uncrashable mode
          {
@@ -270,17 +275,27 @@ int main(void)
          // are we about to crash?
          if (!(global.previousactivecheckboxitems & CHECKBOXMASKUNCRASHABLE))
             { // we just turned on uncrashability.  Remember our current alt. as our target
-            desiredaltitude=global.altitude;
+            uncrasabilityminimumaltitude=global.altitude;
 #if (GPS_TYPE!=NO_GPS)
             navigation_sethometocurrentlocation();
 #endif
             }
- 
-         if (global.altitude+lib_fp_multiply(global.altitudevelocity,UNCRASHABLELOOKAHEADTIME)<desiredaltitude)
-            { // about to crash!
+         
+         // calculate our projected altitude based on how fast our altitude is changing
+         fixedpointnum projectedaltitude=global.altitude+lib_fp_multiply(global.altitudevelocity,UNCRASHABLELOOKAHEADTIME);
+         
+         if (projectedaltitude>uncrasabilityminimumaltitude+FPUNCRAHSABLE_MAX_ALTITUDE_OFFSET)
+            { // we are getting too high
+            // Use Altitude Hold to bring us back to the maximum altitude.
+            altitudeholddesiredaltitude=uncrasabilityminimumaltitude+FPUNCRAHSABLE_MAX_ALTITUDE_OFFSET;
+            altitudeholdactive=1;
+            }            
+         else if (projectedaltitude<altitudeholddesiredaltitude)
+            { // We are about to get below our minimum crashability altitude
             // don't apply throttle until we are almost level
             if (global.estimateddownvector[ZINDEX]>FIXEDPOINTCONSTANT(.8))
                {
+               altitudeholddesiredaltitude=uncrasabilityminimumaltitude;
                altitudeholdactive=1;
                }
             else throttleoutput=0; // we are trying to rotate to level, kill the throttle until we get there
@@ -296,7 +311,7 @@ int main(void)
          fixedpointnum bearingfromhome;
          fixedpointnum distancefromhome=navigation_getdistanceandbearing(global.gps_current_latitude,global.gps_current_longitude,global.gps_home_latitude,global.gps_home_longitude,&bearingfromhome);
          
-         if (distancefromhome>FPUNCRASHABLERADIUS)
+         if (distancefromhome>FPUNCRASHABLE_RADIUS)
             { // we are outside the allowable area, navigate back toward home
             if (!doinguncrashablenavigationflag)
                { // we just started navigating, so we have to set the destination
@@ -338,7 +353,7 @@ int main(void)
          altitudeholdactive=1;
          if (!(global.previousactivecheckboxitems & CHECKBOXMASKALTHOLD))
             { // we just turned on alt hold.  Remember our current alt. as our target
-            desiredaltitude=global.altitude;
+            altitudeholddesiredaltitude=global.altitude;
             integratedaltitudeerror=0;
             }
          }
@@ -347,28 +362,14 @@ int main(void)
       // check for altitude hold and adjust the throttle output accordingly
 		if (altitudeholdactive)
 			{
-         integratedaltitudeerror+=lib_fp_multiply(desiredaltitude-global.altitude,global.timesliver);
+         integratedaltitudeerror+=lib_fp_multiply(altitudeholddesiredaltitude-global.altitude,global.timesliver);
          lib_fp_constrain(&integratedaltitudeerror,-INTEGRATEDANGLEERRORLIMIT,INTEGRATEDANGLEERRORLIMIT); // don't let the integrated error get too high
 			
          // do pid for the altitude hold and add it to the throttle output
-         throttleoutput+=lib_fp_multiply(desiredaltitude-global.altitude,usersettings.pid_pgain[ALTITUDEINDEX])
+         throttleoutput+=lib_fp_multiply(altitudeholddesiredaltitude-global.altitude,usersettings.pid_pgain[ALTITUDEINDEX])
             -lib_fp_multiply(global.altitudevelocity,usersettings.pid_dgain[ALTITUDEINDEX])
             +lib_fp_multiply(integratedaltitudeerror,usersettings.pid_igain[ALTITUDEINDEX]);
             
-/*static fixedpointnum maxaltitude=0;
-static fixedpointnum maxbaroaltitude=0;
-static fixedpointnum maxaltitudevelocity=0;
-static fixedpointnum minaltintegration=0;
-
-if (global.altitude>maxaltitude) maxaltitude=global.altitude;
-if (global.barorawaltitude>maxbaroaltitude) maxbaroaltitude=global.barorawaltitude;
-if (global.altitudevelocity>maxaltitudevelocity) maxaltitudevelocity=global.altitudevelocity;
-if (integratedaltitudeerror<minaltintegration) minaltintegration=integratedaltitudeerror;
-global.debugvalue[0]=maxaltitude>>FIXEDPOINTSHIFT;
-global.debugvalue[1]=maxaltitudevelocity>>FIXEDPOINTSHIFT;
-global.debugvalue[2]=minaltintegration>>FIXEDPOINTSHIFT;
-global.debugvalue[3]=maxbaroaltitude>>FIXEDPOINTSHIFT;
-*/         
          }
 #endif
       if ((global.activecheckboxitems & CHECKBOXMASKAUTOTHROTTLE) || altitudeholdactive)

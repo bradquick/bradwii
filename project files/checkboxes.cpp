@@ -16,7 +16,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 #include "checkboxes.h"
-#include "main.h"
+#include "bradwii.h"
 #include "rx.h"
 
 extern globalstruct global;

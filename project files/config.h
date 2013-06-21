@@ -113,4 +113,5 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // increase the GYRO_LOW_PASS_FILTER from 0 through 10.  The lowest value that works correctly is the one you should use.
 #define GYRO_LOW_PASS_FILTER 0
 
+#define UNCRAHSABLE_MAX_ALTITUDE_OFFSET 30.0 // 30 meters above where uncrashability was enabled
 #define UNCRAHSABLE_RADIUS 15.0 // 15 meter radius

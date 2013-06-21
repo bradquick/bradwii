@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "gps.h"
 #include "defs.h"
 #include "lib_serial.h"
-#include "main.h"
+#include "bradwii.h"
 
 // when adding GPS's, the following functions must be included:
 // initgps()  // does any initialization of the gps

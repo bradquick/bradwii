@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "navigation.h"
 #include "gps.h"
 #include "lib_fp.h"
-#include "main.h"
+#include "bradwii.h"
 
 #if (GPS_TYPE!=NO_GPS)
 

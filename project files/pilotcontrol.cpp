@@ -16,7 +16,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 #include "pilotcontrol.h"
-#include "main.h"
+#include "bradwii.h"
 #include "vectors.h"
 #include "lib_timers.h"
 

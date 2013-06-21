@@ -20,7 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "lib_i2c.h"
 #include "lib_fp.h"
 #include "lib_timers.h"
-#include "main.h"
+#include "bradwii.h"
 
 extern globalstruct global;
 extern usersettingsstruct usersettings;

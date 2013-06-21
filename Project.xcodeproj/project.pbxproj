@@ -17,7 +17,7 @@
 		A242CC6A14DB64CA00605F36 /* lib_i2c.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = lib_i2c.cpp; path = "../Avr Libraries/lib_i2c.cpp"; sourceTree = SOURCE_ROOT; };
 		A242CC7114DB66B100605F36 /* lib_timers.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = lib_timers.cpp; path = "../Avr Libraries/lib_timers.cpp"; sourceTree = SOURCE_ROOT; };
 		A242CCA214DB68BC00605F36 /* lib_digitalio.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = lib_digitalio.cpp; path = "../Avr Libraries/lib_digitalio.cpp"; sourceTree = SOURCE_ROOT; };
-		A27328C114D9F0BB00E39B15 /* main.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
+		A27328C114D9F0BB00E39B15 /* bradwii.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = bradwii.cpp; sourceTree = "<group>"; };
 		A27328C514D9F0BB00E39B15 /* Makefile */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.make; path = Makefile; sourceTree = "<group>"; };
 		A276EDB616CD2E05001CADD5 /* defs.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = defs.h; sourceTree = "<group>"; };
 		A276EDB916CD2E21001CADD5 /* config.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = config.h; sourceTree = "<group>"; };
@@ -37,7 +37,7 @@
 		A2AF0B0516CFE2D3009F9A0E /* output.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = output.cpp; sourceTree = "<group>"; };
 		A2BE92A016DECC870058337F /* baro.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = baro.h; sourceTree = "<group>"; };
 		A2BE92A116DECC870058337F /* baro.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = baro.cpp; sourceTree = "<group>"; };
-		A2C278D416D8394200D8F9CE /* main.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = main.h; sourceTree = "<group>"; };
+		A2C278D416D8394200D8F9CE /* bradwii.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = bradwii.h; sourceTree = "<group>"; };
 		A2C27A2916D94AA200D8F9CE /* imu.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = imu.h; sourceTree = "<group>"; };
 		A2C27A2A16D94AA200D8F9CE /* imu.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = imu.cpp; sourceTree = "<group>"; };
 		A2D5C27F1708823D00130BA2 /* vectors.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = vectors.h; sourceTree = "<group>"; };
@@ -97,8 +97,8 @@
 				A22542E816C7E8B2003E96D8 /* projectsettings.h */,
 				A2E5E1DA16EFECE800C91811 /* navigation.h */,
 				A2E5E1DB16EFECE800C91811 /* navigation.cpp */,
-				A2C278D416D8394200D8F9CE /* main.h */,
-				A27328C114D9F0BB00E39B15 /* main.cpp */,
+				A2C278D416D8394200D8F9CE /* bradwii.h */,
+				A27328C114D9F0BB00E39B15 /* bradwii.cpp */,
 				A2D5C27F1708823D00130BA2 /* vectors.h */,
 				A2D5C2801708823D00130BA2 /* vectors.cpp */,
 				A2D5C2D01709AE9F00130BA2 /* pilotcontrol.h */,

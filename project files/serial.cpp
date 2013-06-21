@@ -26,7 +26,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "lib_timers.h"
 #include "lib_fp.h"
 
-#include "main.h"
+#include "bradwii.h"
 #include "serial.h"
 #include "defs.h"
 #include "checkboxes.h"

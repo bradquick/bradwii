@@ -18,7 +18,7 @@
 CLOCK      = 16000000
 #PROGRAMMER = -c stk500v2 -P/dev/cu.SLAB_USBtoUART
 #PROGRAMMER = -c arduino -P/dev/cu.SLAB_USBtoUART
-OBJECTS    = main.o lib_usb.o rx.o serial.o output.o gyro.o accelerometer.o imu.o baro.o checkboxes.o compass.o autotune.o pilotcontrol.o eeprom.o gps.o navigation.o vectors.o lib_pwm.o lib_digitalio.o lib_timers.o lib_i2c.o lib_serial.o lib_fp.o
+OBJECTS    = bradwii.o lib_usb.o rx.o serial.o output.o gyro.o accelerometer.o imu.o baro.o checkboxes.o compass.o autotune.o pilotcontrol.o eeprom.o gps.o navigation.o vectors.o lib_pwm.o lib_digitalio.o lib_timers.o lib_i2c.o lib_serial.o lib_fp.o
 # to run at 8mhz:
 #FUSES      = -U hfuse:w:0xdf:m -U lfuse:w:0xe2:m
 
@@ -32,7 +32,7 @@ COMPILE = avr-gcc -Wall -Os -DF_CPU=$(CLOCK) -mmcu=$(DEVICE) -I "$(PROJECT_DIR)/
 # install: is called for the make and burn target
 # symbolic targets:
 all:
-	$(COMPILE) -c main.cpp -o main.o
+	$(COMPILE) -c bradwii.cpp -o bradwii.o
 	$(COMPILE) -c rx.cpp -o rx.o
 	$(COMPILE) -c serial.cpp -o serial.o
 	$(COMPILE) -c output.cpp -o output.o
@@ -56,12 +56,12 @@ all:
 	$(COMPILE) -c $(LIBRARYPATH)lib_serial.cpp -o lib_serial.o
 	$(COMPILE) -c $(LIBRARYPATH)lib_fp.cpp -o lib_fp.o
 	$(COMPILE) -c $(LIBRARYPATH)lib_usb.cpp -o lib_usb.o
-	$(COMPILE) -o main.elf -Wl,--gc-sections $(OBJECTS)
-	avr-size main.elf
-	rm -f main.hex
-	avr-objcopy -j .text -j .data -O ihex main.elf main.hex
+	$(COMPILE) -o bradwii.elf -Wl,--gc-sections $(OBJECTS)
+	avr-size bradwii.elf
+	rm -f bradwii.hex
+	avr-objcopy -j .text -j .data -O ihex bradwii.elf bradwii.hex
 	
-#all:	main.hex
+#all:	bradwii.hex
 
 .cpp.o:
 	$(COMPILE) -c $< -o $@
@@ -80,7 +80,7 @@ all:
 	$(COMPILE) -S $< -o $@
 
 flash:	all
-	$(AVRDUDE) -U flash:w:main.hex:i
+	$(AVRDUDE) -U flash:w:bradwii.hex:i
 #avrdude.conf -v -v -v -v -patmega2560 -cstk500v2 -P/dev/cu.SLAB_USBtoUART -Uflash:w:/var/folders/qn/5h0p0ppc8xjczf001s7ppjqr0000gn/T/build5197281368797617405.tmp/MultiWii_2_1_brad.cpp.hex:i 
 
 
@@ -92,25 +92,25 @@ install: flash
 
 # if you use a bootloader, change the command below appropriately:
 load: all
-	bootloadHID main.hex
+	bootloadHID bradwii.hex
 
 clean:
-	rm -f main.hex main.elf $(OBJECTS)
+	rm -f bradwii.hex bradwii.elf $(OBJECTS)
 
 # file targets:
-main.elf: $(OBJECTS)
+bradwii.elf: $(OBJECTS)
 	echo here
-	$(COMPILE) -o main.elf $(OBJECTS)
+	$(COMPILE) -o bradwii.elf $(OBJECTS)
 
-main.hex: main.elf
-	rm -f main.hex
-	avr-objcopy -j .text -j .data -O ihex main.elf main.hex
+bradwii.hex: bradwii.elf
+	rm -f bradwii.hex
+	avr-objcopy -j .text -j .data -O ihex bradwii.elf bradwii.hex
 # If you have an EEPROM section, you must also create a hex file for the
 # EEPROM and add it to the "flash" target.
 
 # Targets for code debugging and analysis:
-disasm:	main.elf
-	avr-objdump -d main.elf
+disasm:	bradwii.elf
+	avr-objdump -d bradwii.elf
 
 cpp:
-	$(COMPILE) -E main.c
+	$(COMPILE) -E bradwii.c
