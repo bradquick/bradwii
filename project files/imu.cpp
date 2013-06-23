@@ -225,17 +225,17 @@ void imucalculateestimatedattitude()
       
       // filter out errant baro readings.  I don't know why I need to do this, but every once in a while the baro
       // will give a reading of 3000 meters when it should read 150 meters.
-      if (lib_fp_abs(baroaltitudechange)<FIXEDPOINTCONSTANT(20))
+      if (lib_fp_abs(baroaltitudechange)<FIXEDPOINTCONSTANT(500))
          {
          // Use the baro reading to adjust the altitude over time (basically a complimentary filter)
-         lib_fp_lowpassfilter(&global.altitude, global.barorawaltitude,barotimeinterval>>TIMESLIVEREXTRASHIFT, FIXEDPOINTONEOVERFOUR,0);
+         lib_fp_lowpassfilter(&global.altitude, global.barorawaltitude,barotimeinterval>>TIMESLIVEREXTRASHIFT, FIXEDPOINTONEOVERONE,0);
 
          // Use the change in barometer readings to get an altitude velocity.  Use this to adjust the altitude velocity
          // over time (basically a complimentary filter).
          // We don't want to divide by the time interval to get velocity (divide is expensive) to then turn around and
          // multiply by the same time interval. So the following is the same as the lib_fp_lowpassfilter code
          // except we eliminate the multiply.
-         fixedpointnum fraction=lib_fp_multiply(barotimeinterval>>TIMESLIVEREXTRASHIFT,FIXEDPOINTONEOVERTWO);
+         fixedpointnum fraction=lib_fp_multiply(barotimeinterval>>TIMESLIVEREXTRASHIFT,FIXEDPOINTONEOVERONEHALF);
          global.altitudevelocity=(baroaltitudechange+lib_fp_multiply((FIXEDPOINTONE)-fraction,global.altitudevelocity));
 		
          lastbarorawaltitude=global.barorawaltitude;

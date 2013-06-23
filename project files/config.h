@@ -90,20 +90,20 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  #define ESC_CALIB_HIGH MAX_MOTOR_OUTPUT
 
 // Choose the type of r/c reciever that will be used
-#define RX_TYPE RX_NORMAL
-//#define RX_TYPE RX_DSM2
-//#define RX_TYPE RX_DSM2_11BIT
-//#define RX_DSM2_SERIAL_PORT 1
+//#define RX_TYPE RX_NORMAL
+//#define RX_TYPE RX_DSM2_1024
+#define RX_TYPE RX_DSM2_2048
+#define RX_DSM2_SERIAL_PORT 1
 
-// uncomment and set the number of RX channels, otherwise it will default to what the control board can handle
-//#define RXNUMCHANNELS 6
+// uncomment and set the number of RX channels, otherwise it will default to what the control board/receiver can handle
+//#define RXNUMCHANNELS 8
 
 // un-comment if you don't want to include autotune code
 //#define NO_AUTOTUNE
 // To adjust how agressive the tuning is, adjust the AUTOTUNEMAXOSCILLATION value.  A larger
 // value will result in more agressive tuning.
 // It will rock back and forth between -AUTOTUNE_TARGET_ANGLE and AUTOTUNE_TARGET_ANGLE degrees
-#define AUTOTUNE_MAX_OSCILLATION 5.0
+#define AUTOTUNE_MAX_OSCILLATION 4.0
 #define AUTOTUNE_TARGET_ANGLE 20.0 
 
 // Gyro low pass filter.
@@ -114,4 +114,4 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define GYRO_LOW_PASS_FILTER 0
 
 #define UNCRAHSABLE_MAX_ALTITUDE_OFFSET 30.0 // 30 meters above where uncrashability was enabled
-#define UNCRAHSABLE_RADIUS 15.0 // 15 meter radius
+#define UNCRAHSABLE_RADIUS 50.0 // 50 meter radius

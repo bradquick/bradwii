@@ -81,5 +81,5 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 // RX receiver types
 #define RX_NORMAL 0
-#define RX_DSM2 1
-#define RX_DSM2_11BIT 2
+#define RX_DSM2_1024 1
+#define RX_DSM2_2048 2

@@ -111,7 +111,10 @@ void autotune(fixedpointnum *angleerror,unsigned char startingorstopping)
 					if (autotunepeak1<(FPAUTOTUNEMAXOSCILLATION>>1))
 						currentivalue=lib_fp_multiply(currentivalue,AUTOTUNEINCREASEMULTIPLIER);
 					else
-						currentivalue=lib_fp_multiply(currentivalue,AUTOTUNEDECREASEMULTIPLIER);
+						{
+                  currentivalue=lib_fp_multiply(currentivalue,AUTOTUNEDECREASEMULTIPLIER);
+                  if (currentivalue<AUTOTUNEMINIMUMIVALUE) currentivalue=AUTOTUNEMINIMUMIVALUE;
+                  }
 					
 					// go back to checking P and D
 					cyclecount=1;

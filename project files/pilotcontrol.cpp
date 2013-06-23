@@ -41,6 +41,8 @@ void resetpilotcontrol()
 	{ // called when switching from navigation control to pilot control or when idling on the ground.
 	// keeps us from accumulating yaw error that we can't correct.
 	desiredcompassheading=global.currentestimatedeulerattitude[YAWINDEX];
+   
+   // calculate our max rotation rates based on usersettings
 	highyawrate=lib_fp_multiply(usersettings.maxyawrate, FP_HIGH_RATES_MULTILIER);
 	highpitchandrollrate=lib_fp_multiply(usersettings.maxpitchandrollrate, FP_HIGH_RATES_MULTILIER);
 	}

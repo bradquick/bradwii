@@ -222,9 +222,7 @@ void evaluatecommand(char portnumber,unsigned char *data)
 		sendgoodheader(portnumber,3*NUMPIDITEMS);
 		for (int x=0;x<NUMPIDITEMS;++x)
 			{
-			if (x==YAWINDEX)
-				sendandchecksumcharacter(portnumber,usersettings.pid_pgain[x]>>5);
-			else if (x==ALTITUDEINDEX)
+			if (x==ALTITUDEINDEX)
 				sendandchecksumcharacter(portnumber,usersettings.pid_pgain[x]>>6);
 			else if (x==NAVIGATIONINDEX)
 				sendandchecksumcharacter(portnumber,usersettings.pid_pgain[x]>>9);
@@ -243,9 +241,7 @@ void evaluatecommand(char portnumber,unsigned char *data)
 		{
 		for (int x=0;x<NUMPIDITEMS;++x)
 			{
-			if (x==YAWINDEX)
-				usersettings.pid_pgain[x]=((fixedpointnum)(*data++))<<5;
-			else if (x==ALTITUDEINDEX)
+			if (x==ALTITUDEINDEX)
 				usersettings.pid_pgain[x]=((fixedpointnum)(*data++))<<6;
 			else if (x==NAVIGATIONINDEX)
 				usersettings.pid_pgain[x]=((fixedpointnum)(*data++))<<9;

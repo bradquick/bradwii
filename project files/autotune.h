@@ -30,7 +30,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #define AUTOTUNEINCREASEMULTIPLIER FIXEDPOINTCONSTANT(1.05)
 #define AUTOTUNEDECREASEMULTIPLIER FIXEDPOINTCONSTANT(.95)
+#define AUTOTUNEMINIMUMIVALUE (1L<<3)
 
-#define YAWGAINMULTIPLIER FIXEDPOINTCONSTANT(3) // yaw p gain is simply set to a multiple of the roll p gain
+#define YAWGAINMULTIPLIER FIXEDPOINTCONSTANT(2.0) // yaw p gain is simply set to a multiple of the roll p gain
 
 void autotune(fixedpointnum *angleerror,unsigned char startingorstopping);

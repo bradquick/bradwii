@@ -25,10 +25,10 @@ a number of improvements.
 
 In order to make the code run quickly on 8 bit processors, much of the math is done using fixed point numbers
 instead of floating point.  Much pain was taken to write almost the entire code without performing any
-division, which is slow. As a result, main loop cycles take well under 2 milliseconds.
+division, which is slow. As a result, main loop cycles can take well under 2 milliseconds.
 
 A second advantage is that I believe that this code is more logically layed out and better commented than 
-other multi-copter code.  It is designed to be easy to follow for the guy who wants to understand better how
+some other multi-copter code.  It is designed to be easy to follow for the guy who wants to understand better how
 the code works and maybe wants to modify it.
 
 In general, I didn't include code that I haven't tested myself, therefore many aircraft configurations, control boards,
@@ -59,8 +59,8 @@ c
 o
 m
 
-
 */
+
 #include "stdio.h"
 #include <avr/io.h>
 #include <avr/interrupt.h> 
@@ -112,9 +112,11 @@ int main(void)
    // try to load usersettings from eeprom
 	readusersettingsfromeeprom();
 	
-   //initialize the libraries
+   // set our LED as a digital output
+   lib_digitalio_initpin(LED1_OUTPUT,DIGITALOUTPUT);
+
+   //initialize the libraries that require initialization
 	lib_timers_init();
-   lib_digitalio_initpin(LED1_OUTPUT,DIGITALOUTPUT); // set pin as an output
 	lib_i2c_init();
    
    // initialize all other modules
@@ -127,15 +129,14 @@ int main(void)
 	initcompass();	
 	initgps();
 	initimu();
-
+   
 	// set the default i2c speed to 400 Mhz.  If a device needs to slow it down, it can, but it should set it back.
 	lib_i2c_setclockspeed(I2C_400_MHZ);
 
 	global.armed=0;
 	global.navigationmode=NAVIGATIONMODEOFF;
-   
    global.failsafetimer=lib_timers_starttimer();
-	
+
 	for(;;) 
 		{
 		// check to see what switches are activated
@@ -175,7 +176,7 @@ int main(void)
 		// turn on or off navigation when appropriate
 		if (global.navigationmode==NAVIGATIONMODEOFF)
 			{
-			if (global.activecheckboxitems & CHECKBOXMASKRETURNTOHOME) // return to home hold switch turned on
+			if (global.activecheckboxitems & CHECKBOXMASKRETURNTOHOME) // return to home switch turned on
 				{
 				navigation_set_destination(global.gps_home_latitude,global.gps_home_longitude);
 				global.navigationmode=NAVIGATIONMODERETURNTOHOME;
@@ -192,6 +193,8 @@ int main(void)
 				|| (global.navigationmode==NAVIGATIONMODEPOSITIONHOLD && !(global.activecheckboxitems & CHECKBOXMASKPOSITIONHOLD)))
 				{
 				global.navigationmode=NAVIGATIONMODEOFF;
+            
+            // we will be turning control back over to the pilot.
 				resetpilotcontrol();
 				}
 			}
@@ -201,38 +204,37 @@ int main(void)
 		readrx();
 
 		
-		// turn on the LED when we are both stable and the gps has 5 satelites or more
+		// turn on the LED when we are stable and the gps has 5 satelites or more
 		#if (GPS_TYPE==NO_GPS)
 			lib_digitalio_setoutput(LED1_OUTPUT, (!global.stable)==LED1_ON);
 		#else
 			lib_digitalio_setoutput(LED1_OUTPUT, (!(global.stable && global.gps_num_satelites>=5))==LED1_ON);
 		#endif
 		
-		// get the angle
+		// get the angle error.  Angle error is the difference between our current attitude and our desired attitude.
+      // It can be set by navigation, or by the pilot, etc.
 		fixedpointnum angleerror[3];
 		
 #if (GPS_TYPE!=NO_GPS)
 		// read the gps
 		unsigned char gotnewgpsreading=readgps();
 
+      // let the pilot control the aircraft.
+      getangleerrorfrompilotinput(angleerror);
+      
 		// if we are navigating, use navigation to determine our desired attitude (tilt angles)
 		if (global.navigationmode!=NAVIGATIONMODEOFF)
 			{ // we are navigating
 			navigation_setangleerror(gotnewgpsreading,angleerror);
 			}
-		else
 #endif
-			{
-			// let the pilot control the aircraft.
-			getangleerrorfrompilotinput(angleerror);
-			}
 
       if (global.rxvalues[THROTTLEINDEX]<FPARMEDMINMOTOROUTPUT)
 			{
-			// don't accumnulate error when we can't correct it
+			// We are probably on the ground. Don't accumnulate error when we can't correct it
 			resetpilotcontrol();
 			
-			// bleed off integrated error
+			// bleed off integrated error by averaging in a value of zero
 			lib_fp_lowpassfilter(&integratedangleerror[ROLLINDEX],0L,global.timesliver>>TIMESLIVEREXTRASHIFT,FIXEDPOINTONEOVERONEFOURTH,0); 
 			lib_fp_lowpassfilter(&integratedangleerror[PITCHINDEX],0L,global.timesliver>>TIMESLIVEREXTRASHIFT,FIXEDPOINTONEOVERONEFOURTH,0);
 			lib_fp_lowpassfilter(&integratedangleerror[YAWINDEX],0L,global.timesliver>>TIMESLIVEREXTRASHIFT,FIXEDPOINTONEOVERONEFOURTH,0);
@@ -243,12 +245,12 @@ int main(void)
 		if (global.activecheckboxitems & CHECKBOXMASKAUTOTUNE)
 			{
 			if (!(global.previousactivecheckboxitems & CHECKBOXMASKAUTOTUNE))
-				autotune(angleerror,AUTOTUNESTARTING);
+				autotune(angleerror,AUTOTUNESTARTING); // tell autotune that we just started autotuning
 			else
-				autotune(angleerror,AUTOTUNETUNING);
+				autotune(angleerror,AUTOTUNETUNING); // tell autotune that we are in the middle of autotuning
 			}
 		else if (global.previousactivecheckboxitems & CHECKBOXMASKAUTOTUNE)
-			autotune(angleerror,AUTOTUNESTOPPING);
+			autotune(angleerror,AUTOTUNESTOPPING); // tell autotune that we just stopped autotuning
 #endif
 
 		// get the pilot's throttle component
@@ -259,24 +261,41 @@ int main(void)
       // uncrashability mode can turn it on.
       unsigned char altitudeholdactive=0;
       
+      if (global.activecheckboxitems & CHECKBOXMASKALTHOLD)
+         {
+         altitudeholdactive=1;
+         if (!(global.previousactivecheckboxitems & CHECKBOXMASKALTHOLD))
+            { // we just turned on alt hold.  Remember our current alt. as our target
+            altitudeholddesiredaltitude=global.altitude;
+            integratedaltitudeerror=0;
+            }
+         }
+         
+      
       // uncrashability mode
       #define UNCRASHABLELOOKAHEADTIME FIXEDPOINTONE // look ahead one second to see if we are going to be at a bad altitude
       #define UNCRASHABLERECOVERYANGLE FIXEDPOINTCONSTANT(15) // don't let the pilot pitch or roll more than 20 degrees when altitude is too low.
       #define FPUNCRASHABLE_RADIUS FIXEDPOINTCONSTANT(UNCRAHSABLE_RADIUS) 
       #define FPUNCRAHSABLE_MAX_ALTITUDE_OFFSET FIXEDPOINTCONSTANT(UNCRAHSABLE_MAX_ALTITUDE_OFFSET)
 #if (GPS_TYPE!=NO_GPS)
-      static unsigned char doinguncrashablenavigationflag=0;
+      // keep a flag that tells us whether uncrashability is doing gps navigation or not
+      static unsigned char doinguncrashablenavigationflag;
 #endif
+      // we need a place to remember what the altitude was when uncrashability mode was turned on
       static fixedpointnum uncrasabilityminimumaltitude;
+      static fixedpointnum uncrasabilitydesiredaltitude;
+      static unsigned char doinguncrashablealtitudehold=0;
       
       if (global.activecheckboxitems & CHECKBOXMASKUNCRASHABLE) // uncrashable mode
          {
          // First, check our altitude
          // are we about to crash?
          if (!(global.previousactivecheckboxitems & CHECKBOXMASKUNCRASHABLE))
-            { // we just turned on uncrashability.  Remember our current alt. as our target
+            { // we just turned on uncrashability.  Remember our current altitude as our new minimum altitude.
             uncrasabilityminimumaltitude=global.altitude;
+            doinguncrashablenavigationflag=0;
 #if (GPS_TYPE!=NO_GPS)
+            // set this location as our new home
             navigation_sethometocurrentlocation();
 #endif
             }
@@ -288,14 +307,22 @@ int main(void)
             { // we are getting too high
             // Use Altitude Hold to bring us back to the maximum altitude.
             altitudeholddesiredaltitude=uncrasabilityminimumaltitude+FPUNCRAHSABLE_MAX_ALTITUDE_OFFSET;
+            integratedaltitudeerror=0;
             altitudeholdactive=1;
             }            
-         else if (projectedaltitude<altitudeholddesiredaltitude)
+         else if (projectedaltitude<uncrasabilityminimumaltitude)
             { // We are about to get below our minimum crashability altitude
+            if (doinguncrashablealtitudehold==0)
+               { // if we just entered uncrashability, set our desired altitude to the current altitude
+               uncrasabilitydesiredaltitude=global.altitude;
+               integratedaltitudeerror=0;
+               doinguncrashablealtitudehold=1;
+               }
+            
             // don't apply throttle until we are almost level
-            if (global.estimateddownvector[ZINDEX]>FIXEDPOINTCONSTANT(.8))
+            if (global.estimateddownvector[ZINDEX]>FIXEDPOINTCONSTANT(.4))
                {
-               altitudeholddesiredaltitude=uncrasabilityminimumaltitude;
+               altitudeholddesiredaltitude=uncrasabilitydesiredaltitude;
                altitudeholdactive=1;
                }
             else throttleoutput=0; // we are trying to rotate to level, kill the throttle until we get there
@@ -304,7 +331,8 @@ int main(void)
             lib_fp_constrain(&angleerror[ROLLINDEX],-UNCRASHABLERECOVERYANGLE-global.currentestimatedeulerattitude[ROLLINDEX],UNCRASHABLERECOVERYANGLE-global.currentestimatedeulerattitude[ROLLINDEX]);
             lib_fp_constrain(&angleerror[PITCHINDEX],-UNCRASHABLERECOVERYANGLE-global.currentestimatedeulerattitude[PITCHINDEX],UNCRASHABLERECOVERYANGLE-global.currentestimatedeulerattitude[PITCHINDEX]);
             }
-            
+         else doinguncrashablealtitudehold=0;
+         
 #if (GPS_TYPE!=NO_GPS)
          // Next, check to see if our GPS says we are out of bounds
          // are we out of bounds?
@@ -328,36 +356,17 @@ int main(void)
 #if (GPS_TYPE!=NO_GPS)
       else doinguncrashablenavigationflag=0;
 #endif
-      
 
-		// calculate output values.  Output values will range from 0 to 1.0
-
-		// calculate pid
-		fixedpointnum pidoutput[3];
-		
-		for (int x=0;x<3;++x)
-			{
-			integratedangleerror[x]+=lib_fp_multiply(angleerror[x],global.timesliver);
-			
-			// don't let the integrated error get too high (windup)
-			lib_fp_constrain(&integratedangleerror[x],-INTEGRATEDANGLEERRORLIMIT,INTEGRATEDANGLEERRORLIMIT);
-			
-			// do the attitude pid
-			pidoutput[x]=lib_fp_multiply(angleerror[x],usersettings.pid_pgain[x])
-				-lib_fp_multiply(global.gyrorate[x],usersettings.pid_dgain[x])
-				+(lib_fp_multiply(integratedangleerror[x],usersettings.pid_igain[x])>>4);
-			}
-
-      if (global.activecheckboxitems & CHECKBOXMASKALTHOLD)
+      // if we don't hear from the receiver for over a second, try to land safely
+      if (lib_timers_gettimermicroseconds(global.failsafetimer)>1000000L)
          {
-         altitudeholdactive=1;
-         if (!(global.previousactivecheckboxitems & CHECKBOXMASKALTHOLD))
-            { // we just turned on alt hold.  Remember our current alt. as our target
-            altitudeholddesiredaltitude=global.altitude;
-            integratedaltitudeerror=0;
-            }
+         throttleoutput=FPFAILSAFEMOTOROUTPUT;
+
+         // make sure we are level!
+         angleerror[ROLLINDEX]=-global.currentestimatedeulerattitude[ROLLINDEX];
+         angleerror[PITCHINDEX]=-global.currentestimatedeulerattitude[PITCHINDEX];
          }
-         
+
 #if (BAROMETER_TYPE!=NO_BAROMETER)
       // check for altitude hold and adjust the throttle output accordingly
 		if (altitudeholdactive)
@@ -391,16 +400,24 @@ int main(void)
             throttleoutput=lib_fp_multiply(throttleoutput-AUTOTHROTTLEDEADAREA,recriprocal)+AUTOTHROTTLEDEADAREA;
             }
          }
-         
-      // if we don't hear from the receiver for over a second, try to land safely
-      if (lib_timers_gettimermicroseconds(global.failsafetimer)>1000000L)
-         {
-         throttleoutput=FPFAILSAFEMOTOROUTPUT;
 
-         // make sure we are level!
-         angleerror[ROLLINDEX]=-global.currentestimatedeulerattitude[ROLLINDEX];
-         angleerror[PITCHINDEX]=-global.currentestimatedeulerattitude[PITCHINDEX];
-         }
+		// calculate output values.  Output values will range from 0 to 1.0
+
+		// calculate pid outputs based on our angleerrors as inputs
+		fixedpointnum pidoutput[3];
+		
+		for (int x=0;x<3;++x)
+			{
+			integratedangleerror[x]+=lib_fp_multiply(angleerror[x],global.timesliver);
+			
+			// don't let the integrated error get too high (windup)
+			lib_fp_constrain(&integratedangleerror[x],-INTEGRATEDANGLEERRORLIMIT,INTEGRATEDANGLEERRORLIMIT);
+			
+			// do the attitude pid
+			pidoutput[x]=lib_fp_multiply(angleerror[x],usersettings.pid_pgain[x])
+				-lib_fp_multiply(global.gyrorate[x],usersettings.pid_dgain[x])
+				+(lib_fp_multiply(integratedangleerror[x],usersettings.pid_igain[x])>>4);
+			}
 
       lib_fp_constrain(&throttleoutput,0,FIXEDPOINTONE);
 
@@ -428,13 +445,12 @@ void defaultusersettings()
 	// set default PID settings
 	for (int x=0;x<3;++x)
 		{
-		usersettings.pid_pgain[x]=28L<<3; // 2.8 on configurator
-		usersettings.pid_igain[x]=20L;     // .020 on configurator
-		usersettings.pid_dgain[x]=15L<<2;     // 15 on configurator
+		usersettings.pid_pgain[x]=20L<<3; // 2.0 on configurator
+		usersettings.pid_igain[x]=4L;     // .004 on configurator
+		usersettings.pid_dgain[x]=8L<<2;     // 15 on configurator
 		}
 
-	usersettings.pid_pgain[YAWINDEX]=20L<<5; // 2 on configurator
-	usersettings.pid_dgain[YAWINDEX]=15L<<2; // 15 on configurator
+	usersettings.pid_pgain[YAWINDEX]=40L<<3; // 4 on configurator
 	
 	for (int x=3;x<NUMPIDITEMS;++x)
 		{

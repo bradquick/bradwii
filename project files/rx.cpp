@@ -140,18 +140,14 @@ void readrx()
 		}
 	}
 
-#elif (RX_TYPE==RX_DSM2 || RX_TYPE==RX_DSM2_11BIT)
+#elif (RX_TYPE==RX_DSM2_1024 || RX_TYPE==RX_DSM2_2048)
 
-#if (RX_TYPE==RX_DSM2)
+#if (RX_TYPE==RX_DSM2_1024)
 	#define DSM2_CHAN_SHIFT  2       // Assumes 10 bit frames, that is 1024 mode.
 	#define DSM2_CHAN_MASK   0x03    // Assumes 10 bit frames, that is 1024 mode.
-	#define DSM2_DATA_SHIFT 0        // Assumes 10 bit frames, that is 1024 mode.
-	#define DSM2_BIND_PULSES 3
 #else
 	#define DSM2_CHAN_SHIFT  3       // Assumes 11 bit frames, that is 2048 mode.
 	#define DSM2_CHAN_MASK   0x07    // Assumes 11 bit frames, that is 2048 mode.
-	#define DSM2_DATA_SHIFT >> 1     // Assumes 11 bit frames, that is 2048 mode.
-	#define DSM2_BIND_PULSES 5
 #endif
 
 #define DSM2_BAUD 115200L
@@ -173,11 +169,11 @@ void dsm2serialcallback(unsigned char c)
 	// getting new data.
 	unsigned long microsecondssincelastchar=lib_timers_gettimermicrosecondsandreset(&dsm2timer);
 	if (microsecondssincelastchar>5000)
-		{ // this is a new packet
+		{ // this is a new packet.  Skip this first byte
 		dsm2state=DSM2STATE_NEWFRAMESARTED;
 		}
 	else if (dsm2state==DSM2STATE_NEWFRAMESARTED)
-		{
+		{ // skip the 2nd byte too
 		dsm2state=DSM2STATE_WAITINGFORFIRSTCHAR;
 		}
 	else if (dsm2state==DSM2STATE_WAITINGFORFIRSTCHAR)
@@ -209,7 +205,7 @@ void readrx()
 	{
 	for (int x=0;x<RXNUMCHANNELS;++x)
 		{
-#if (RX_TYPE==RX_DSM2)
+#if (RX_TYPE==RX_DSM2_1024)
 		// convert from 0-1024 range to -1 to 1 fixedpointnum range and low pass filter to remove glitches
 		lib_fp_lowpassfilter(&global.rxvalues[x], ((fixedpointnum)rxrawvalues[x]-512)<<7, global.timesliver, FIXEDPOINTONEOVERONESIXTYITH, TIMESLIVEREXTRASHIFT);
 #else

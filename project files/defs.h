@@ -41,7 +41,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 	#ifndef GPS_TYPE
 		#define GPS_TYPE SERIAL_GPS
 	#endif
-	#if (RX_TYPE==RX_DSM2 && !defined(RX_DSM2_SERIAL_PORT))
+	#if ((RX_TYPE==RX_DSM2_1024 || RX_TYPE==RX_DSM2_2048) && !defined(RX_DSM2_SERIAL_PORT))
 		#define RX_DSM2_SERIAL_PORT 1
 	#endif
 	
@@ -64,7 +64,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 	#ifndef GPS_TYPE
 		#define GPS_TYPE NO_GPS
 	#endif
-	#if (RX_TYPE==RX_DSM2 && !defined(RX_DSM2_SERIAL_PORT))
+	#if ((RX_TYPE==RX_DSM2_1024 || RX_TYPE==RX_DSM2_2048) && !defined(RX_DSM2_SERIAL_PORT))
 		#define RX_DSM2_SERIAL_PORT 0
 	#endif
 
@@ -87,7 +87,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 	#ifndef GPS_TYPE
 		#define GPS_TYPE NO_GPS
 	#endif
-	#if (RX_TYPE==RX_DSM2 && !defined(RX_DSM2_SERIAL_PORT))
+	#if ((RX_TYPE==RX_DSM2_1024 || RX_TYPE==RX_DSM2_2048) && !defined(RX_DSM2_SERIAL_PORT))
 		#define RX_DSM2_SERIAL_PORT 1
 	#endif
 	
@@ -96,7 +96,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #endif
 
 #ifndef RXNUMCHANNELS
-	#define RXNUMCHANNELS 6
+   #if (RX_TYPE==RX_DSM2_1024 || RX_TYPE==RX_DSM2_2048)
+      #define RXNUMCHANNELS 8
+   #else
+      #define RXNUMCHANNELS 6
+   #endif
 #endif
 
 // set microcontroller dependant defines here

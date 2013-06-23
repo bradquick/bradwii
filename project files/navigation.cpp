@@ -187,11 +187,13 @@ void navigation_setangleerror(unsigned char gotnewgpsreading,fixedpointnum *angl
    // set the angle error as the difference between where we want to be and where we currently are angle wise.
 	angleerror[ROLLINDEX]=navigation_desiredeulerattitude[ROLLINDEX]-global.currentestimatedeulerattitude[ROLLINDEX];
 	angleerror[PITCHINDEX]=navigation_desiredeulerattitude[PITCHINDEX]-global.currentestimatedeulerattitude[PITCHINDEX];
-	angleerror[YAWINDEX]=navigation_desiredeulerattitude[YAWINDEX]-global.currentestimatedeulerattitude[YAWINDEX];
+
+   // don't set the yaw.  Let the pilot do yaw
+//	angleerror[YAWINDEX]=navigation_desiredeulerattitude[YAWINDEX]-global.currentestimatedeulerattitude[YAWINDEX];
 
    // don't let the yaw angle error get too large for any one cycle in order to control the maximum yaw rate.
-   lib_fp_constrain180(&angleerror[YAWINDEX]);
-   lib_fp_constrain(&angleerror[YAWINDEX],-MAXYAWANGLEERROR,MAXYAWANGLEERROR);
+//   lib_fp_constrain180(&angleerror[YAWINDEX]);
+//   lib_fp_constrain(&angleerror[YAWINDEX],-MAXYAWANGLEERROR,MAXYAWANGLEERROR);
 	}
 	
 #endif

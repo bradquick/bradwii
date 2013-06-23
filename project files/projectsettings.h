@@ -46,7 +46,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define SERIAL3INPUTBUFFERSIZE 64
 #endif
 
-#if (RX_TYPE==RX_DSM2)
+#if (RX_TYPE==RX_DSM2_1024 || RX_TYPE==RX_DSM2_2048)
 
 #if (RX_DSM2_SERIAL_PORT==0)
 	#define USESERIALPORT0
