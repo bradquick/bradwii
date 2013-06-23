@@ -223,16 +223,16 @@ void evaluatecommand(char portnumber,unsigned char *data)
 		for (int x=0;x<NUMPIDITEMS;++x)
 			{
 			if (x==ALTITUDEINDEX)
-				sendandchecksumcharacter(portnumber,usersettings.pid_pgain[x]>>6);
+				sendandchecksumcharacter(portnumber,usersettings.pid_pgain[x]>>7);
 			else if (x==NAVIGATIONINDEX)
-				sendandchecksumcharacter(portnumber,usersettings.pid_pgain[x]>>9);
+				sendandchecksumcharacter(portnumber,usersettings.pid_pgain[x]>>11);
 			else
 				sendandchecksumcharacter(portnumber,usersettings.pid_pgain[x]>>3);
 			sendandchecksumcharacter(portnumber,usersettings.pid_igain[x]);
 			if (x==NAVIGATIONINDEX)
 				sendandchecksumcharacter(portnumber,usersettings.pid_dgain[x]>>8);
 			else if (x==ALTITUDEINDEX)
-				sendandchecksumcharacter(portnumber,usersettings.pid_dgain[x]>>6);
+				sendandchecksumcharacter(portnumber,usersettings.pid_dgain[x]>>9);
 			else
 				sendandchecksumcharacter(portnumber,usersettings.pid_dgain[x]>>2);
 			}
@@ -242,16 +242,16 @@ void evaluatecommand(char portnumber,unsigned char *data)
 		for (int x=0;x<NUMPIDITEMS;++x)
 			{
 			if (x==ALTITUDEINDEX)
-				usersettings.pid_pgain[x]=((fixedpointnum)(*data++))<<6;
+				usersettings.pid_pgain[x]=((fixedpointnum)(*data++))<<7;
 			else if (x==NAVIGATIONINDEX)
-				usersettings.pid_pgain[x]=((fixedpointnum)(*data++))<<9;
+				usersettings.pid_pgain[x]=((fixedpointnum)(*data++))<<11;
 			else
 				usersettings.pid_pgain[x]=((fixedpointnum)(*data++))<<3;
 			usersettings.pid_igain[x]=((fixedpointnum)(*data++));
 			if (x==NAVIGATIONINDEX)
 				usersettings.pid_dgain[x]=((fixedpointnum)(*data++))<<8;
 			else if (x==ALTITUDEINDEX)
-				usersettings.pid_dgain[x]=((fixedpointnum)(*data++))<<6;
+				usersettings.pid_dgain[x]=((fixedpointnum)(*data++))<<9;
 			else
 				usersettings.pid_dgain[x]=((fixedpointnum)(*data++))<<2;
 

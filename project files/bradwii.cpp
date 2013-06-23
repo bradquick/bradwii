@@ -357,16 +357,6 @@ int main(void)
       else doinguncrashablenavigationflag=0;
 #endif
 
-      // if we don't hear from the receiver for over a second, try to land safely
-      if (lib_timers_gettimermicroseconds(global.failsafetimer)>1000000L)
-         {
-         throttleoutput=FPFAILSAFEMOTOROUTPUT;
-
-         // make sure we are level!
-         angleerror[ROLLINDEX]=-global.currentestimatedeulerattitude[ROLLINDEX];
-         angleerror[PITCHINDEX]=-global.currentestimatedeulerattitude[PITCHINDEX];
-         }
-
 #if (BAROMETER_TYPE!=NO_BAROMETER)
       // check for altitude hold and adjust the throttle output accordingly
 		if (altitudeholdactive)
@@ -399,6 +389,16 @@ int main(void)
          
             throttleoutput=lib_fp_multiply(throttleoutput-AUTOTHROTTLEDEADAREA,recriprocal)+AUTOTHROTTLEDEADAREA;
             }
+         }
+
+      // if we don't hear from the receiver for over a second, try to land safely
+      if (lib_timers_gettimermicroseconds(global.failsafetimer)>1000000L)
+         {
+         throttleoutput=FPFAILSAFEMOTOROUTPUT;
+
+         // make sure we are level!
+         angleerror[ROLLINDEX]=-global.currentestimatedeulerattitude[ROLLINDEX];
+         angleerror[PITCHINDEX]=-global.currentestimatedeulerattitude[PITCHINDEX];
          }
 
 		// calculate output values.  Output values will range from 0 to 1.0
@@ -439,18 +439,18 @@ void defaultusersettings()
 	global.usersettingsfromeeprom=0; // this should get set to one if we read from eeprom
 	
 	// set default acro mode rotation rates
-	usersettings.maxyawrate=125L<<FIXEDPOINTSHIFT; // degrees per second
-	usersettings.maxpitchandrollrate=250L<<FIXEDPOINTSHIFT; // degrees per second
+	usersettings.maxyawrate=200L<<FIXEDPOINTSHIFT; // degrees per second
+	usersettings.maxpitchandrollrate=400L<<FIXEDPOINTSHIFT; // degrees per second
 
 	// set default PID settings
 	for (int x=0;x<3;++x)
 		{
-		usersettings.pid_pgain[x]=20L<<3; // 2.0 on configurator
-		usersettings.pid_igain[x]=4L;     // .004 on configurator
-		usersettings.pid_dgain[x]=8L<<2;     // 15 on configurator
+		usersettings.pid_pgain[x]=15L<<3; // 1.5 on configurator
+		usersettings.pid_igain[x]=8L;     // .008 on configurator
+		usersettings.pid_dgain[x]=8L<<2;     // 8 on configurator
 		}
 
-	usersettings.pid_pgain[YAWINDEX]=40L<<3; // 4 on configurator
+	usersettings.pid_pgain[YAWINDEX]=30L<<3; // 3 on configurator
 	
 	for (int x=3;x<NUMPIDITEMS;++x)
 		{
@@ -459,11 +459,11 @@ void defaultusersettings()
 		usersettings.pid_dgain[x]=0;
 		}
 	
-	usersettings.pid_pgain[ALTITUDEINDEX]=50L<<6; // 5.0 on configurator
-	usersettings.pid_dgain[ALTITUDEINDEX]=6L<<6;     // 6 on configurator
+	usersettings.pid_pgain[ALTITUDEINDEX]=27L<<7; // 2.7 on configurator
+	usersettings.pid_dgain[ALTITUDEINDEX]=6L<<9;     // 6 on configurator
 
-	usersettings.pid_pgain[NAVIGATIONINDEX]=30L<<9; // 3.0 on configurator
-	usersettings.pid_dgain[NAVIGATIONINDEX]=100L<<8;     // .100 on configurator
+	usersettings.pid_pgain[NAVIGATIONINDEX]=25L<<11; // 2.5 on configurator
+	usersettings.pid_dgain[NAVIGATIONINDEX]=188L<<8;     // .188 on configurator
 	
 	// set default configuration checkbox settings.
 	for (int x=0;x<NUMPOSSIBLECHECKBOXES;++x)

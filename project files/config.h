@@ -65,8 +65,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define MIN_MOTOR_OUTPUT 1000
 #define MAX_MOTOR_OUTPUT 2000
 #define ARMED_MIN_MOTOR_OUTPUT 1067 // motors spin slowly when armed
-//#define ARMED_MIN_MOTOR_OUTPUT 1090 // motors spin slowly when armed
-#define FAILSAFE_MOTOR_OUTPUT 1100 // throttle setting for bringing the aircraft down at a safe speed
+#define FAILSAFE_MOTOR_OUTPUT 1200 // throttle setting for bringing the aircraft down at a safe speed
 
 // Divide the Aux inputs into low, medium, and high using the following divisions
 #define AUX_MID_RANGE_LOW 1300
