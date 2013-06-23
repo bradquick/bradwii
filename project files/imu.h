@@ -17,7 +17,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "lib_fp.h"
 
-	
+   
 void initimu();
 void imucalculateestimatedattitude();
 void calibrategyroandaccelerometer();

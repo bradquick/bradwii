@@ -94,13 +94,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define RX_TYPE RX_DSM2_2048
 #define RX_DSM2_SERIAL_PORT 1
 
-// uncomment and set the number of RX channels, otherwise it will default to what the control board/receiver can handle
+// uncomment to set the number of RX channels, otherwise it will default to what the control board/receiver can handle
 //#define RXNUMCHANNELS 8
 
 // un-comment if you don't want to include autotune code
 //#define NO_AUTOTUNE
 // To adjust how agressive the tuning is, adjust the AUTOTUNEMAXOSCILLATION value.  A larger
-// value will result in more agressive tuning.
+// value will result in more agressive tuning. A lower value will result in softer tuning.
 // It will rock back and forth between -AUTOTUNE_TARGET_ANGLE and AUTOTUNE_TARGET_ANGLE degrees
 #define AUTOTUNE_MAX_OSCILLATION 4.0
 #define AUTOTUNE_TARGET_ANGLE 20.0 

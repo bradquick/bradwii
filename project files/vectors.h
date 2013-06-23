@@ -21,10 +21,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 // an attitude is defined as first a rotation from north, then a 3d vector that points down (gravity) from the rotated reference.
 typedef struct
-	{
-	fixedpointnum westvector[3];
-	fixedpointnum downvector[3];
-	} attitudestruct;
+   {
+   fixedpointnum westvector[3];
+   fixedpointnum downvector[3];
+   } attitudestruct;
 
 void vectorcrossproduct(fixedpointnum *v1,fixedpointnum *v2,fixedpointnum *v3);
 fixedpointnum normalizevector(fixedpointnum *v);

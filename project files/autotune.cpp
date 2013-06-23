@@ -27,15 +27,15 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
 // So, after we reach the target, then wait a little longer to record the peak oscillation, we have four choices:
 // if (overshoot)
-//		{
-//		if (too much oscillation) decrease P
-//		else increase D
-//		}
-//	else // undershoot
-//		{ 
-//		if (too much oscillation) decrease D
-//		else increase P
-//		}
+//      {
+//      if (too much oscillation) decrease P
+//      else increase D
+//      }
+//   else // undershoot
+//      { 
+//      if (too much oscillation) decrease D
+//      else increase P
+//      }
 
 
 #include "config.h"
@@ -65,127 +65,127 @@ fixedpointnum testvalue=0;
 char cyclecount=1;
 
 void autotune(fixedpointnum *angleerror,unsigned char startingorstopping)
-	{
-	if (!global.armed)
-		{
-		// we aren't armed.  Don't do anything, but if autotuning is started, save our settings to eeprom
-		if (startingorstopping==AUTOTUNESTARTING)
-			writeusersettingstoeeprom();
+   {
+   if (!global.armed)
+      {
+      // we aren't armed.  Don't do anything, but if autotuning is started, save our settings to eeprom
+      if (startingorstopping==AUTOTUNESTARTING)
+         writeusersettingstoeeprom();
 
-		return;
-		}
-		
-	if (startingorstopping==AUTOTUNESTOPPING)
-		{
-		usersettings.pid_igain[autotuneindex]=currentivalue;
-		
-		usersettings.pid_igain[YAWINDEX]=usersettings.pid_igain[ROLLINDEX];
-		usersettings.pid_dgain[YAWINDEX]=usersettings.pid_dgain[ROLLINDEX];
-		usersettings.pid_pgain[YAWINDEX]=lib_fp_multiply(usersettings.pid_pgain[ROLLINDEX],YAWGAINMULTIPLIER);
+      return;
+      }
+      
+   if (startingorstopping==AUTOTUNESTOPPING)
+      {
+      usersettings.pid_igain[autotuneindex]=currentivalue;
+      
+      usersettings.pid_igain[YAWINDEX]=usersettings.pid_igain[ROLLINDEX];
+      usersettings.pid_dgain[YAWINDEX]=usersettings.pid_dgain[ROLLINDEX];
+      usersettings.pid_pgain[YAWINDEX]=lib_fp_multiply(usersettings.pid_pgain[ROLLINDEX],YAWGAINMULTIPLIER);
 
-		autotuneindex=!autotuneindex; // alternate between roll and pitch
-		return;
-		}
+      autotuneindex=!autotuneindex; // alternate between roll and pitch
+      return;
+      }
 
-	if (startingorstopping==AUTOTUNESTARTING)
-		{
-		currentivalue=usersettings.pid_igain[autotuneindex];
-		usersettings.pid_igain[autotuneindex]=0;
-		cyclecount=1;
-		sawfirstpeak=0;
-		rising=0;
-		targetangle=-FPAUTOTUNETARGETANGLE;
-		}
-	else
-		{
-		if (!sawfirstpeak)
-			{
-			if ((rising && global.currentestimatedeulerattitude[autotuneindex]>0 && global.gyrorate[autotuneindex]<0) // we have changed direction
-				|| (!rising && global.currentestimatedeulerattitude[autotuneindex]<0 && global.gyrorate[autotuneindex]>0))
-				{
-				if (cyclecount==0) // we are checking the I value
-					{
-					autotunepeak1=global.currentestimatedeulerattitude[autotuneindex]-targetangle;
-					if (!rising) autotunepeak1=-autotunepeak1;
+   if (startingorstopping==AUTOTUNESTARTING)
+      {
+      currentivalue=usersettings.pid_igain[autotuneindex];
+      usersettings.pid_igain[autotuneindex]=0;
+      cyclecount=1;
+      sawfirstpeak=0;
+      rising=0;
+      targetangle=-FPAUTOTUNETARGETANGLE;
+      }
+   else
+      {
+      if (!sawfirstpeak)
+         {
+         if ((rising && global.currentestimatedeulerattitude[autotuneindex]>0 && global.gyrorate[autotuneindex]<0) // we have changed direction
+            || (!rising && global.currentestimatedeulerattitude[autotuneindex]<0 && global.gyrorate[autotuneindex]>0))
+            {
+            if (cyclecount==0) // we are checking the I value
+               {
+               autotunepeak1=global.currentestimatedeulerattitude[autotuneindex]-targetangle;
+               if (!rising) autotunepeak1=-autotunepeak1;
 
-					if (autotunepeak1<(FPAUTOTUNEMAXOSCILLATION>>1))
-						currentivalue=lib_fp_multiply(currentivalue,AUTOTUNEINCREASEMULTIPLIER);
-					else
-						{
+               if (autotunepeak1<(FPAUTOTUNEMAXOSCILLATION>>1))
+                  currentivalue=lib_fp_multiply(currentivalue,AUTOTUNEINCREASEMULTIPLIER);
+               else
+                  {
                   currentivalue=lib_fp_multiply(currentivalue,AUTOTUNEDECREASEMULTIPLIER);
                   if (currentivalue<AUTOTUNEMINIMUMIVALUE) currentivalue=AUTOTUNEMINIMUMIVALUE;
                   }
-					
-					// go back to checking P and D
-					cyclecount=1;
-					rising=!rising;
-					}
-				else // we are checking P and D values
-					{
-					targetangleatpeak=targetangle;
-					autotunepeak2=autotunepeak1=global.currentestimatedeulerattitude[autotuneindex];
-			
-					sawfirstpeak=1;
-					autotunetime=0;
-					usersettings.pid_igain[autotuneindex]=0;
-					}
-				}
-			}
-		else // we saw the first peak. looking for the second
-			{
-			if ((rising && global.currentestimatedeulerattitude[autotuneindex]<autotunepeak2)
-				|| (!rising && global.currentestimatedeulerattitude[autotuneindex]>autotunepeak2))
-				autotunepeak2=global.currentestimatedeulerattitude[autotuneindex];
-				
-			autotunetime+=global.timesliver;
-	
-			if (autotunetime>AUTOTUNESETTLINGTIME)
-				{
-				if (!rising)
-					{
-					autotunepeak1=-autotunepeak1;
-					autotunepeak2=-autotunepeak2;
-					targetangleatpeak=-targetangleatpeak;
-					}
-			
-				fixedpointnum oscillationamplitude=autotunepeak1-autotunepeak2;
-			
-				// analyze the data
-				// Our goal is to have zero overshoot and to have AUTOTUNEMAXOSCILLATION amplitude
-				if (autotunepeak1>targetangleatpeak) // overshoot
-					{
-					if (oscillationamplitude>FPAUTOTUNEMAXOSCILLATION) // we have too much oscillation, so we can't increase D, so decrease P
-						usersettings.pid_pgain[autotuneindex]=lib_fp_multiply(usersettings.pid_pgain[autotuneindex], AUTOTUNEDECREASEMULTIPLIER);
-					else // we don't have too much oscillation, so we can increase D
-						usersettings.pid_dgain[autotuneindex]=lib_fp_multiply(usersettings.pid_dgain[autotuneindex], AUTOTUNEINCREASEMULTIPLIER);
-					}
-				else // undershoot
-					{
-					if (oscillationamplitude>FPAUTOTUNEMAXOSCILLATION) // we have too much oscillation, so we should lower D
-						usersettings.pid_dgain[autotuneindex]=lib_fp_multiply(usersettings.pid_dgain[autotuneindex], AUTOTUNEDECREASEMULTIPLIER);
-					else // we don't have too much oscillation, so we increase P
-						usersettings.pid_pgain[autotuneindex]=lib_fp_multiply(usersettings.pid_pgain[autotuneindex], AUTOTUNEINCREASEMULTIPLIER);
-					}
-				
-				// switch to the other direction and start a new cycle
-				rising=!rising;
-				sawfirstpeak=0;
-			
-				if (++cyclecount==3)
-					{ // switch to testing I value
-					cyclecount=0;
-				
-					usersettings.pid_igain[autotuneindex]=currentivalue;
-					}
-				}
-			}
-		}
-	
-	if (rising) targetangle=global.rxvalues[autotuneindex]*20L+FPAUTOTUNETARGETANGLE;
-	else targetangle=global.rxvalues[autotuneindex]*20L-FPAUTOTUNETARGETANGLE;
-	
-	// override the angle error for the axis we are tuning
-	angleerror[autotuneindex]=targetangle-global.currentestimatedeulerattitude[autotuneindex];
-	}
+               
+               // go back to checking P and D
+               cyclecount=1;
+               rising=!rising;
+               }
+            else // we are checking P and D values
+               {
+               targetangleatpeak=targetangle;
+               autotunepeak2=autotunepeak1=global.currentestimatedeulerattitude[autotuneindex];
+         
+               sawfirstpeak=1;
+               autotunetime=0;
+               usersettings.pid_igain[autotuneindex]=0;
+               }
+            }
+         }
+      else // we saw the first peak. looking for the second
+         {
+         if ((rising && global.currentestimatedeulerattitude[autotuneindex]<autotunepeak2)
+            || (!rising && global.currentestimatedeulerattitude[autotuneindex]>autotunepeak2))
+            autotunepeak2=global.currentestimatedeulerattitude[autotuneindex];
+            
+         autotunetime+=global.timesliver;
+   
+         if (autotunetime>AUTOTUNESETTLINGTIME)
+            {
+            if (!rising)
+               {
+               autotunepeak1=-autotunepeak1;
+               autotunepeak2=-autotunepeak2;
+               targetangleatpeak=-targetangleatpeak;
+               }
+         
+            fixedpointnum oscillationamplitude=autotunepeak1-autotunepeak2;
+         
+            // analyze the data
+            // Our goal is to have zero overshoot and to have AUTOTUNEMAXOSCILLATION amplitude
+            if (autotunepeak1>targetangleatpeak) // overshoot
+               {
+               if (oscillationamplitude>FPAUTOTUNEMAXOSCILLATION) // we have too much oscillation, so we can't increase D, so decrease P
+                  usersettings.pid_pgain[autotuneindex]=lib_fp_multiply(usersettings.pid_pgain[autotuneindex], AUTOTUNEDECREASEMULTIPLIER);
+               else // we don't have too much oscillation, so we can increase D
+                  usersettings.pid_dgain[autotuneindex]=lib_fp_multiply(usersettings.pid_dgain[autotuneindex], AUTOTUNEINCREASEMULTIPLIER);
+               }
+            else // undershoot
+               {
+               if (oscillationamplitude>FPAUTOTUNEMAXOSCILLATION) // we have too much oscillation, so we should lower D
+                  usersettings.pid_dgain[autotuneindex]=lib_fp_multiply(usersettings.pid_dgain[autotuneindex], AUTOTUNEDECREASEMULTIPLIER);
+               else // we don't have too much oscillation, so we increase P
+                  usersettings.pid_pgain[autotuneindex]=lib_fp_multiply(usersettings.pid_pgain[autotuneindex], AUTOTUNEINCREASEMULTIPLIER);
+               }
+            
+            // switch to the other direction and start a new cycle
+            rising=!rising;
+            sawfirstpeak=0;
+         
+            if (++cyclecount==3)
+               { // switch to testing I value
+               cyclecount=0;
+            
+               usersettings.pid_igain[autotuneindex]=currentivalue;
+               }
+            }
+         }
+      }
+   
+   if (rising) targetangle=global.rxvalues[autotuneindex]*20L+FPAUTOTUNETARGETANGLE;
+   else targetangle=global.rxvalues[autotuneindex]*20L-FPAUTOTUNETARGETANGLE;
+   
+   // override the angle error for the axis we are tuning
+   angleerror[autotuneindex]=targetangle-global.currentestimatedeulerattitude[autotuneindex];
+   }
 
 #endif

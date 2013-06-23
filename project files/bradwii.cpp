@@ -37,13 +37,13 @@ components that they need.
 
 If you find the code useful, I'd love to hear from you.  Email me at the address that's shown vertically below:
 
-b        I made my
-r			email address
-a			vertical so
-d			the spam bots
-@			won't figure
-j			it out.
-a			- Thanks.
+b         I made my
+r         email address
+a         vertical so
+d         the spam bots
+@         won't figure
+j         it out.
+a         - Thanks.
 m
 e
 s
@@ -106,156 +106,156 @@ unsigned long timeslivertimer=0;
 
 // It all starts here:
 int main(void)
-	{
+   {
    // start with default user settings in case there's nothing in eeprom
-	defaultusersettings();
+   defaultusersettings();
    // try to load usersettings from eeprom
-	readusersettingsfromeeprom();
-	
+   readusersettingsfromeeprom();
+   
    // set our LED as a digital output
    lib_digitalio_initpin(LED1_OUTPUT,DIGITALOUTPUT);
 
    //initialize the libraries that require initialization
-	lib_timers_init();
-	lib_i2c_init();
+   lib_timers_init();
+   lib_i2c_init();
    
    // initialize all other modules
-	initrx();
-	initoutputs();
-	serialinit();	
-	initgyro();
-	initacc();
-	initbaro();
-	initcompass();	
-	initgps();
-	initimu();
+   initrx();
+   initoutputs();
+   serialinit();   
+   initgyro();
+   initacc();
+   initbaro();
+   initcompass();   
+   initgps();
+   initimu();
    
-	// set the default i2c speed to 400 Mhz.  If a device needs to slow it down, it can, but it should set it back.
-	lib_i2c_setclockspeed(I2C_400_MHZ);
+   // set the default i2c speed to 400 Mhz.  If a device needs to slow it down, it can, but it should set it back.
+   lib_i2c_setclockspeed(I2C_400_MHZ);
 
-	global.armed=0;
-	global.navigationmode=NAVIGATIONMODEOFF;
+   global.armed=0;
+   global.navigationmode=NAVIGATIONMODEOFF;
    global.failsafetimer=lib_timers_starttimer();
 
-	for(;;) 
-		{
-		// check to see what switches are activated
-		checkcheckboxitems();
-		
-		// check for config program activity
-		serialcheckforaction();	
-		
-		// load global.timesliver with the amount of time that has passed since we last went through this loop
-		// convert from microseconds to fixedpointnum seconds shifted by TIMESLIVEREXTRASHIFT
-		// 4295L is (FIXEDPOINTONE<<FIXEDPOINTSHIFT)*.000001
-		global.timesliver=(lib_timers_gettimermicrosecondsandreset(&timeslivertimer)*4295L)>>(FIXEDPOINTSHIFT-TIMESLIVEREXTRASHIFT);
-	
-		// don't allow big jumps in time because of something slowing the update loop down (should never happen anyway)
-		if (global.timesliver>(FIXEDPOINTONEFIFTIETH<<TIMESLIVEREXTRASHIFT)) global.timesliver=FIXEDPOINTONEFIFTIETH<<TIMESLIVEREXTRASHIFT;
-		
-		// run the imu to estimate the current attitude of the aircraft
-		imucalculateestimatedattitude();
+   for(;;) 
+      {
+      // check to see what switches are activated
+      checkcheckboxitems();
+      
+      // check for config program activity
+      serialcheckforaction();   
+      
+      // load global.timesliver with the amount of time that has passed since we last went through this loop
+      // convert from microseconds to fixedpointnum seconds shifted by TIMESLIVEREXTRASHIFT
+      // 4295L is (FIXEDPOINTONE<<FIXEDPOINTSHIFT)*.000001
+      global.timesliver=(lib_timers_gettimermicrosecondsandreset(&timeslivertimer)*4295L)>>(FIXEDPOINTSHIFT-TIMESLIVEREXTRASHIFT);
+   
+      // don't allow big jumps in time because of something slowing the update loop down (should never happen anyway)
+      if (global.timesliver>(FIXEDPOINTONEFIFTIETH<<TIMESLIVEREXTRASHIFT)) global.timesliver=FIXEDPOINTONEFIFTIETH<<TIMESLIVEREXTRASHIFT;
+      
+      // run the imu to estimate the current attitude of the aircraft
+      imucalculateestimatedattitude();
 
-		// arm and disarm via rx aux switches
-		if (global.rxvalues[THROTTLEINDEX]<FPARMEDMINMOTOROUTPUT)
-			{ // see if we want to change armed modes
-			if (!global.armed)
-				{
-				if (global.activecheckboxitems & CHECKBOXMASKARM)
-					{
-					global.armed=1;
-					#if (GPS_TYPE!=NO_GPS)
-						navigation_sethometocurrentlocation();
-					#endif
-					}
-				}
-			else if (!(global.activecheckboxitems & CHECKBOXMASKARM)) global.armed=0;
-			}
+      // arm and disarm via rx aux switches
+      if (global.rxvalues[THROTTLEINDEX]<FPARMEDMINMOTOROUTPUT)
+         { // see if we want to change armed modes
+         if (!global.armed)
+            {
+            if (global.activecheckboxitems & CHECKBOXMASKARM)
+               {
+               global.armed=1;
+               #if (GPS_TYPE!=NO_GPS)
+                  navigation_sethometocurrentlocation();
+               #endif
+               }
+            }
+         else if (!(global.activecheckboxitems & CHECKBOXMASKARM)) global.armed=0;
+         }
 
-		#if (GPS_TYPE!=NO_GPS)
-		// turn on or off navigation when appropriate
-		if (global.navigationmode==NAVIGATIONMODEOFF)
-			{
-			if (global.activecheckboxitems & CHECKBOXMASKRETURNTOHOME) // return to home switch turned on
-				{
-				navigation_set_destination(global.gps_home_latitude,global.gps_home_longitude);
-				global.navigationmode=NAVIGATIONMODERETURNTOHOME;
-				}
-			else if (global.activecheckboxitems & CHECKBOXMASKPOSITIONHOLD) // position hold turned on
-				{
-				navigation_set_destination(global.gps_current_latitude,global.gps_current_longitude);
-				global.navigationmode=NAVIGATIONMODEPOSITIONHOLD;
-				}
-			}
-		else // we are currently navigating
-			{ // turn off navigation if desired
-			if ((global.navigationmode==NAVIGATIONMODERETURNTOHOME && !(global.activecheckboxitems & CHECKBOXMASKRETURNTOHOME))
-				|| (global.navigationmode==NAVIGATIONMODEPOSITIONHOLD && !(global.activecheckboxitems & CHECKBOXMASKPOSITIONHOLD)))
-				{
-				global.navigationmode=NAVIGATIONMODEOFF;
+      #if (GPS_TYPE!=NO_GPS)
+      // turn on or off navigation when appropriate
+      if (global.navigationmode==NAVIGATIONMODEOFF)
+         {
+         if (global.activecheckboxitems & CHECKBOXMASKRETURNTOHOME) // return to home switch turned on
+            {
+            navigation_set_destination(global.gps_home_latitude,global.gps_home_longitude);
+            global.navigationmode=NAVIGATIONMODERETURNTOHOME;
+            }
+         else if (global.activecheckboxitems & CHECKBOXMASKPOSITIONHOLD) // position hold turned on
+            {
+            navigation_set_destination(global.gps_current_latitude,global.gps_current_longitude);
+            global.navigationmode=NAVIGATIONMODEPOSITIONHOLD;
+            }
+         }
+      else // we are currently navigating
+         { // turn off navigation if desired
+         if ((global.navigationmode==NAVIGATIONMODERETURNTOHOME && !(global.activecheckboxitems & CHECKBOXMASKRETURNTOHOME))
+            || (global.navigationmode==NAVIGATIONMODEPOSITIONHOLD && !(global.activecheckboxitems & CHECKBOXMASKPOSITIONHOLD)))
+            {
+            global.navigationmode=NAVIGATIONMODEOFF;
             
             // we will be turning control back over to the pilot.
-				resetpilotcontrol();
-				}
-			}
-		#endif
-		
-		// read the receiver
-		readrx();
+            resetpilotcontrol();
+            }
+         }
+      #endif
+      
+      // read the receiver
+      readrx();
 
-		
-		// turn on the LED when we are stable and the gps has 5 satelites or more
-		#if (GPS_TYPE==NO_GPS)
-			lib_digitalio_setoutput(LED1_OUTPUT, (!global.stable)==LED1_ON);
-		#else
-			lib_digitalio_setoutput(LED1_OUTPUT, (!(global.stable && global.gps_num_satelites>=5))==LED1_ON);
-		#endif
-		
-		// get the angle error.  Angle error is the difference between our current attitude and our desired attitude.
+      
+      // turn on the LED when we are stable and the gps has 5 satelites or more
+      #if (GPS_TYPE==NO_GPS)
+         lib_digitalio_setoutput(LED1_OUTPUT, (!global.stable)==LED1_ON);
+      #else
+         lib_digitalio_setoutput(LED1_OUTPUT, (!(global.stable && global.gps_num_satelites>=5))==LED1_ON);
+      #endif
+      
+      // get the angle error.  Angle error is the difference between our current attitude and our desired attitude.
       // It can be set by navigation, or by the pilot, etc.
-		fixedpointnum angleerror[3];
-		
+      fixedpointnum angleerror[3];
+      
 #if (GPS_TYPE!=NO_GPS)
-		// read the gps
-		unsigned char gotnewgpsreading=readgps();
+      // read the gps
+      unsigned char gotnewgpsreading=readgps();
 
       // let the pilot control the aircraft.
       getangleerrorfrompilotinput(angleerror);
       
-		// if we are navigating, use navigation to determine our desired attitude (tilt angles)
-		if (global.navigationmode!=NAVIGATIONMODEOFF)
-			{ // we are navigating
-			navigation_setangleerror(gotnewgpsreading,angleerror);
-			}
+      // if we are navigating, use navigation to determine our desired attitude (tilt angles)
+      if (global.navigationmode!=NAVIGATIONMODEOFF)
+         { // we are navigating
+         navigation_setangleerror(gotnewgpsreading,angleerror);
+         }
 #endif
 
       if (global.rxvalues[THROTTLEINDEX]<FPARMEDMINMOTOROUTPUT)
-			{
-			// We are probably on the ground. Don't accumnulate error when we can't correct it
-			resetpilotcontrol();
-			
-			// bleed off integrated error by averaging in a value of zero
-			lib_fp_lowpassfilter(&integratedangleerror[ROLLINDEX],0L,global.timesliver>>TIMESLIVEREXTRASHIFT,FIXEDPOINTONEOVERONEFOURTH,0); 
-			lib_fp_lowpassfilter(&integratedangleerror[PITCHINDEX],0L,global.timesliver>>TIMESLIVEREXTRASHIFT,FIXEDPOINTONEOVERONEFOURTH,0);
-			lib_fp_lowpassfilter(&integratedangleerror[YAWINDEX],0L,global.timesliver>>TIMESLIVEREXTRASHIFT,FIXEDPOINTONEOVERONEFOURTH,0);
-   		}
+         {
+         // We are probably on the ground. Don't accumnulate error when we can't correct it
+         resetpilotcontrol();
+         
+         // bleed off integrated error by averaging in a value of zero
+         lib_fp_lowpassfilter(&integratedangleerror[ROLLINDEX],0L,global.timesliver>>TIMESLIVEREXTRASHIFT,FIXEDPOINTONEOVERONEFOURTH,0); 
+         lib_fp_lowpassfilter(&integratedangleerror[PITCHINDEX],0L,global.timesliver>>TIMESLIVEREXTRASHIFT,FIXEDPOINTONEOVERONEFOURTH,0);
+         lib_fp_lowpassfilter(&integratedangleerror[YAWINDEX],0L,global.timesliver>>TIMESLIVEREXTRASHIFT,FIXEDPOINTONEOVERONEFOURTH,0);
+         }
 
 #ifndef NO_AUTOTUNE
-		// let autotune adjust the angle error if the pilot has autotune turned on
-		if (global.activecheckboxitems & CHECKBOXMASKAUTOTUNE)
-			{
-			if (!(global.previousactivecheckboxitems & CHECKBOXMASKAUTOTUNE))
-				autotune(angleerror,AUTOTUNESTARTING); // tell autotune that we just started autotuning
-			else
-				autotune(angleerror,AUTOTUNETUNING); // tell autotune that we are in the middle of autotuning
-			}
-		else if (global.previousactivecheckboxitems & CHECKBOXMASKAUTOTUNE)
-			autotune(angleerror,AUTOTUNESTOPPING); // tell autotune that we just stopped autotuning
+      // let autotune adjust the angle error if the pilot has autotune turned on
+      if (global.activecheckboxitems & CHECKBOXMASKAUTOTUNE)
+         {
+         if (!(global.previousactivecheckboxitems & CHECKBOXMASKAUTOTUNE))
+            autotune(angleerror,AUTOTUNESTARTING); // tell autotune that we just started autotuning
+         else
+            autotune(angleerror,AUTOTUNETUNING); // tell autotune that we are in the middle of autotuning
+         }
+      else if (global.previousactivecheckboxitems & CHECKBOXMASKAUTOTUNE)
+         autotune(angleerror,AUTOTUNESTOPPING); // tell autotune that we just stopped autotuning
 #endif
 
-		// get the pilot's throttle component
-		// convert from fixedpoint -1 to 1 to fixedpoint 0 to 1
-		fixedpointnum throttleoutput=(global.rxvalues[THROTTLEINDEX]>>1)+FIXEDPOINTCONSTANT(.5);
+      // get the pilot's throttle component
+      // convert from fixedpoint -1 to 1 to fixedpoint 0 to 1
+      fixedpointnum throttleoutput=(global.rxvalues[THROTTLEINDEX]>>1)+FIXEDPOINTCONSTANT(.5);
 
       // keep a flag to indicate whether we shoud apply altitude hold.  The pilot can turn it on or
       // uncrashability mode can turn it on.
@@ -359,11 +359,11 @@ int main(void)
 
 #if (BAROMETER_TYPE!=NO_BAROMETER)
       // check for altitude hold and adjust the throttle output accordingly
-		if (altitudeholdactive)
-			{
+      if (altitudeholdactive)
+         {
          integratedaltitudeerror+=lib_fp_multiply(altitudeholddesiredaltitude-global.altitude,global.timesliver);
          lib_fp_constrain(&integratedaltitudeerror,-INTEGRATEDANGLEERRORLIMIT,INTEGRATEDANGLEERRORLIMIT); // don't let the integrated error get too high
-			
+         
          // do pid for the altitude hold and add it to the throttle output
          throttleoutput+=lib_fp_multiply(altitudeholddesiredaltitude-global.altitude,usersettings.pid_pgain[ALTITUDEINDEX])
             -lib_fp_multiply(global.altitudevelocity,usersettings.pid_dgain[ALTITUDEINDEX])
@@ -401,85 +401,85 @@ int main(void)
          angleerror[PITCHINDEX]=-global.currentestimatedeulerattitude[PITCHINDEX];
          }
 
-		// calculate output values.  Output values will range from 0 to 1.0
+      // calculate output values.  Output values will range from 0 to 1.0
 
-		// calculate pid outputs based on our angleerrors as inputs
-		fixedpointnum pidoutput[3];
-		
-		for (int x=0;x<3;++x)
-			{
-			integratedangleerror[x]+=lib_fp_multiply(angleerror[x],global.timesliver);
-			
-			// don't let the integrated error get too high (windup)
-			lib_fp_constrain(&integratedangleerror[x],-INTEGRATEDANGLEERRORLIMIT,INTEGRATEDANGLEERRORLIMIT);
-			
-			// do the attitude pid
-			pidoutput[x]=lib_fp_multiply(angleerror[x],usersettings.pid_pgain[x])
-				-lib_fp_multiply(global.gyrorate[x],usersettings.pid_dgain[x])
-				+(lib_fp_multiply(integratedangleerror[x],usersettings.pid_igain[x])>>4);
-			}
+      // calculate pid outputs based on our angleerrors as inputs
+      fixedpointnum pidoutput[3];
+      
+      for (int x=0;x<3;++x)
+         {
+         integratedangleerror[x]+=lib_fp_multiply(angleerror[x],global.timesliver);
+         
+         // don't let the integrated error get too high (windup)
+         lib_fp_constrain(&integratedangleerror[x],-INTEGRATEDANGLEERRORLIMIT,INTEGRATEDANGLEERRORLIMIT);
+         
+         // do the attitude pid
+         pidoutput[x]=lib_fp_multiply(angleerror[x],usersettings.pid_pgain[x])
+            -lib_fp_multiply(global.gyrorate[x],usersettings.pid_dgain[x])
+            +(lib_fp_multiply(integratedangleerror[x],usersettings.pid_igain[x])>>4);
+         }
 
       lib_fp_constrain(&throttleoutput,0,FIXEDPOINTONE);
 
-		// mix the outputs to create motor values
+      // mix the outputs to create motor values
 #if (AIRCRAFT_CONFIGURATION==QUADX)
-		setmotoroutput(0,MOTOR_0_CHANNEL,throttleoutput-pidoutput[ROLLINDEX]+pidoutput[PITCHINDEX]-pidoutput[YAWINDEX]);
-		setmotoroutput(1,MOTOR_1_CHANNEL,throttleoutput-pidoutput[ROLLINDEX]-pidoutput[PITCHINDEX]+pidoutput[YAWINDEX]);
-		setmotoroutput(2,MOTOR_2_CHANNEL,throttleoutput+pidoutput[ROLLINDEX]+pidoutput[PITCHINDEX]+pidoutput[YAWINDEX]);
-		setmotoroutput(3,MOTOR_3_CHANNEL,throttleoutput+pidoutput[ROLLINDEX]-pidoutput[PITCHINDEX]-pidoutput[YAWINDEX]);
+      setmotoroutput(0,MOTOR_0_CHANNEL,throttleoutput-pidoutput[ROLLINDEX]+pidoutput[PITCHINDEX]-pidoutput[YAWINDEX]);
+      setmotoroutput(1,MOTOR_1_CHANNEL,throttleoutput-pidoutput[ROLLINDEX]-pidoutput[PITCHINDEX]+pidoutput[YAWINDEX]);
+      setmotoroutput(2,MOTOR_2_CHANNEL,throttleoutput+pidoutput[ROLLINDEX]+pidoutput[PITCHINDEX]+pidoutput[YAWINDEX]);
+      setmotoroutput(3,MOTOR_3_CHANNEL,throttleoutput+pidoutput[ROLLINDEX]-pidoutput[PITCHINDEX]-pidoutput[YAWINDEX]);
 #endif
-		}
-		
+      }
+      
    return 0;   /* never reached */
-	}
+   }
 
 
 void defaultusersettings()
-	{
-	global.usersettingsfromeeprom=0; // this should get set to one if we read from eeprom
-	
-	// set default acro mode rotation rates
-	usersettings.maxyawrate=200L<<FIXEDPOINTSHIFT; // degrees per second
-	usersettings.maxpitchandrollrate=400L<<FIXEDPOINTSHIFT; // degrees per second
+   {
+   global.usersettingsfromeeprom=0; // this should get set to one if we read from eeprom
+   
+   // set default acro mode rotation rates
+   usersettings.maxyawrate=200L<<FIXEDPOINTSHIFT; // degrees per second
+   usersettings.maxpitchandrollrate=400L<<FIXEDPOINTSHIFT; // degrees per second
 
-	// set default PID settings
-	for (int x=0;x<3;++x)
-		{
-		usersettings.pid_pgain[x]=15L<<3; // 1.5 on configurator
-		usersettings.pid_igain[x]=8L;     // .008 on configurator
-		usersettings.pid_dgain[x]=8L<<2;     // 8 on configurator
-		}
+   // set default PID settings
+   for (int x=0;x<3;++x)
+      {
+      usersettings.pid_pgain[x]=15L<<3; // 1.5 on configurator
+      usersettings.pid_igain[x]=8L;     // .008 on configurator
+      usersettings.pid_dgain[x]=8L<<2;     // 8 on configurator
+      }
 
-	usersettings.pid_pgain[YAWINDEX]=30L<<3; // 3 on configurator
-	
-	for (int x=3;x<NUMPIDITEMS;++x)
-		{
-		usersettings.pid_pgain[x]=0;
-		usersettings.pid_igain[x]=0;
-		usersettings.pid_dgain[x]=0;
-		}
-	
-	usersettings.pid_pgain[ALTITUDEINDEX]=27L<<7; // 2.7 on configurator
-	usersettings.pid_dgain[ALTITUDEINDEX]=6L<<9;     // 6 on configurator
+   usersettings.pid_pgain[YAWINDEX]=30L<<3; // 3 on configurator
+   
+   for (int x=3;x<NUMPIDITEMS;++x)
+      {
+      usersettings.pid_pgain[x]=0;
+      usersettings.pid_igain[x]=0;
+      usersettings.pid_dgain[x]=0;
+      }
+   
+   usersettings.pid_pgain[ALTITUDEINDEX]=27L<<7; // 2.7 on configurator
+   usersettings.pid_dgain[ALTITUDEINDEX]=6L<<9;     // 6 on configurator
 
-	usersettings.pid_pgain[NAVIGATIONINDEX]=25L<<11; // 2.5 on configurator
-	usersettings.pid_dgain[NAVIGATIONINDEX]=188L<<8;     // .188 on configurator
-	
-	// set default configuration checkbox settings.
-	for (int x=0;x<NUMPOSSIBLECHECKBOXES;++x)
-		{
-		usersettings.checkboxconfiguration[x]=0;
-		}
-	usersettings.checkboxconfiguration[CHECKBOXARM]=CHECKBOXMASKAUX1HIGH;
-	usersettings.checkboxconfiguration[CHECKBOXSEMIACRO]=CHECKBOXMASKAUX2HIGH;
-	usersettings.checkboxconfiguration[CHECKBOXHIGHRATES]=CHECKBOXMASKAUX2HIGH;
-	
-	// reset the calibration settings
-	for (int x=0;x<3;++x)
-		{
-		usersettings.compasszerooffset[x]=0;
-		usersettings.compasscalibrationmultiplier[x]=1L<<FIXEDPOINTSHIFT;
-		usersettings.gyrocalibration[x]=0;
-		usersettings.acccalibration[x]=0;
-		}
-	}
+   usersettings.pid_pgain[NAVIGATIONINDEX]=25L<<11; // 2.5 on configurator
+   usersettings.pid_dgain[NAVIGATIONINDEX]=188L<<8;     // .188 on configurator
+   
+   // set default configuration checkbox settings.
+   for (int x=0;x<NUMPOSSIBLECHECKBOXES;++x)
+      {
+      usersettings.checkboxconfiguration[x]=0;
+      }
+   usersettings.checkboxconfiguration[CHECKBOXARM]=CHECKBOXMASKAUX1HIGH;
+   usersettings.checkboxconfiguration[CHECKBOXSEMIACRO]=CHECKBOXMASKAUX2HIGH;
+   usersettings.checkboxconfiguration[CHECKBOXHIGHRATES]=CHECKBOXMASKAUX2HIGH;
+   
+   // reset the calibration settings
+   for (int x=0;x<3;++x)
+      {
+      usersettings.compasszerooffset[x]=0;
+      usersettings.compasscalibrationmultiplier[x]=1L<<FIXEDPOINTSHIFT;
+      usersettings.gyrocalibration[x]=0;
+      usersettings.acccalibration[x]=0;
+      }
+   }
