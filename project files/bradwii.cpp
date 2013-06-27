@@ -137,7 +137,7 @@ int main(void)
    global.navigationmode=NAVIGATIONMODEOFF;
    global.failsafetimer=lib_timers_starttimer();
 
-   for(;;) 
+   for(;;)
       {
       // check to see what switches are activated
       checkcheckboxitems();
@@ -215,13 +215,13 @@ int main(void)
       // It can be set by navigation, or by the pilot, etc.
       fixedpointnum angleerror[3];
       
+      // let the pilot control the aircraft.
+      getangleerrorfrompilotinput(angleerror);
+      
 #if (GPS_TYPE!=NO_GPS)
       // read the gps
       unsigned char gotnewgpsreading=readgps();
 
-      // let the pilot control the aircraft.
-      getangleerrorfrompilotinput(angleerror);
-      
       // if we are navigating, use navigation to determine our desired attitude (tilt angles)
       if (global.navigationmode!=NAVIGATIONMODEOFF)
          { // we are navigating
@@ -293,8 +293,8 @@ int main(void)
          if (!(global.previousactivecheckboxitems & CHECKBOXMASKUNCRASHABLE))
             { // we just turned on uncrashability.  Remember our current altitude as our new minimum altitude.
             uncrasabilityminimumaltitude=global.altitude;
-            doinguncrashablenavigationflag=0;
 #if (GPS_TYPE!=NO_GPS)
+            doinguncrashablenavigationflag=0;
             // set this location as our new home
             navigation_sethometocurrentlocation();
 #endif

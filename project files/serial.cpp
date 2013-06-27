@@ -36,7 +36,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "gps.h"
 
 #define MSP_VERSION 0
-#define  VERSION  10
+#define  VERSION  100 // version 1.0
 
 
 extern globalstruct global;
@@ -60,7 +60,6 @@ void serialinit()
 
 #if (MULTIWII_CONFIG_SERIAL_PORTS & SERIALPORT3)
    lib_serial_initport(3,SERIAL_3_BAUD);
-   lib_serial_sendstring(3,"test\n\r");
 #endif
 
 #if (MULTIWII_CONFIG_SERIAL_PORTS & SERIALPORTUSB)
@@ -355,7 +354,10 @@ void serialcheckportforaction(char portnumber)
       if (serialreceivestate[portnumber]==SERIALSTATEGOTCOMMAND)
          {
          // this is the only state where we have to read more than one byte, so do this first, even though it's not first in the sequence of events
-         if (numcharsavailable>serialdatasize[portnumber]) // we need to wait for data plus the checksum
+         // we need to wait for data plus the checksum.  But don't process until we have enough space in the output buffer
+         int spaceneeded=40;
+         if (serialcommand[portnumber]==MSP_BOXNAMES) spaceneeded=strlen(checkboxnames)+10;
+         if (numcharsavailable>serialdatasize[portnumber] && lib_serial_availableoutputbuffersize(portnumber)>=spaceneeded)
             {
             unsigned char data[65];
             lib_serial_getdata(portnumber, data, serialdatasize[portnumber]+1);

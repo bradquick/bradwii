@@ -57,10 +57,9 @@ int autotuneindex=ROLLINDEX;
 fixedpointnum autotunetime;
 fixedpointnum autotunepeak1;
 fixedpointnum autotunepeak2;
-fixedpointnum targetangle;
+fixedpointnum targetangle=0;
 fixedpointnum targetangleatpeak;
 fixedpointnum currentivalue;
-fixedpointnum testvalue=0;
 
 char cyclecount=1;
 
@@ -68,8 +67,9 @@ void autotune(fixedpointnum *angleerror,unsigned char startingorstopping)
    {
    if (!global.armed)
       {
-      // we aren't armed.  Don't do anything, but if autotuning is started, save our settings to eeprom
-      if (startingorstopping==AUTOTUNESTARTING)
+      // we aren't armed.  Don't do anything, but if autotuning is started and we have collected
+      // autotuning data, save our settings to eeprom
+      if (startingorstopping==AUTOTUNESTARTING && targetangle!=0)
          writeusersettingstoeeprom();
 
       return;

@@ -92,7 +92,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //#define RX_TYPE RX_NORMAL
 //#define RX_TYPE RX_DSM2_1024
 #define RX_TYPE RX_DSM2_2048
-#define RX_DSM2_SERIAL_PORT 1
+//#define RX_DSM2_SERIAL_PORT 1
 
 // uncomment to set the number of RX channels, otherwise it will default to what the control board/receiver can handle
 //#define RXNUMCHANNELS 8
