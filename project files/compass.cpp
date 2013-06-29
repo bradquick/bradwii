@@ -123,7 +123,7 @@ void calibratecompass()
    
 void initcompass() 
    { 
-   lib_timers_delaymilli(100);
+      lib_timers_delaymilliseconds(100);
 
    // set gains for calibration
    

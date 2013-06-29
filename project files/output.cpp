@@ -58,13 +58,13 @@ void initoutputs()
  /********  special version of MultiWii to calibrate all attached ESCs ************/
 #if defined(ESC_CALIB_CANNOT_FLY)
     setallmotoroutputs(ESC_CALIB_HIGH);
-    lib_timers_delaymilli(3000);
+       lib_timers_delaymilliseconds(3000);
     setallmotoroutputs(ESC_CALIB_LOW);
     while (1) 
       {
-      lib_timers_delaymilli(500);
+         lib_timers_delaymilliseconds(500);
       lib_digitalio_setoutput(LED1_OUTPUT, 0);
-      lib_timers_delaymilli(500);
+         lib_timers_delaymilliseconds(500);
       lib_digitalio_setoutput(LED1_OUTPUT, 1);
       }
 #endif

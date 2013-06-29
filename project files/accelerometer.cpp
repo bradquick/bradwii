@@ -54,25 +54,25 @@ extern globalstruct global;
 
 void initacc() 
    {
-   lib_timers_delaymilli(10);
+      lib_timers_delaymilliseconds(10);
    //default range 2G: 1G = 4096 unit.
    lib_i2c_writereg(BMA180_ADDRESS,0x0D,1<<4); // register: ctrl_reg0  -- value: set bit ee_w to 1 to enable writing
-   lib_timers_delaymilli(5);
+      lib_timers_delaymilliseconds(5);
    unsigned char control = lib_i2c_readreg(BMA180_ADDRESS, 0x20);
    control = control & 0x0F;        // save tcs register
    control = control | (0x01 << 4); // register: bw_tcs reg: bits 4-7 to set bw -- value: set low pass filter to 20Hz
    lib_i2c_writereg(BMA180_ADDRESS, 0x20, control);
-   lib_timers_delaymilli(5);
+      lib_timers_delaymilliseconds(5);
    control = lib_i2c_readreg(BMA180_ADDRESS, 0x30);
    control = control & 0xFC;        // save tco_z register
    control = control | 0x00;        // set mode_config to 0
    lib_i2c_writereg(BMA180_ADDRESS, 0x30, control);
-   lib_timers_delaymilli(5); 
+      lib_timers_delaymilliseconds(5); 
    control = lib_i2c_readreg(BMA180_ADDRESS, 0x35);
    control = control & 0xF1;        // save offset_x and smp_skip register
    control = control | (0x05 << 1); // set range to 8G
    lib_i2c_writereg(BMA180_ADDRESS, 0x35, control);
-   lib_timers_delaymilli(5); 
+      lib_timers_delaymilliseconds(5); 
    }
 
 void readacc() 

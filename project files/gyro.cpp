@@ -52,13 +52,13 @@ extern globalstruct global;
 
 void initgyro()
    {
-   lib_timers_delaymilli(100);
+      lib_timers_delaymilliseconds(100);
    lib_i2c_writereg(ITG3200_ADDRESS, 0x3E, 0x80); //register: Power Management  --  value: reset device
-   lib_timers_delaymilli(5);
+      lib_timers_delaymilliseconds(5);
    lib_i2c_writereg(ITG3200_ADDRESS, 0x16, 0x18 + ITG3200_DLPF_CFG); //register: DLPF_CFG - low pass filter configuration
-   lib_timers_delaymilli(5);
+      lib_timers_delaymilliseconds(5);
    lib_i2c_writereg(ITG3200_ADDRESS, 0x3E, 0x03); //register: Power Management  --  value: PLL with Z Gyro reference
-   lib_timers_delaymilli(100);
+      lib_timers_delaymilliseconds(100);
    }
 
 void readgyro()
@@ -86,7 +86,7 @@ void initgyro()
    {
 
    lib_i2c_writereg(MPU6050_ADDRESS, 0x6B, 0x80);             //PWR_MGMT_1    -- DEVICE_RESET 1
-   lib_timers_delaymilli(5);
+      lib_timers_delaymilliseconds(5);
    lib_i2c_writereg(MPU6050_ADDRESS, 0x6B, 0x03);             //PWR_MGMT_1    -- SLEEP 0; CYCLE 0; TEMP_DIS 0; CLKSEL 3 (PLL with Z Gyro reference)
    lib_i2c_writereg(MPU6050_ADDRESS, 0x1A, MPU6050_DLPF_CFG); //CONFIG        -- EXT_SYNC_SET 0 (disable input pin for data sync) ; default DLPF_CFG = 0 => ACC bandwidth = 260Hz  GYRO bandwidth = 256Hz)
    lib_i2c_writereg(MPU6050_ADDRESS, 0x1B, 0x18);             //GYRO_CONFIG   -- FS_SEL = 3: Full scale set to 2000 deg/sec

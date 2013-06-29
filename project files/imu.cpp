@@ -89,7 +89,7 @@ void calibrategyroandaccelerometer()
          usersettings.gyrocalibration[x]+=global.gyrorate[x];
          usersettings.acccalibration[x]+=global.acc_g_vector[x];
          }
-      lib_timers_delaymilli(10);
+         lib_timers_delaymilliseconds(10);
       }
 
    for (int x=0;x<3;++x)
