@@ -1,4 +1,10 @@
-Brad-Wii Instructions
+BradWii
+
+Download:
+
+The Arduino version can be downloaded here:
+
+http://www.jamesltaylor.com/////
 
 Features:
 
@@ -8,9 +14,9 @@ Features:
 	- Multi-Wii 328p
 	- Multi-Wii NanoWii
 
-- Other boards should be easy to add for anyone with programming abilities.
+- Other boards should be easy to add for anyone with programming abilities. I tried to include only things that I have tested.
 
-- Extensive use of fixed point math means the code is faster and more accurate.  Each value has 32 bit precision and the loop times are under 2 milliseconds. All integration and filtering is time based, which means that constant loop times aren't necessary.  The result is stable flight.
+- Extensive use of fixed point math means the code is faster and more accurate.  Each value has 32 bit precision and the loop times are frequently under 2 milliseconds. All integration and filtering is time based, which means that constant loop times aren't critical.  The result is stable flight.
 
 - Level, Acro, and Semi-Acro flight modes.
 
@@ -18,7 +24,7 @@ Features:
 
 - Simplified settings means there are fewer things (especially PID) that need to be adjusted.
 
-- Auto PID tuning.
+- Auto PID tuning!
 
 - Position Hold
 
@@ -34,7 +40,11 @@ Features:
 
 - Uncrashability Mode - Takes over when you get below critical attitude or get too far away.  Practice those Acro maneuvers without being able to dumb-thumb it!
 
-- The project doesn't rely on any Arduino libraries which means that it can be easily developed on other development systems.  Brad-Wii was originally developed on a Mac using Xcode.  The Xcode project can be cloned from here: https://github.com/bradquick/bradwii
+
+- The project doesn't rely on any Arduino libraries which means that it can be easily developed on other development systems.  BradWii was originally developed on a Mac using Xcode.  The Xcode project can be cloned from the links below. You will also need to clone the libraries.  My avr tools are in a unique location, so some tweaking will be involved in getting the xcode version working (experienced programmers only). 
+
+https://github.com/bradquick/bradwii
+https://github.com/bradquick/avrlibraries
 
 - Well commented, logically laid out code.  It is designed to be easy to add additional sensors and control boards.  Developers should find this code a good starting point for various projects.  The curious will find it easier to understand what makes their multi-rotors tick.
 
