@@ -39,7 +39,7 @@ fixedpointnum estimated_compass_vector[3]={FIXEDPOINTONE,0,0}; // start pointing
 #define MINACCMAGNITUDESQUARED FIXEDPOINTCONSTANT(0.9)
 
 // convert MAG_DECLINIATION_DEGREES to fixed point
-#define FP_MAG_DECLINIATION_DEGREES FIXEDPOINTCONSTANT(MAG_DECLINIATION_DEGREES)
+#define FP_MAG_DECLINATION_DEGREES FIXEDPOINTCONSTANT(MAG_DECLINATION_DEGREES)
 
 // The following two rates can be defined in config.h to adjust imu performance.
 // Ideally, we want to run mostly on the gyro since the gyro gives us instant feedback, but the gyro
@@ -76,26 +76,24 @@ void calibrategyroandaccelerometer()
       usersettings.gyrocalibration[x]=0;
       usersettings.acccalibration[x]=0;
       }
-      
+
+   fixedpointnum totaltime=0;
+   
    // calibrate the gyro and acc
-   for (int x=0;x<128;++x)
+   while (totaltime<4L<<(FIXEDPOINTSHIFT+TIMESLIVEREXTRASHIFT)) // 4 seconds
       {
       readgyro();
       readacc();
-      global.acc_g_vector[ZINDEX]-=(1L<<FIXEDPOINTSHIFT); // veritcal vector should be at 1 G
+      global.acc_g_vector[ZINDEX]-=FIXEDPOINTONE; // vertical vector should be at 1 G
+
+      calculatetimesliver();
+      totaltime+=global.timesliver;
       
       for (int x=0;x<3;++x)
          {
-         usersettings.gyrocalibration[x]+=global.gyrorate[x];
-         usersettings.acccalibration[x]+=global.acc_g_vector[x];
+         lib_fp_lowpassfilter(&usersettings.gyrocalibration[x],-global.gyrorate[x],global.timesliver,FIXEDPOINTONEOVERONE,TIMESLIVEREXTRASHIFT);
+         lib_fp_lowpassfilter(&usersettings.acccalibration[x],-global.acc_g_vector[x],global.timesliver,FIXEDPOINTONEOVERONE,TIMESLIVEREXTRASHIFT);
          }
-         lib_timers_delaymilliseconds(10);
-      }
-
-   for (int x=0;x<3;++x)
-      {
-      usersettings.gyrocalibration[x]=-usersettings.gyrocalibration[x]/128;
-      usersettings.acccalibration[x]=-usersettings.acccalibration[x]/128;
       }
    }
 
@@ -166,31 +164,22 @@ void imucalculateestimatedattitude()
 #if (COMPASS_TYPE!=NO_COMPASS)
    int gotnewcompassreading=readcompass();
       
-//   if (global.activecheckboxitems & CHECKBOXMASKCOMPASS)
+   if (gotnewcompassreading)
       {
-/*      if (!(global.previousactivecheckboxitems & CHECKBOXMASKCOMPASS))
-         { // we just switched into compass mode
-         // set the estimated compass vector to the actual compass vector immediately
-         for (int x=0;x<3;++x)
-            estimated_compass_vector[x]=global.compassvector[x];
-         }
-      else */if (gotnewcompassreading)
+      // use the compass to correct the yaw in our estimated attitude.
+      // the compass vector points somewhat north, but it also points down more than north where I live, so we can't
+      // get the yaw directly from the compass vector.  Instead, we have to take a cross product of
+      // the gravity vector and the compass vector, which should point east
+      fixedpointnum westvector[3];
+      
+      vectorcrossproduct(global.compassvector,global.estimateddownvector,westvector);
+
+      // use the actual compass reading to slowly adjust our estimated west vector
+      for (int x=0;x<3;++x)
          {
-         // use the compass to correct the yaw in our estimated attitude.
-         // the compass vector points somewhat north, but it also points down more than north where I live, so we can't
-         // get the yaw directly from the compass vector.  Instead, we have to take a cross product of
-         // the gravity vector and the compass vector, which should point east
-         fixedpointnum westvector[3];
-         
-         vectorcrossproduct(global.compassvector,global.estimateddownvector,westvector);
-   
-         // use the actual compass reading to slowly adjust our estimated west vector
-         for (int x=0;x<3;++x)
-            {
-            lib_fp_lowpassfilter(&global.estimatedwestvector[x], westvector[x],compasstimeinterval>>TIMESLIVEREXTRASHIFT, ONE_OVER_ACC_COMPLIMENTARY_FILTER_TIME_PERIOD,0);
-            }
-         compasstimeinterval=0;
+         lib_fp_lowpassfilter(&global.estimatedwestvector[x], westvector[x],compasstimeinterval>>TIMESLIVEREXTRASHIFT, ONE_OVER_ACC_COMPLIMENTARY_FILTER_TIME_PERIOD,0);
          }
+      compasstimeinterval=0;
       }
 #else
    if (compasstimeinterval>(6553L<<TIMESLIVEREXTRASHIFT)) // 10 hz
@@ -256,6 +245,6 @@ void imucalculateestimatedattitude()
    if (global.estimateddownvector[ZINDEX]<1)
       xvalue=-xvalue;
       
-   global.currentestimatedeulerattitude[YAWINDEX] = lib_fp_atan2(global.estimatedwestvector[YINDEX],xvalue)+FP_MAG_DECLINIATION_DEGREES;
+   global.currentestimatedeulerattitude[YAWINDEX] = lib_fp_atan2(global.estimatedwestvector[YINDEX],xvalue)+FP_MAG_DECLINATION_DEGREES;
    lib_fp_constrain180(&global.currentestimatedeulerattitude[YAWINDEX]);
    }

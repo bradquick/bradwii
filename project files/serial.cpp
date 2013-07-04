@@ -36,7 +36,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "gps.h"
 
 #define MSP_VERSION 0
-#define  VERSION  100 // version 1.0
+#define  VERSION  101 // version 1.01
 
 
 extern globalstruct global;
@@ -192,8 +192,7 @@ void evaluatecommand(char portnumber,unsigned char *data)
          }
       for (int x=0;x<3;++x)
          { // convert from
-         int value=(global.compassvector[x])>>8; // no particular units
-//         int value=global.compassrawvalue[x]; // mag values go here
+         int value=(global.compassvector[x])>>8;
          sendandchecksumdata(portnumber,(unsigned char *)&value,2);
          }
       }
@@ -346,6 +345,8 @@ void evaluatecommand(char portnumber,unsigned char *data)
    lib_serial_sendchar(portnumber,serialchecksum[portnumber]);
    }
 
+#define MAXPAYLOADSIZE 64
+
 void serialcheckportforaction(char portnumber)
    {
    int numcharsavailable;
@@ -357,9 +358,10 @@ void serialcheckportforaction(char portnumber)
          // we need to wait for data plus the checksum.  But don't process until we have enough space in the output buffer
          int spaceneeded=40;
          if (serialcommand[portnumber]==MSP_BOXNAMES) spaceneeded=strlen(checkboxnames)+10;
+
          if (numcharsavailable>serialdatasize[portnumber] && lib_serial_availableoutputbuffersize(portnumber)>=spaceneeded)
             {
-            unsigned char data[65];
+            unsigned char data[MAXPAYLOADSIZE+1];
             lib_serial_getdata(portnumber, data, serialdatasize[portnumber]+1);
             for (int x=0;x<serialdatasize[portnumber];++x)
                serialchecksum[portnumber]^=data[x];
@@ -369,10 +371,11 @@ void serialcheckportforaction(char portnumber)
                }
             serialreceivestate[portnumber]=SERIALSTATEIDLE;
             }
+         else return;
          }
       else
          {
-         char c=lib_serial_getchar(portnumber);
+         unsigned char c=lib_serial_getchar(portnumber);
          
          if (serialreceivestate[portnumber]==SERIALSTATEIDLE)
             {
@@ -391,8 +394,12 @@ void serialcheckportforaction(char portnumber)
          else if (serialreceivestate[portnumber]==SERIALSTATEGOTLESSTHANSIGN)
             {
             serialdatasize[portnumber]=c;
-            serialchecksum[portnumber]=c;
-            serialreceivestate[portnumber]=SERIALSTATEGOTDATASIZE;
+            if (c>MAXPAYLOADSIZE) serialreceivestate[portnumber]=SERIALSTATEIDLE;
+            else
+               {
+               serialchecksum[portnumber]=c;
+               serialreceivestate[portnumber]=SERIALSTATEGOTDATASIZE;
+               }
             }
          else if (serialreceivestate[portnumber]==SERIALSTATEGOTDATASIZE)
             {

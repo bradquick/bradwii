@@ -99,3 +99,4 @@ typedef struct
    } usersettingsstruct;
 
 void defaultusersettings();
+void calculatetimesliver();

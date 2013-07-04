@@ -28,6 +28,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //#define CONTROL_BOARD_TYPE CONTROL_BOARD_MULTIWII_328P
 //#define CONTROL_BOARD_TYPE CONTROL_BOARD_NANOWII
 
+// Choose the type of r/c reciever that will be used
+#define RX_TYPE RX_NORMAL
+//#define RX_TYPE RX_DSM2_1024
+//#define RX_TYPE RX_DSM2_2048
+//#define RX_DSM2_SERIAL_PORT 1
+
 // Choose an aircraft configuration (defaults to QUADX)
 //#define AIRCRAFT_CONFIGURATION QUADX
 
@@ -78,7 +84,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //#define BAROMETER_TYPE NO_BAROMETER
 
 // Get your magnetic decliniation from here : http://magnetic-declination.com/
-#define MAG_DECLINIATION_DEGREES  -13.4 // for Hyde Park, NY
+#define MAG_DECLINATION_DEGREES  -13.4 // for Hyde Park, NY
 
 // ESCs calibration
 // To calibrate all ESCs connected to the aircraft at the same time (useful to avoid unplugging/re-plugging each ESC)
@@ -87,12 +93,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // #define ESC_CALIB_CANNOT_FLY  // uncomment to activate
  #define ESC_CALIB_LOW  MIN_MOTOR_OUTPUT
  #define ESC_CALIB_HIGH MAX_MOTOR_OUTPUT
-
-// Choose the type of r/c reciever that will be used
-//#define RX_TYPE RX_NORMAL
-//#define RX_TYPE RX_DSM2_1024
-#define RX_TYPE RX_DSM2_2048
-//#define RX_DSM2_SERIAL_PORT 1
 
 // uncomment to set the number of RX channels, otherwise it will default to what the control board/receiver can handle
 //#define RXNUMCHANNELS 8

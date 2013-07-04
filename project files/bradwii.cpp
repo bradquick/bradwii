@@ -131,7 +131,7 @@ int main(void)
    initimu();
    
    // set the default i2c speed to 400 Mhz.  If a device needs to slow it down, it can, but it should set it back.
-   lib_i2c_setclockspeed(I2C_400_MHZ);
+   lib_i2c_setclockspeed(I2C_400_KHZ);
 
    global.armed=0;
    global.navigationmode=NAVIGATIONMODEOFF;
@@ -145,14 +145,8 @@ int main(void)
       // check for config program activity
       serialcheckforaction();   
       
-      // load global.timesliver with the amount of time that has passed since we last went through this loop
-      // convert from microseconds to fixedpointnum seconds shifted by TIMESLIVEREXTRASHIFT
-      // 4295L is (FIXEDPOINTONE<<FIXEDPOINTSHIFT)*.000001
-      global.timesliver=(lib_timers_gettimermicrosecondsandreset(&timeslivertimer)*4295L)>>(FIXEDPOINTSHIFT-TIMESLIVEREXTRASHIFT);
-   
-      // don't allow big jumps in time because of something slowing the update loop down (should never happen anyway)
-      if (global.timesliver>(FIXEDPOINTONEFIFTIETH<<TIMESLIVEREXTRASHIFT)) global.timesliver=FIXEDPOINTONEFIFTIETH<<TIMESLIVEREXTRASHIFT;
-      
+      calculatetimesliver();
+
       // run the imu to estimate the current attitude of the aircraft
       imucalculateestimatedattitude();
 
@@ -433,6 +427,16 @@ int main(void)
    return 0;   /* never reached */
    }
 
+void calculatetimesliver()
+   {
+   // load global.timesliver with the amount of time that has passed since we last went through this loop
+   // convert from microseconds to fixedpointnum seconds shifted by TIMESLIVEREXTRASHIFT
+   // 4295L is (FIXEDPOINTONE<<FIXEDPOINTSHIFT)*.000001
+   global.timesliver=(lib_timers_gettimermicrosecondsandreset(&timeslivertimer)*4295L)>>(FIXEDPOINTSHIFT-TIMESLIVEREXTRASHIFT);
+
+   // don't allow big jumps in time because of something slowing the update loop down (should never happen anyway)
+   if (global.timesliver>(FIXEDPOINTONEFIFTIETH<<TIMESLIVEREXTRASHIFT)) global.timesliver=FIXEDPOINTONEFIFTIETH<<TIMESLIVEREXTRASHIFT;
+   }
 
 void defaultusersettings()
    {

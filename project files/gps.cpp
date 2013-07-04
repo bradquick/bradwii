@@ -113,7 +113,7 @@ char readgps()
                   {
                   gpsdegrees = gpsstringtoangle(gpsdata);
                   }
-               else if (gpsparameternumber == 3)
+               else if (gpsparameternumber == 3 && gpsdegrees!=0)
                   {
                   if ( gpsdata[0] == 'S') global.gps_current_latitude=-gpsdegrees;
                   else global.gps_current_latitude=gpsdegrees;
@@ -122,7 +122,7 @@ char readgps()
                   {
                   gpsdegrees = gpsstringtoangle(gpsdata);
                   }
-               else if (gpsparameternumber == 5)
+               else if (gpsparameternumber == 5 && gpsdegrees!=0)
                   {
                   if ( gpsdata[0] == 'W') global.gps_current_longitude=-gpsdegrees;
                   else global.gps_current_longitude=gpsdegrees;
