@@ -50,11 +50,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 typedef struct
    {
    unsigned char usersettingsfromeeprom;            // set to 1 if user settings were read from eeprom
+   fixedpointnum barorawaltitude;                  // Current altitude read from barometer, in meters (approximately)
    fixedpointnum debugvalue[4];                     // for display in the multiwii config program. Use for debugging.
    fixedpointnum timesliver;                        // The time in seconds (shifted TIMESLIVEREXTRASHIFT) since the last iteration of the main loop
    fixedpointnum gyrorate[3];                        // Corrected gyro rates in degrees per second
    fixedpointnum acc_g_vector[3];                  // Corrected accelerometer vector, in G's
-   fixedpointnum barorawaltitude;                  // Current altitude read from barometer, in meters (approximately)
    fixedpointnum altitude;                           // A filtered version of the baromemter's altitude
    fixedpointnum altitudevelocity;                  // The rate of change of the altitude
    fixedpointnum estimateddownvector[3];            // A unit vector (approximately) poining in the direction we think down is relative to the aircraft

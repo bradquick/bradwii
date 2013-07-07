@@ -83,9 +83,6 @@ void checkcheckboxitems()
       if (usersettings.checkboxconfiguration[x] & mask) global.activecheckboxitems |= (1L<<x);
       }
 
-#define STICK_ARM STICK_COMMAND_YAW_HIGH+STICK_COMMAND_ROLL_HIGH+STICK_COMMAND_PITCH_LOW
-#define STICK_DISARM STICK_COMMAND_YAW_LOW+STICK_COMMAND_ROLL_LOW+STICK_COMMAND_PITCH_LOW
-      
 #if (defined(STICK_ARM) | defined (STICK_DISARM))
    // figure out where the sticks are
    unsigned int stickmask=0;

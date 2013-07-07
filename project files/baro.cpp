@@ -114,7 +114,7 @@ void bmp085_getpressureandcalculatealtitude()
    long  x1, x2, x3, b3, b5, b6, p, tmp;
    unsigned long b4, b7;
    long pressure;
-   
+
    // Temperature calculations
    x1 = ((long)bmp085_ut - bmp085_ctx.ac6) * bmp085_ctx.ac5 >> 15;
    x2 = ((long)bmp085_ctx.mc << 11) / (x1 + bmp085_ctx.md);

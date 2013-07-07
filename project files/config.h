@@ -24,17 +24,17 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "options.h"
 
 // Choose your control board:
-#define CONTROL_BOARD_TYPE CONTROL_BOARD_MULTIWII_PRO_2
+//#define CONTROL_BOARD_TYPE CONTROL_BOARD_MULTIWII_PRO_2
 //#define CONTROL_BOARD_TYPE CONTROL_BOARD_MULTIWII_328P
 //#define CONTROL_BOARD_TYPE CONTROL_BOARD_NANOWII
-//#define CONTROL_BOARD_TYPE CONTROL_BOARD_SIRIUS_AIR
+#define CONTROL_BOARD_TYPE CONTROL_BOARD_SIRIUS_AIR
 //#define CONTROL_BOARD_TYPE CONTROL_BOARD_SIRIUS_AIR_GPS
 
 // Choose the type of r/c reciever that will be used
-//#define RX_TYPE RX_NORMAL
+#define RX_TYPE RX_NORMAL
 //#define RX_TYPE RX_CPPM
 //#define RX_TYPE RX_DSM2_1024
-#define RX_TYPE RX_DSM2_2048
+//#define RX_TYPE RX_DSM2_2048
 //#define RX_DSM2_SERIAL_PORT 1
 
 // Choose a channel order if you don't like the default for your receiver type selected above
@@ -53,8 +53,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //#define STICK_DISARM STICK_COMMAND_YAW_LOW
 
 // uncomment the following two lines to allow arming using yaw, roll, and pitch all at once
-//#define STICK_ARM STICK_COMMAND_YAW_HIGH+STICK_COMMAND_ROLL_HIGH+STICK_COMMAND_PITCH_LOW
-//#define STICK_DISARM STICK_COMMAND_YAW_LOW+STICK_COMMAND_ROLL_LOW+STICK_COMMAND_PITCH_LOW
+#define STICK_ARM STICK_COMMAND_YAW_HIGH+STICK_COMMAND_ROLL_HIGH+STICK_COMMAND_PITCH_LOW
+#define STICK_DISARM STICK_COMMAND_YAW_LOW+STICK_COMMAND_ROLL_LOW+STICK_COMMAND_PITCH_LOW
 
 // Choose an aircraft configuration (defaults to QUADX)
 //#define AIRCRAFT_CONFIGURATION QUADX
@@ -122,7 +122,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  #define ESC_CALIB_HIGH MAX_MOTOR_OUTPUT
 
 // un-comment if you don't want to include autotune code
-//#define NO_AUTOTUNE
+#define NO_AUTOTUNE
 // To adjust how agressive the tuning is, adjust the AUTOTUNEMAXOSCILLATION value.  A larger
 // value will result in more agressive tuning. A lower value will result in softer tuning.
 // It will rock back and forth between -AUTOTUNE_TARGET_ANGLE and AUTOTUNE_TARGET_ANGLE degrees
