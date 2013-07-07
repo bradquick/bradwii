@@ -43,6 +43,7 @@ extern globalstruct global;
 extern usersettingsstruct usersettings;
 
 extern const char checkboxnames[];
+extern unsigned int lib_i2c_error_count;
 
 void serialinit()
    {
@@ -200,7 +201,7 @@ void evaluatecommand(char portnumber,unsigned char *data)
       { // send attitude data
       sendgoodheader(portnumber,10);
       sendandchecksumint(portnumber,(global.timesliver*15)>>8); // convert from fixedpointnum to microseconds
-      sendandchecksumint(portnumber,0); // i2c error count
+      sendandchecksumint(portnumber,lib_i2c_error_count); // i2c error count
       sendandchecksumint(portnumber,0); // baro mag, gps, sonar
       sendandchecksumdata(portnumber,(unsigned char *)&global.activecheckboxitems,4); // options1
       }

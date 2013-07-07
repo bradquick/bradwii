@@ -27,12 +27,34 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define CONTROL_BOARD_TYPE CONTROL_BOARD_MULTIWII_PRO_2
 //#define CONTROL_BOARD_TYPE CONTROL_BOARD_MULTIWII_328P
 //#define CONTROL_BOARD_TYPE CONTROL_BOARD_NANOWII
+//#define CONTROL_BOARD_TYPE CONTROL_BOARD_SIRIUS_AIR
+//#define CONTROL_BOARD_TYPE CONTROL_BOARD_SIRIUS_AIR_GPS
 
 // Choose the type of r/c reciever that will be used
-#define RX_TYPE RX_NORMAL
+//#define RX_TYPE RX_NORMAL
+//#define RX_TYPE RX_CPPM
 //#define RX_TYPE RX_DSM2_1024
-//#define RX_TYPE RX_DSM2_2048
+#define RX_TYPE RX_DSM2_2048
 //#define RX_DSM2_SERIAL_PORT 1
+
+// Choose a channel order if you don't like the default for your receiver type selected above
+//#define RX_CHANNEL_ORDER         THROTTLEINDEX,ROLLINDEX,PITCHINDEX,YAWINDEX,AUX1INDEX,AUX2INDEX,AUX3INDEX,AUX4INDEX,8,9,10,11 //For Graupner/Spektrum
+//#define RX_CHANNEL_ORDER         ROLLINDEX,PITCHINDEX,THROTTLEINDEX,YAWINDEX,AUX1INDEX,AUX2INDEX,AUX3INDEX,AUX4INDEX,8,9,10,11 //For Robe/Hitec/Futaba
+//#define RX_CHANNEL_ORDER         ROLLINDEX,PITCHINDEX,YAWINDEX,THROTTLEINDEX,AUX1INDEX,AUX2INDEX,AUX3INDEX,AUX4INDEX,8,9,10,11 //For Multiplex
+//#define RX_CHANNEL_ORDER         PITCHINDEX,ROLLINDEX,THROTTLEINDEX,YAWINDEX,AUX1INDEX,AUX2INDEX,AUX3INDEX,AUX4INDEX,8,9,10,11 //For some Hitec/Sanwa/Others
+
+// uncomment to set the number of RX channels, otherwise it will default to what the control board/receiver can handle
+//#define RXNUMCHANNELS 8
+
+// uncomment to allow arming and disarming with the sticks:
+// Arming and disarming only happen at low throttle
+// Uncomment the following two lines to allow arming using yaw
+//#define STICK_ARM STICK_COMMAND_YAW_HIGH
+//#define STICK_DISARM STICK_COMMAND_YAW_LOW
+
+// uncomment the following two lines to allow arming using yaw, roll, and pitch all at once
+//#define STICK_ARM STICK_COMMAND_YAW_HIGH+STICK_COMMAND_ROLL_HIGH+STICK_COMMAND_PITCH_LOW
+//#define STICK_DISARM STICK_COMMAND_YAW_LOW+STICK_COMMAND_ROLL_LOW+STICK_COMMAND_PITCH_LOW
 
 // Choose an aircraft configuration (defaults to QUADX)
 //#define AIRCRAFT_CONFIGURATION QUADX
@@ -53,6 +75,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 // Choose whether to include code for a GPS and set parameters for the GPS, otherwise it will default o what the control board come with
 //#define GPS_TYPE NO_GPS // select if no GPS is going to be used
+//#define GPS_TYPE I2C_GPS // select if an i2c gps is going to be used
 //#define GPS_TYPE SERIAL_GPS   // select if a serial GPS (NMEA) is going to be used
 //#define GPS_SERIAL_PORT 2
 //#define GPS_BAUD 115200
@@ -61,11 +84,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define HIGH_RATES_MULTILIER 2.0
 
 // Choose maximum tilt angles when in level mode
-#define LEVEL_MODE_MAX_TILT 45 // 45 degrees
+#define LEVEL_MODE_MAX_TILT 55 // 55 degrees
 #define LEVEL_MODE_MAX_TILT_HIGH_ANGLE 80 // 80 degrees when high angle checkbox active
 
 // Choose maximum tilt angles owhile navigating. This will determine how fast it moves from point to point.
-#define NAVIGATION_MAX_TILT 15 //15 degrees
+#define NAVIGATION_MAX_TILT 8 //15 degrees
 
 // Choose output ranges (in microseconds)
 #define MIN_MOTOR_OUTPUT 1000
@@ -76,6 +99,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // Divide the Aux inputs into low, medium, and high using the following divisions
 #define AUX_MID_RANGE_LOW 1300
 #define AUX_MID_RANGE_HIGH 1700
+
+// Define low and high values for stick commands
+#define STICK_RANGE_LOW 1150
+#define STICK_RANGE_HIGH 1850
 
 // un-comment if you don't want to include code for a compass, otherwise it will default to what the control board has on it
 //#define COMPASS_TYPE NO_COMPASS
@@ -93,9 +120,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // #define ESC_CALIB_CANNOT_FLY  // uncomment to activate
  #define ESC_CALIB_LOW  MIN_MOTOR_OUTPUT
  #define ESC_CALIB_HIGH MAX_MOTOR_OUTPUT
-
-// uncomment to set the number of RX channels, otherwise it will default to what the control board/receiver can handle
-//#define RXNUMCHANNELS 8
 
 // un-comment if you don't want to include autotune code
 //#define NO_AUTOTUNE

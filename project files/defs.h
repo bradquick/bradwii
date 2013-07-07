@@ -90,13 +90,36 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
    #if ((RX_TYPE==RX_DSM2_1024 || RX_TYPE==RX_DSM2_2048) && !defined(RX_DSM2_SERIAL_PORT))
       #define RX_DSM2_SERIAL_PORT 1
    #endif
-   
+
+#elif (CONTROL_BOARD_TYPE==CONTROL_BOARD_SIRIUS_AIR || CONTROL_BOARD_TYPE==CONTROL_BOARD_SIRIUS_AIR_GPS)
+   #define MICROCONTROLLER_TYPE MEGA32U4
+   #define GYRO_TYPE MPU6050 // gyro
+   #define GYRO_ORIENTATION(VALUES,X, Y, Z) {VALUES[ROLLINDEX] =  -Y; VALUES[PITCHINDEX] = X; VALUES[YAWINDEX] = -Z;}
+   #define ACCELEROMETER_TYPE MPU6050 // accelerometer
+   #define ACC_ORIENTATION(VALUES,X, Y, Z)  {VALUES[ROLLINDEX]  = X; VALUES[PITCHINDEX]  = Y; VALUES[YAWINDEX]  =  Z;}
+   #ifndef MULTIWII_CONFIG_SERIAL_PORTS
+      #define MULTIWII_CONFIG_SERIAL_PORTS SERIALPORTUSB
+   #endif
+   #define BAROMETER_TYPE BMP085 // baro
+   #if ((RX_TYPE==RX_DSM2_1024 || RX_TYPE==RX_DSM2_2048) && !defined(RX_DSM2_SERIAL_PORT))
+      #define RX_DSM2_SERIAL_PORT 1
+   #endif
+   #if (CONTROL_BOARD_TYPE==CONTROL_BOARD_SIRIUS_AIR_GPS)
+      #define COMPASS_TYPE HMC5883 // compass
+      #define COMPASS_ORIENTATION(VALUES,X, Y, Z) {VALUES[ROLLINDEX]  =  -X; VALUES[PITCHINDEX]  = Y; VALUES[YAWINDEX]  = Z;}
+      #define GPS_TYPE I2C_GPS
+   #else
+      #define COMPASS_TYPE NO_COMPASS // compass
+      #define GPS_TYPE NO_GPS
+   #endif
+//  #define RCAUX2PIND17
+
 #else
    You need to define a Control Board in config.h!
 #endif
 
 #ifndef RXNUMCHANNELS
-   #if (RX_TYPE==RX_DSM2_1024 || RX_TYPE==RX_DSM2_2048)
+   #if (RX_TYPE==RX_DSM2_1024 || RX_TYPE==RX_DSM2_2048 || RX_TYPE==RX_CPPM)
       #define RXNUMCHANNELS 8
    #else
       #define RXNUMCHANNELS 6

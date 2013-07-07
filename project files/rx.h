@@ -41,3 +41,6 @@ void readrx();
 #define FPAUXMIDRANGELOW (((fixedpointnum)AUX_MID_RANGE_LOW-1500)<<7)
 #define FPAUXMIDRANGEHIGH (((fixedpointnum)AUX_MID_RANGE_HIGH-1500)<<7)
 #define FPTHROTTLELOW (((fixedpointnum)900-1500)<<7)
+
+#define FPSTICKLOW (((fixedpointnum)STICK_RANGE_LOW-1500)<<7)
+#define FPSTICKHIGH (((fixedpointnum)STICK_RANGE_HIGH-1500)<<7)

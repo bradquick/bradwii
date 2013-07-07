@@ -19,6 +19,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "defs.h"
 #include "lib_serial.h"
 #include "bradwii.h"
+#include "lib_i2c.h"
+#include "lib_timers.h"
 
 // when adding GPS's, the following functions must be included:
 // initgps()  // does any initialization of the gps
@@ -177,6 +179,140 @@ char readgps()
       }
    return(0); // no complete data yet
    }
-         
-#endif
 
+#elif (GPS_TYPE==I2C_GPS)
+
+/**************************************************************************************/
+/***************                       I2C GPS                     ********************/
+/**************************************************************************************/
+#define I2C_GPS_ADDRESS                         0x20 //7 bits       
+///////////////////////////////////////////////////////////////////////////////////////////////////
+// I2C GPS NAV registers
+///////////////////////////////////////////////////////////////////////////////////////////////////
+//
+#define I2C_GPS_STATUS_00                            00 //(Read only)
+        #define I2C_GPS_STATUS_NEW_DATA       0x01      // New data is available (after every GGA frame)
+        #define I2C_GPS_STATUS_2DFIX          0x02      // 2dfix achieved
+        #define I2C_GPS_STATUS_3DFIX          0x04      // 3dfix achieved
+        #define I2C_GPS_STATUS_WP_REACHED     0x08      // Active waypoint has been reached (not cleared until new waypoint is set)
+        #define I2C_GPS_STATUS_NUMSATS        0xF0      // Number of sats in view
+
+#define I2C_GPS_COMMAND                              01 // (write only)
+        #define I2C_GPS_COMMAND_POSHOLD       0x01      // Start position hold at the current gps positon
+        #define I2C_GPS_COMMAND_START_NAV     0x02      // get the WP from the command and start navigating toward it
+        #define I2C_GPS_COMMAND_SET_WP        0x03      // copy current position to given WP      
+        #define I2C_GPS_COMMAND_UPDATE_PIDS   0x04      // update PI and PID controllers from the PID registers, this must be called after a pid register is changed
+        #define I2C_GPS_COMMAND_NAV_OVERRIDE  0x05      // do not nav since we tring to controll the copter manually (not implemented yet)
+        #define I2C_GPS_COMMAND_STOP_NAV      0x06      // Stop navigation (zeroes out nav_lat and nav_lon
+        #define I2C_GPS_COMMAND__7            0x07
+        #define I2C_GPS_COMMAND__8            0x08      
+        #define I2C_GPS_COMMAND__9            0x09
+        #define I2C_GPS_COMMAND__a            0x0a
+        #define I2C_GPS_COMMAND__b            0x0b
+        #define I2C_GPS_COMMAND__c            0x0c
+        #define I2C_GPS_COMMAND__d            0x0d
+        #define I2C_GPS_COMMAND__e            0x0e
+        #define I2C_GPS_COMMAND__f            0x0f
+
+        #define I2C_GPS_COMMAND_WP_MASK       0xF0       // Waypoint number
+
+#define I2C_GPS_WP_REG                              02   // Waypoint register (Read only)
+        #define I2C_GPS_WP_REG_ACTIVE_MASK    0x0F       // Active Waypoint lower 4 bits
+        #define I2C_GPS_WP_REG_PERVIOUS_MASK  0xF0       // pervious Waypoint upper 4 bits
+        
+#define I2C_GPS_REG_VERSION                         03   // Version of the I2C_NAV SW uint8_t
+#define I2C_GPS_REG_RES2                            04   // reserved for future use (uint8_t)
+#define I2C_GPS_REG_RES3                            05   // reserved for future use (uint8_t)
+#define I2C_GPS_REG_RES4                            06   // reserved for future use (uint8_t)
+
+
+#define I2C_GPS_LOCATION                            07   // current location 8 byte (lat, lon) int32_t
+#define I2C_GPS_NAV_LAT                             15   // Desired banking towards north/south int16_t
+#define I2C_GPS_NAV_LON                             17   // Desired banking toward east/west    int16_t
+#define I2C_GPS_WP_DISTANCE                         19   // Distance to current WP in cm uint32
+#define I2C_GPS_WP_TARGET_BEARING                   23   // bearing towards current wp 1deg = 1000 int16_t
+#define I2C_GPS_NAV_BEARING                         25   // crosstrack corrected bearing towards current wp 1deg = 1000 int16_t
+#define I2C_GPS_HOME_TO_COPTER_BEARING              27   // bearing from home to copter 1deg = 1000 int16_t
+#define I2C_GPS_DISTANCE_TO_HOME                    29   // distance to home in m int16_t
+        
+#define I2C_GPS_GROUND_SPEED                        31   // GPS ground speed in m/s*100 (uint16_t)      (Read Only)
+#define I2C_GPS_ALTITUDE                            33   // GPS altitude in meters (uint16_t)           (Read Only)
+#define I2C_GPS_GROUND_COURSE                       35   // GPS ground course (uint16_t)
+#define I2C_GPS_RES1                                37   // reserved for future use (uint16_t)
+#define I2C_GPS_TIME                                39   // UTC Time from GPS in hhmmss.sss * 100 (uint32_t)(unneccesary precision) (Read Only)
+
+unsigned long gpstimer;
+
+void initgps()
+   {
+   gpstimer=lib_timers_starttimer();
+   }
+
+char readgps()
+   { // returns 1 if new data was read
+   if (lib_timers_gettimermicroseconds(gpstimer)<50000) return(0); // 20 hz
+
+   gpstimer=lib_timers_starttimer();
+   
+   unsigned char shiftedaddress=I2C_GPS_ADDRESS<<1;
+   lib_i2c_start_wait(shiftedaddress+I2C_WRITE);
+   if (lib_i2c_write(I2C_GPS_STATUS_00))
+      return(0); 
+
+   lib_i2c_rep_start(shiftedaddress+I2C_READ);
+
+   unsigned char gps_status= lib_i2c_readnak();
+ 
+   global.gps_num_satelites = (gps_status & 0xf0) >> 4;
+   if (gps_status & I2C_GPS_STATUS_3DFIX) 
+      { //Check is we have a good 3d fix (numsats>5)
+      long longvalue;
+      unsigned char *ptr=(unsigned char *)&longvalue;
+      
+      lib_i2c_rep_start(shiftedaddress+I2C_WRITE);
+      lib_i2c_write(I2C_GPS_LOCATION); 
+      lib_i2c_rep_start(shiftedaddress+I2C_READ);
+
+      *ptr++ = lib_i2c_readack();
+      *ptr++ = lib_i2c_readack();
+      *ptr++ = lib_i2c_readack();
+      *ptr = lib_i2c_readack();
+
+      global.gps_current_latitude=lib_fp_multiply(longvalue,27488L); // convert from 10,000,000 m to fixedpointnum
+      
+      ptr=(unsigned char *)&longvalue;
+      
+      *ptr++ = lib_i2c_readack();
+      *ptr++ = lib_i2c_readack();
+      *ptr++ = lib_i2c_readack();
+      *ptr = lib_i2c_readnak();
+      
+      global.gps_current_longitude=lib_fp_multiply(longvalue,27488L); // convert from 10,000,000 m to fixedpointnum
+
+      int intvalue;
+      ptr= (unsigned char *)&intvalue;
+      
+      lib_i2c_rep_start(shiftedaddress+I2C_WRITE);
+      lib_i2c_write(I2C_GPS_GROUND_SPEED); 
+      lib_i2c_rep_start(shiftedaddress+I2C_READ);
+
+      *ptr++ = lib_i2c_readack();
+      *ptr++ = lib_i2c_readack();
+      
+      global.gps_current_speed=intvalue*665L; // convert fro cm/s to fixedpointnum to m/s
+      
+      ptr= (unsigned char *)&intvalue;
+      *ptr++ = lib_i2c_readack();
+      *ptr = lib_i2c_readnak();
+
+      global.gps_current_altitude=((fixedpointnum)intvalue)<<FIXEDPOINTSHIFT;
+
+      lib_i2c_stop();
+      return(1);
+      }
+   lib_i2c_stop();
+
+   return(0);
+   }
+
+#endif

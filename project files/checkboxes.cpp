@@ -82,4 +82,30 @@ void checkcheckboxitems()
       {
       if (usersettings.checkboxconfiguration[x] & mask) global.activecheckboxitems |= (1L<<x);
       }
+
+#define STICK_ARM STICK_COMMAND_YAW_HIGH+STICK_COMMAND_ROLL_HIGH+STICK_COMMAND_PITCH_LOW
+#define STICK_DISARM STICK_COMMAND_YAW_LOW+STICK_COMMAND_ROLL_LOW+STICK_COMMAND_PITCH_LOW
+      
+#if (defined(STICK_ARM) | defined (STICK_DISARM))
+   // figure out where the sticks are
+   unsigned int stickmask=0;
+   if (global.rxvalues[ROLLINDEX]<FPSTICKLOW) stickmask |= STICK_COMMAND_ROLL_LOW;
+   else if (global.rxvalues[ROLLINDEX]>FPSTICKHIGH) stickmask |= STICK_COMMAND_ROLL_HIGH;
+
+   if (global.rxvalues[PITCHINDEX]<FPSTICKLOW) stickmask |= STICK_COMMAND_PITCH_LOW;
+   else if (global.rxvalues[PITCHINDEX]>FPSTICKHIGH) stickmask |= STICK_COMMAND_PITCH_HIGH;
+
+   if (global.rxvalues[YAWINDEX]<FPSTICKLOW) stickmask |= STICK_COMMAND_YAW_LOW;
+   else if (global.rxvalues[YAWINDEX]>FPSTICKHIGH) stickmask |= STICK_COMMAND_YAW_HIGH;
+
+
+   // If the sticks are in the right positions, set the arm or disarm checkbox value
+   // Start with the previous value in case the sticks aren't doing anything special
+   global.activecheckboxitems=(global.activecheckboxitems & ~CHECKBOXMASKARM) | (global.previousactivecheckboxitems & CHECKBOXMASKARM);
+   
+   if ((stickmask & (STICK_ARM))==STICK_ARM) global.activecheckboxitems |= CHECKBOXMASKARM;
+   
+   else if ((stickmask & (STICK_DISARM))==STICK_DISARM) global.activecheckboxitems &= ~CHECKBOXMASKARM;
+      
+#endif
    }

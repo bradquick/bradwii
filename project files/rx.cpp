@@ -156,11 +156,15 @@ void readrx()
 #define DSM2STATE_WAITINGFORFIRSTCHAR 1
 #define DSM2STATE_WAITINGFORSECONDCHAR 2
 
+#ifndef RX_CHANNEL_ORDER
+   #define RX_CHANNEL_ORDER         THROTTLEINDEX,ROLLINDEX,PITCHINDEX,YAWINDEX,AUX1INDEX,AUX2INDEX,AUX3INDEX,AUX4INDEX,8,9,10,11 //For Graupner/Spektrum
+#endif
+
 volatile unsigned int rxrawvalues[RXNUMCHANNELS];
 unsigned long dsm2timer;
 unsigned char dsm2state;
 unsigned char dsm2firstchar;
-unsigned char dsm2channelindex[]={3,0,1,2};
+unsigned char dsm2channelindex[]={RX_CHANNEL_ORDER};
 
 // this callback will get called whenever we receive a character on our dsm2 serial port
 void dsm2serialcallback(unsigned char c)
@@ -184,8 +188,12 @@ void dsm2serialcallback(unsigned char c)
    else
       {
       unsigned char channel = 0x0F & (dsm2firstchar >> DSM2_CHAN_SHIFT);
-      if (channel<4) channel=dsm2channelindex[channel];
-      if (channel < RXNUMCHANNELS) rxrawvalues[channel] = ((unsigned int)(dsm2firstchar & DSM2_CHAN_MASK) << 8) + c;
+      
+      if (channel < RXNUMCHANNELS)
+         {
+         channel=dsm2channelindex[channel];
+         rxrawvalues[channel] = ((unsigned int)(dsm2firstchar & DSM2_CHAN_MASK) << 8) + c;
+         }
       dsm2state=DSM2STATE_WAITINGFORFIRSTCHAR;
 
       // reset the failsafe timer
@@ -213,6 +221,65 @@ void readrx()
       lib_fp_lowpassfilter(&global.rxvalues[x], ((fixedpointnum)rxrawvalues[x]-1024)<<6, global.timesliver, FIXEDPOINTONEOVERONESIXTYITH, TIMESLIVEREXTRASHIFT);
 #endif
       }
+   }
+
+
+#elif (RX_TYPE==RX_CPPM)
+
+#ifndef RX_CHANNEL_ORDER
+   #define RX_CHANNEL_ORDER         THROTTLEINDEX,ROLLINDEX,PITCHINDEX,YAWINDEX,AUX1INDEX,AUX2INDEX,AUX3INDEX,AUX4INDEX,8,9,10,11 //For Graupner/Spektrum
+#endif
+
+unsigned char channelindex[]={RX_CHANNEL_ORDER};
+volatile unsigned int rxrawvalues[RXNUMCHANNELS];
+
+void serialsumcallback(unsigned char interruptnumber, unsigned char newstate) 
+   { // gke
+   static unsigned long starttime = 0;
+   static unsigned char chan = 0;
+   unsigned int width;
+   static unsigned int glitches=0;
+  
+   if (newstate)
+      {
+      width = lib_timers_gettimermicrosecondsandreset(&starttime);
+      
+      if ( width > 3000)
+         {
+         global.failsafetimer=lib_timers_starttimer();  // reset the failsafe timer
+         chan = 0;  
+         }
+      else if (chan < RXNUMCHANNELS)
+         {
+         if (width>900 && width<2050)
+            rxrawvalues[chan] = width;
+         else
+            {
+            global.debugvalue[1] = width;
+            global.debugvalue[0] = ++glitches;
+            }
+          
+         chan++;
+         }
+      } 
+   }
+
+void readrx()
+   {
+   unsigned char chan;
+   
+   for (chan=0; chan<RXNUMCHANNELS;++chan) // convert from 1000-2000 range to -1 to 1 fixedpointnum range and low pass filter to remove glitches
+      lib_fp_lowpassfilter(&global.rxvalues[channelindex[chan]], ((fixedpointnum)rxrawvalues[chan]-1500)*131L, global.timesliver, FIXEDPOINTONEOVERONESIXTYITH, TIMESLIVEREXTRASHIFT);
+   }
+
+void initrx()
+   {
+   for (int x=0;x<RXNUMCHANNELS;++x)
+      global.rxvalues[x]=0; // middle position
+   global.rxvalues[THROTTLEINDEX]=FPTHROTTLELOW; // default throttle to low position
+      
+   lib_digitalio_initpin(THROTTLE_RX_INPUT,DIGITALINPUT);
+   lib_digitalio_setinterruptcallback(THROTTLE_RX_INPUT, serialsumcallback);   
    }
 
 #endif

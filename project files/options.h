@@ -20,9 +20,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #pragma once
 
 // CONTROL_BOARD_TYPE's
-#define CONTROL_BOARD_MULTIWII_PRO_2 0
-#define CONTROL_BOARD_MULTIWII_328P 1
-#define CONTROL_BOARD_NANOWII 2
+#define CONTROL_BOARD_MULTIWII_PRO_2 1
+#define CONTROL_BOARD_MULTIWII_328P 2
+#define CONTROL_BOARD_NANOWII 3
+#define CONTROL_BOARD_SIRIUS_AIR 4
+#define CONTROL_BOARD_SIRIUS_AIR_GPS 5
 
 // MICROCONTROLLER_TYPE's
 #define MEGA2560 0
@@ -60,6 +62,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // GPS_TYPE's
 #define NO_GPS 0
 #define SERIAL_GPS 1
+#define I2C_GPS 2
 
 // COMPASS_TYPE's
 #define NO_COMPASS 0
@@ -83,3 +86,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define RX_NORMAL 0
 #define RX_DSM2_1024 1
 #define RX_DSM2_2048 2
+#define RX_CPPM 3
+
+// Stick Command stick positions
+#define STICK_COMMAND_ROLL_LOW (1<<0)
+#define STICK_COMMAND_ROLL_HIGH (1<<1)
+#define STICK_COMMAND_PITCH_LOW (1<<2)
+#define STICK_COMMAND_PITCH_HIGH (1<<3)
+#define STICK_COMMAND_YAW_LOW (1<<4)
+#define STICK_COMMAND_YAW_HIGH (1<<5)
+

@@ -80,6 +80,7 @@ all:
 	$(COMPILE) -S $< -o $@
 
 flash:	all
+#   python resetleonardo.py /dev/cu.usbmodem1421
 	$(AVRDUDE) -U flash:w:bradwii.hex:i
 #avrdude.conf -v -v -v -v -patmega2560 -cstk500v2 -P/dev/cu.SLAB_USBtoUART -Uflash:w:/var/folders/qn/5h0p0ppc8xjczf001s7ppjqr0000gn/T/build5197281368797617405.tmp/MultiWii_2_1_brad.cpp.hex:i 
 
