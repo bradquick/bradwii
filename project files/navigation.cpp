@@ -73,10 +73,10 @@ fixedpointnum navigation_desiredeulerattitude[3];
 //                \      |
 //                 \     |
 //                  \    | crosstrack
-//                     \   | distance
-//                     \  |
-//                      \ |
-//                       \| 
+//                   \   | distance
+//                    \  |
+//                     \ |
+//                      \| 
 //                       * current location
 //
 //  angle A is the difference between our start to destination bearing and our current bearing to the destination

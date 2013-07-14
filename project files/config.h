@@ -24,17 +24,17 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "options.h"
 
 // Choose your control board:
-//#define CONTROL_BOARD_TYPE CONTROL_BOARD_MULTIWII_PRO_2
+#define CONTROL_BOARD_TYPE CONTROL_BOARD_MULTIWII_PRO_2
 //#define CONTROL_BOARD_TYPE CONTROL_BOARD_MULTIWII_328P
 //#define CONTROL_BOARD_TYPE CONTROL_BOARD_NANOWII
-#define CONTROL_BOARD_TYPE CONTROL_BOARD_SIRIUS_AIR
+//#define CONTROL_BOARD_TYPE CONTROL_BOARD_SIRIUS_AIR
 //#define CONTROL_BOARD_TYPE CONTROL_BOARD_SIRIUS_AIR_GPS
 
 // Choose the type of r/c reciever that will be used
-#define RX_TYPE RX_NORMAL
+//#define RX_TYPE RX_NORMAL
 //#define RX_TYPE RX_CPPM
 //#define RX_TYPE RX_DSM2_1024
-//#define RX_TYPE RX_DSM2_2048
+#define RX_TYPE RX_DSM2_2048
 //#define RX_DSM2_SERIAL_PORT 1
 
 // Choose a channel order if you don't like the default for your receiver type selected above
@@ -101,8 +101,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define AUX_MID_RANGE_HIGH 1700
 
 // Define low and high values for stick commands
-#define STICK_RANGE_LOW 1150
-#define STICK_RANGE_HIGH 1850
+#define STICK_RANGE_LOW 1170
+#define STICK_RANGE_HIGH 1830
 
 // un-comment if you don't want to include code for a compass, otherwise it will default to what the control board has on it
 //#define COMPASS_TYPE NO_COMPASS
@@ -122,7 +122,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  #define ESC_CALIB_HIGH MAX_MOTOR_OUTPUT
 
 // un-comment if you don't want to include autotune code
-#define NO_AUTOTUNE
+//#define NO_AUTOTUNE
 // To adjust how agressive the tuning is, adjust the AUTOTUNEMAXOSCILLATION value.  A larger
 // value will result in more agressive tuning. A lower value will result in softer tuning.
 // It will rock back and forth between -AUTOTUNE_TARGET_ANGLE and AUTOTUNE_TARGET_ANGLE degrees
@@ -138,3 +138,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #define UNCRAHSABLE_MAX_ALTITUDE_OFFSET 30.0 // 30 meters above where uncrashability was enabled
 #define UNCRAHSABLE_RADIUS 50.0 // 50 meter radius
+
+// Uncomment the following line if you want to turn off gain scheduling.  Gain scheduling adjusts the PID gains
+// depending on the level of throttle.  It attempts to eliminate the wobbles while decending under low throttle.
+// #define NOGAINSCHEDULING

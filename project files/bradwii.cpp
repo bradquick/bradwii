@@ -411,6 +411,14 @@ int main(void)
          pidoutput[x]=lib_fp_multiply(angleerror[x],usersettings.pid_pgain[x])
             -lib_fp_multiply(global.gyrorate[x],usersettings.pid_dgain[x])
             +(lib_fp_multiply(integratedangleerror[x],usersettings.pid_igain[x])>>4);
+            
+         // add gain scheduling.  Essentialy modifies the gains depending on
+         // throttle level. Multiplies PID outputs by 1.5 when at full throttle,
+         // 1.0 when at mid throttle, and .5 when at zero throttle.  This helps
+         // eliminate the wobbles when decending at low throttle.
+#ifndef NOGAINSCHEDULING
+         pidoutput[x]=lib_fp_multiply(throttleoutput+FIXEDPOINTCONSTANT(.5),pidoutput[x]);
+#endif
          }
 
       lib_fp_constrain(&throttleoutput,0,FIXEDPOINTONE);
