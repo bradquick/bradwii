@@ -86,8 +86,6 @@ void navigation_sethometocurrentlocation()
    {
    global.gps_home_latitude=global.gps_current_latitude;
    global.gps_home_longitude=global.gps_current_longitude;
-   global.gps_home_heading=global.currentestimatedeulerattitude[YAWINDEX];
-   global.gps_home_altitude=global.barorawaltitude;
    }
    
 void navigation_set_destination(fixedpointnum latitude,fixedpointnum longitude)

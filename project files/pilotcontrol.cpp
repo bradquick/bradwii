@@ -50,6 +50,24 @@ void resetpilotcontrol()
 void getangleerrorfrompilotinput(fixedpointnum *angleerror)
    {
    // sets the ange errors for roll, pitch, and yaw based on where the pilot has the tx sticks.
+   fixedpointnum rxrollvalue;
+   fixedpointnum rxpitchvalue;
+   
+   // if in headfree mode, rotate the pilot's stick inputs by the angle that is the difference between where we are currently heading and where we were heading when we armed.
+   if (global.activecheckboxitems & CHECKBOXMASKHEADFREE)
+      {
+      fixedpointnum angledifference = global.currentestimatedeulerattitude[YAWINDEX] - global.heading_when_armed;
+
+      fixedpointnum cosangledifference = lib_fp_cosine(angledifference);
+      fixedpointnum sinangledifference = lib_fp_sine(angledifference);
+      rxpitchvalue = lib_fp_multiply(global.rxvalues[PITCHINDEX],cosangledifference) + lib_fp_multiply(global.rxvalues[ROLLINDEX],sinangledifference);
+      rxrollvalue =  lib_fp_multiply(global.rxvalues[ROLLINDEX],cosangledifference) - lib_fp_multiply(global.rxvalues[PITCHINDEX],sinangledifference);
+      }
+   else
+      {
+      rxpitchvalue=global.rxvalues[PITCHINDEX];
+      rxrollvalue=global.rxvalues[ROLLINDEX];
+      }
    
    // first, calculate level mode values
    // how far is our estimated current attitude from our desired attitude?
@@ -60,8 +78,8 @@ void getangleerrorfrompilotinput(fixedpointnum *angleerror)
    else levelmodemaxangle=FP_LEVEL_MODE_MAX_TILT;
 
    // the angle error is how much our current angles differ from our desired angles.
-   fixedpointnum levelmoderollangleerror=lib_fp_multiply(global.rxvalues[ROLLINDEX],levelmodemaxangle)-global.currentestimatedeulerattitude[ROLLINDEX];
-   fixedpointnum levelmodepitchangleerror=lib_fp_multiply(global.rxvalues[PITCHINDEX],levelmodemaxangle)-global.currentestimatedeulerattitude[PITCHINDEX];
+   fixedpointnum levelmoderollangleerror=lib_fp_multiply(rxrollvalue,levelmodemaxangle)-global.currentestimatedeulerattitude[ROLLINDEX];
+   fixedpointnum levelmodepitchangleerror=lib_fp_multiply(rxpitchvalue,levelmodemaxangle)-global.currentestimatedeulerattitude[PITCHINDEX];
    
    // In acro mode, we want the rotation rate to be proportional to the pilot's stick movement.  The desired rotation rate is
    // the stick movement * a multiplier.
@@ -82,8 +100,8 @@ void getangleerrorfrompilotinput(fixedpointnum *angleerror)
       maxpitchandrollrate=usersettings.maxpitchandrollrate;
       }
       
-   angleerror[ROLLINDEX]=lib_fp_multiply(lib_fp_multiply(global.rxvalues[ROLLINDEX],maxpitchandrollrate)-global.gyrorate[ROLLINDEX],global.timesliver);
-   angleerror[PITCHINDEX]=lib_fp_multiply(lib_fp_multiply(global.rxvalues[PITCHINDEX],maxpitchandrollrate)-global.gyrorate[PITCHINDEX],global.timesliver);
+   angleerror[ROLLINDEX]=lib_fp_multiply(lib_fp_multiply(rxrollvalue,maxpitchandrollrate)-global.gyrorate[ROLLINDEX],global.timesliver);
+   angleerror[PITCHINDEX]=lib_fp_multiply(lib_fp_multiply(rxpitchvalue,maxpitchandrollrate)-global.gyrorate[PITCHINDEX],global.timesliver);
 
    // put a low pass filter on the yaw gyro.  If we don't do this, things can get jittery.
    lib_fp_lowpassfilter(&filteredyawgyrorate, global.gyrorate[YAWINDEX], global.timesliver>>(TIMESLIVEREXTRASHIFT-3), FIXEDPOINTONEOVERONESIXTYITH, 3);
@@ -130,17 +148,17 @@ void getangleerrorfrompilotinput(fixedpointnum *angleerror)
       // figure out how much the most moved stick is from centered
       fixedpointnum maxstickthrow;
    
-      if (global.rxvalues[ROLLINDEX]<0)
-         maxstickthrow=-global.rxvalues[ROLLINDEX];
+      if (rxrollvalue<0)
+         maxstickthrow=-rxrollvalue;
       else
-         maxstickthrow=global.rxvalues[ROLLINDEX];
+         maxstickthrow=rxrollvalue;
          
-      if (global.rxvalues[PITCHINDEX]<0)
+      if (rxpitchvalue<0)
          {
-         if (-global.rxvalues[PITCHINDEX]>maxstickthrow) maxstickthrow=-global.rxvalues[PITCHINDEX];
+         if (-rxpitchvalue>maxstickthrow) maxstickthrow=-rxpitchvalue;
          }
       else
-         if (global.rxvalues[PITCHINDEX]>maxstickthrow) maxstickthrow=global.rxvalues[PITCHINDEX];
+         if (rxpitchvalue>maxstickthrow) maxstickthrow=rxpitchvalue;
          
    
       // if the aircraft is tipped more than 90 degrees, use full acro mode so we don't run into

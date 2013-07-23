@@ -35,7 +35,8 @@ char checkboxnames[]/* PROGMEM */= // names for dynamic generation of config GUI
    "High Rates;"
    "High Angle;"
    "Auto Tune;"
-   "Uncrashable"
+   "Uncrashable;"
+   "HF"
    ;
 
 // each checkbox item has a checkboxvalue.  The bits in this value represent low, medium, and high checkboxes

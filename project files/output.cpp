@@ -41,6 +41,9 @@ void initoutputs()
 #ifdef USEPWM411BIT
    lib_pwm_init4(PWM411BITPHASECORRECTMODE,/*PWM411BITNORMALOUTPUTA | PWM411BITNORMALOUTPUTB |*/ PWM411BITNORMALOUTPUTD,PWM411BITPRESCALER16,0x7FF); // TOP to 2047
 #endif
+#ifdef USEPWM5
+   lib_pwm_init5(PWM5PHASECORRECTMODE,PWM5NORMALOUTPUTA | PWM5NORMALOUTPUTB | PWM5NORMALOUTPUTC,PWM5PRESCALER1,0x3FFF); // TOP to 16383
+#endif
 
    lib_digitalio_initpin(MOTOR_0_PIN, DIGITALOUTPUT);
    lib_digitalio_initpin(MOTOR_1_PIN, DIGITALOUTPUT);
@@ -58,13 +61,14 @@ void initoutputs()
  /********  special version of MultiWii to calibrate all attached ESCs ************/
 #if defined(ESC_CALIB_CANNOT_FLY)
     setallmotoroutputs(ESC_CALIB_HIGH);
-       lib_timers_delaymilliseconds(3000);
+    lib_timers_delaymilliseconds(3000);
     setallmotoroutputs(ESC_CALIB_LOW);
-    while (1) 
+
+    while (1)
       {
-         lib_timers_delaymilliseconds(500);
+      lib_timers_delaymilliseconds(500);
       lib_digitalio_setoutput(LED1_OUTPUT, 0);
-         lib_timers_delaymilliseconds(500);
+      lib_timers_delaymilliseconds(500);
       lib_digitalio_setoutput(LED1_OUTPUT, 1);
       }
 #endif

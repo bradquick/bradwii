@@ -236,7 +236,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
    #define MOTOR_4_CHANNEL (OUTPUT_TIMER1 | OUTPUT_CHANNELC)
    #define MOTOR_4_PIN (DIGITALPORTB | 7)
    #define MOTOR_5_CHANNEL (OUTPUT_TIMER4 | OUTPUT_CHANNELA)
-   #define MOTOR_5_PIN (DIGITALPORTC7 | 1)
+   #define MOTOR_5_PIN (DIGITALPORTC | 1)
 
 #endif
 

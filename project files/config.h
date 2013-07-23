@@ -31,10 +31,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //#define CONTROL_BOARD_TYPE CONTROL_BOARD_SIRIUS_AIR_GPS
 
 // Choose the type of r/c reciever that will be used
-//#define RX_TYPE RX_NORMAL
+#define RX_TYPE RX_NORMAL
 //#define RX_TYPE RX_CPPM
 //#define RX_TYPE RX_DSM2_1024
-#define RX_TYPE RX_DSM2_2048
+//#define RX_TYPE RX_DSM2_2048
 //#define RX_DSM2_SERIAL_PORT 1
 
 // Choose a channel order if you don't like the default for your receiver type selected above
@@ -94,7 +94,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define MIN_MOTOR_OUTPUT 1000
 #define MAX_MOTOR_OUTPUT 2000
 #define ARMED_MIN_MOTOR_OUTPUT 1067 // motors spin slowly when armed
-#define FAILSAFE_MOTOR_OUTPUT 1200 // throttle setting for bringing the aircraft down at a safe speed
+#define FAILSAFE_MOTOR_OUTPUT 1100 // throttle setting for bringing the aircraft down at a safe speed
 
 // Divide the Aux inputs into low, medium, and high using the following divisions
 #define AUX_MID_RANGE_LOW 1300
@@ -117,9 +117,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // To calibrate all ESCs connected to the aircraft at the same time (useful to avoid unplugging/re-plugging each ESC)
 // Warning: this creates a special version of code
 //       You cannot fly with this special version. It is only to be used for calibrating ESCs
-// #define ESC_CALIB_CANNOT_FLY  // uncomment to activate
- #define ESC_CALIB_LOW  MIN_MOTOR_OUTPUT
- #define ESC_CALIB_HIGH MAX_MOTOR_OUTPUT
+//#define ESC_CALIB_CANNOT_FLY  // uncomment to activate
+#define ESC_CALIB_LOW  MIN_MOTOR_OUTPUT
+#define ESC_CALIB_HIGH MAX_MOTOR_OUTPUT
 
 // un-comment if you don't want to include autotune code
 //#define NO_AUTOTUNE
@@ -141,4 +141,4 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 // Uncomment the following line if you want to turn off gain scheduling.  Gain scheduling adjusts the PID gains
 // depending on the level of throttle.  It attempts to eliminate the wobbles while decending under low throttle.
-// #define NOGAINSCHEDULING
+#define GAIN_SCHEDULING_FACTOR 1.0

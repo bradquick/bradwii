@@ -62,6 +62,8 @@ typedef struct
    fixedpointnum currentestimatedeulerattitude[3]; // Euler Angles in degrees of how much we think the aircraft is Rolled, Pitched, and Yawed (from North)
    fixedpointnum rxvalues[RXNUMCHANNELS];            // The values of the RX inputs, ranging from -1.0 to 1.0
    fixedpointnum compassvector[3];                  // A unit vector (approximately) poining in the direction our 3d compass is pointing
+   fixedpointnum heading_when_armed;                  // the heading we were pointing when arming was established
+   fixedpointnum altitude_when_armed;                  // The altitude when arming established
    unsigned int motoroutputvalue[NUMMOTORS];         // Output values to send to our motors, from 1000 to 2000
    unsigned long activecheckboxitems;               // Bits for each checkbox item to show which are currently active
    unsigned long previousactivecheckboxitems;      // The previous state of these bits so we can tell when they turn on and off
@@ -69,8 +71,6 @@ typedef struct
    unsigned char gps_num_satelites;                  // How many satelites do we currently see?
    fixedpointnum gps_home_latitude;                  // The latitude when the aircraft was armed
    fixedpointnum gps_home_longitude;               // The longitude when the aircraft was armed
-   fixedpointnum gps_home_heading;                  // the heading we were pointing when home was established
-   fixedpointnum gps_home_altitude;                  // The altitude when home was established
    fixedpointnum gps_current_latitude;               // The current GPS latitude
    fixedpointnum gps_current_longitude;            // The current GPS longitude
    fixedpointnum gps_current_altitude;               // The current GPS altitude

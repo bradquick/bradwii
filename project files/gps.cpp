@@ -62,7 +62,8 @@ unsigned char gpsframetype;
 unsigned char gpschecksum;
 unsigned char gpsfinalchecksum;
 unsigned char gpsfix;
-fixedpointnum gpsdegrees;
+fixedpointnum gpslatitudedegrees;
+fixedpointnum gpslongitudedegrees;
 
 unsigned char hextochar(unsigned char n) 
    {      // convert '0'..'9','A'..'F' to 0..15
@@ -113,21 +114,19 @@ char readgps()
                {
                if (gpsparameternumber == 2) 
                   {
-                  gpsdegrees = gpsstringtoangle(gpsdata);
+                  gpslatitudedegrees = gpsstringtoangle(gpsdata);
                   }
-               else if (gpsparameternumber == 3 && gpsdegrees!=0)
+               else if (gpsparameternumber == 3)
                   {
-                  if ( gpsdata[0] == 'S') global.gps_current_latitude=-gpsdegrees;
-                  else global.gps_current_latitude=gpsdegrees;
+                  if ( gpsdata[0] == 'S') gpslatitudedegrees=-gpslatitudedegrees;
                   }
                else if (gpsparameternumber == 4)
                   {
-                  gpsdegrees = gpsstringtoangle(gpsdata);
+                  gpslongitudedegrees = gpsstringtoangle(gpsdata);
                   }
-               else if (gpsparameternumber == 5 && gpsdegrees!=0)
+               else if (gpsparameternumber == 5)
                   {
-                  if ( gpsdata[0] == 'W') global.gps_current_longitude=-gpsdegrees;
-                  else global.gps_current_longitude=gpsdegrees;
+                  if ( gpsdata[0] == 'W') gpslongitudedegrees=-gpslongitudedegrees;
                   }
                else if (gpsparameternumber == 6)
                   {
@@ -168,6 +167,9 @@ char readgps()
             if (checksum != gpsfinalchecksum || gpsframetype!=FRAME_GGA || !gpsfix) return(0);
             gpsframetype=0; // so we don't check again
 
+            global.gps_current_latitude=gpslatitudedegrees;
+            global.gps_current_longitude=gpslongitudedegrees;
+            
             return(1); // we got a good frame
             }
          else if (gpsdataindex<GPSDATASIZE)
