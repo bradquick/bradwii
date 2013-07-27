@@ -36,11 +36,11 @@ void readrx();
 // convert from 1000-2000 range to fixedpointnum -1 to 1
 #define FPMINMOTOROUTPUT (((fixedpointnum)MIN_MOTOR_OUTPUT-1500)<<7)
 #define FPMAXMOTOROUTPUT (((fixedpointnum)MAX_MOTOR_OUTPUT-1500)<<7)
-#define FPARMEDMINMOTOROUTPUT (((fixedpointnum)ARMED_MIN_MOTOR_OUTPUT-1500)<<7)
 #define FPFAILSAFEMOTOROUTPUT (((fixedpointnum)FAILSAFE_MOTOR_OUTPUT-1500)<<7)
 #define FPAUXMIDRANGELOW (((fixedpointnum)AUX_MID_RANGE_LOW-1500)<<7)
 #define FPAUXMIDRANGEHIGH (((fixedpointnum)AUX_MID_RANGE_HIGH-1500)<<7)
 #define FPTHROTTLELOW (((fixedpointnum)900-1500)<<7)
+#define FPTHROTTLETOMOTOROFFSET (((fixedpointnum) THROTTLE_TO_MOTOR_OFFSET)<<7)
 
 #define FPSTICKLOW (((fixedpointnum)STICK_RANGE_LOW-1500)<<7)
 #define FPSTICKHIGH (((fixedpointnum)STICK_RANGE_HIGH-1500)<<7)

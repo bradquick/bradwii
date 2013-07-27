@@ -22,7 +22,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // This file takes the settings from config.h and creates all of the definitions needed for the rest of the code.
 
 // set control board dependant defines here
-#if (CONTROL_BOARD_TYPE==CONTROL_BOARD_MULTIWII_PRO_2)
+#if (CONTROL_BOARD_TYPE==CONTROL_BOARD_HK_MULTIWII_PRO_2)
    #define MICROCONTROLLER_TYPE MEGA2560
    #define GYRO_TYPE ITG3200 // gyro
    #define GYRO_ORIENTATION(VALUES,X, Y, Z) {VALUES[ROLLINDEX] =  Y; VALUES[PITCHINDEX] = -X; VALUES[YAWINDEX] = -Z;}
@@ -45,7 +45,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
       #define RX_DSM2_SERIAL_PORT 1
    #endif
    
-#elif (CONTROL_BOARD_TYPE==CONTROL_BOARD_MULTIWII_328P)
+#elif (CONTROL_BOARD_TYPE==CONTROL_BOARD_HK_MULTIWII_328P)
    #define MICROCONTROLLER_TYPE MEGA328P
    #define GYRO_TYPE ITG3200 // gyro
    #define GYRO_ORIENTATION(VALUES,X, Y, Z) {VALUES[ROLLINDEX] =  Y; VALUES[PITCHINDEX] = -X; VALUES[YAWINDEX] = -Z;}
@@ -68,7 +68,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
       #define RX_DSM2_SERIAL_PORT 0
    #endif
 
-#elif (CONTROL_BOARD_TYPE==CONTROL_BOARD_NANOWII)
+#elif (CONTROL_BOARD_TYPE==CONTROL_BOARD_HK_NANOWII)
    #define MICROCONTROLLER_TYPE MEGA32U4
    #define GYRO_TYPE MPU6050 // gyro
    #define GYRO_ORIENTATION(VALUES,X, Y, Z) {VALUES[ROLLINDEX] =  -X; VALUES[PITCHINDEX] = -Y; VALUES[YAWINDEX] = -Z;}
@@ -89,6 +89,38 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
    #endif
    #if ((RX_TYPE==RX_DSM2_1024 || RX_TYPE==RX_DSM2_2048) && !defined(RX_DSM2_SERIAL_PORT))
       #define RX_DSM2_SERIAL_PORT 1
+   #endif
+
+#elif (CONTROL_BOARD_TYPE==CONTROL_BOARD_HK_POCKET_QUAD)
+   #define MICROCONTROLLER_TYPE MEGA32U4
+   #define DC_MOTORS
+   #define GYRO_TYPE MPU6050 // gyro
+   #define GYRO_ORIENTATION(VALUES,X, Y, Z) {VALUES[ROLLINDEX] =  Y; VALUES[PITCHINDEX] = -X; VALUES[YAWINDEX] = -Z;}
+   #define ACCELEROMETER_TYPE MPU6050 // accelerometer
+   #define ACC_ORIENTATION(VALUES,X, Y, Z)  {VALUES[ROLLINDEX]  = -X; VALUES[PITCHINDEX]  = -Y; VALUES[YAWINDEX]  =  Z;}
+   #ifndef COMPASS_TYPE
+      #define COMPASS_TYPE NO_COMPASS // compass
+   #endif
+   #define COMPASS_ORIENTATION(VALUES,X, Y, Z) {VALUES[ROLLINDEX]  =  X; VALUES[PITCHINDEX]  = Y; VALUES[YAWINDEX]  = -Z;}
+   #ifndef BAROMETER_TYPE
+      #define BAROMETER_TYPE NO_BAROMETER // baro
+   #endif
+   #ifndef MULTIWII_CONFIG_SERIAL_PORTS
+      #define MULTIWII_CONFIG_SERIAL_PORTS SERIALPORTUSB
+   #endif
+   #ifndef GPS_TYPE
+      #define GPS_TYPE NO_GPS
+   #endif
+   #if (RX_TYPE==RX_NORMAL)
+      #define RXNUMCHANNELS 5
+   #elif ((RX_TYPE==RX_DSM2_1024 || RX_TYPE==RX_DSM2_2048) && !defined(RX_DSM2_SERIAL_PORT))
+      #define RX_DSM2_SERIAL_PORT 1
+   #ifndef ARMED_MIN_MOTOR_OUTPUT
+      #define ARMED_MIN_MOTOR_OUTPUT 1000 // motors don't spin slowly when armed
+   #endif
+   #ifndef THROTTLE_TO_MOTOR_OFFSET
+      #define THROTTLE_TO_MOTOR_OFFSET -60 // allow the motors to stop when armed
+   #endif
    #endif
 
 #elif (CONTROL_BOARD_TYPE==CONTROL_BOARD_SIRIUS_AIR || CONTROL_BOARD_TYPE==CONTROL_BOARD_SIRIUS_AIR_GPS)
@@ -282,4 +314,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
    #ifndef GPS_BAUD
       #define GPS_BAUD 115200
    #endif
+#endif
+
+// use default values if not set anywhere else
+#ifndef ARMED_MIN_MOTOR_OUTPUT
+   #define ARMED_MIN_MOTOR_OUTPUT 1067 // motors spin slowly when armed
+#endif
+#ifndef THROTTLE_TO_MOTOR_OFFSET
+   #define THROTTLE_TO_MOTOR_OFFSET 0 // motors spin slowly when armed
 #endif

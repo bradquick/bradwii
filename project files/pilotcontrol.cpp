@@ -120,7 +120,7 @@ void getangleerrorfrompilotinput(fixedpointnum *angleerror)
       
       // the compass holds only when right side up with throttle up (not sitting on the ground)
       // and the yaw stick is centered.  If it is centered, override the pilot's input
-      if (global.estimateddownvector[ZINDEX]>0 && global.rxvalues[THROTTLEINDEX]<ARMED_MIN_MOTOR_OUTPUT && global.rxvalues[YAWINDEX]>-YAWCOMPASSRXDEADBAND && global.rxvalues[YAWINDEX]<YAWCOMPASSRXDEADBAND)
+      if (global.estimateddownvector[ZINDEX]>0 && global.rxvalues[THROTTLEINDEX]>FPSTICKLOW && global.rxvalues[YAWINDEX]>-YAWCOMPASSRXDEADBAND && global.rxvalues[YAWINDEX]<YAWCOMPASSRXDEADBAND)
          {
          angleerror[YAWINDEX]=desiredcompassheading-global.currentestimatedeulerattitude[YAWINDEX];
          lib_fp_constrain180(&angleerror[YAWINDEX]);

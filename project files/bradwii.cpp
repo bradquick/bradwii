@@ -151,7 +151,7 @@ int main(void)
       imucalculateestimatedattitude();
 
       // arm and disarm via rx aux switches
-      if (global.rxvalues[THROTTLEINDEX]<FPARMEDMINMOTOROUTPUT)
+      if (global.rxvalues[THROTTLEINDEX]<FPSTICKLOW)
          { // see if we want to change armed modes
          if (!global.armed)
             {
@@ -225,7 +225,7 @@ int main(void)
          }
 #endif
 
-      if (global.rxvalues[THROTTLEINDEX]<FPARMEDMINMOTOROUTPUT)
+      if (global.rxvalues[THROTTLEINDEX]<FPSTICKLOW)
          {
          // We are probably on the ground. Don't accumnulate error when we can't correct it
          resetpilotcontrol();
@@ -251,7 +251,7 @@ int main(void)
 
       // get the pilot's throttle component
       // convert from fixedpoint -1 to 1 to fixedpoint 0 to 1
-      fixedpointnum throttleoutput=(global.rxvalues[THROTTLEINDEX]>>1)+FIXEDPOINTCONSTANT(.5);
+      fixedpointnum throttleoutput=(global.rxvalues[THROTTLEINDEX]>>1)+FIXEDPOINTCONSTANT(.5)+FPTHROTTLETOMOTOROFFSET;
 
       // keep a flag to indicate whether we shoud apply altitude hold.  The pilot can turn it on or
       // uncrashability mode can turn it on.

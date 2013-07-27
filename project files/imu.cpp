@@ -169,7 +169,7 @@ void imucalculateestimatedattitude()
       // use the compass to correct the yaw in our estimated attitude.
       // the compass vector points somewhat north, but it also points down more than north where I live, so we can't
       // get the yaw directly from the compass vector.  Instead, we have to take a cross product of
-      // the gravity vector and the compass vector, which should point east
+      // the gravity vector and the compass vector, which should point west
       fixedpointnum westvector[3];
       
       vectorcrossproduct(global.compassvector,global.estimateddownvector,westvector);

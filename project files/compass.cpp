@@ -80,7 +80,6 @@ void compassreadrawvalues(int *compassrawvalues)
                      ((data[2]<<8) | data[3]) );
 #endif
    // set the timer so we know when we can take our next reading
-//   nextcompassreadtime=lib_timers_millisecondssincestart()+70;
    compasstimer=lib_timers_starttimer();
    }
 
