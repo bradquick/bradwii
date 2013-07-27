@@ -485,9 +485,10 @@ void defaultusersettings()
       {
       usersettings.checkboxconfiguration[x]=0;
       }
-   usersettings.checkboxconfiguration[CHECKBOXARM]=CHECKBOXMASKAUX1HIGH;
-   usersettings.checkboxconfiguration[CHECKBOXSEMIACRO]=CHECKBOXMASKAUX2HIGH;
-   usersettings.checkboxconfiguration[CHECKBOXHIGHRATES]=CHECKBOXMASKAUX2HIGH;
+//   usersettings.checkboxconfiguration[CHECKBOXARM]=CHECKBOXMASKAUX1HIGH;
+   usersettings.checkboxconfiguration[CHECKBOXHIGHANGLE]=CHECKBOXMASKAUX1LOW;
+   usersettings.checkboxconfiguration[CHECKBOXSEMIACRO]=CHECKBOXMASKAUX1HIGH;
+   usersettings.checkboxconfiguration[CHECKBOXHIGHRATES]=CHECKBOXMASKAUX1HIGH;
    
    // reset the calibration settings
    for (int x=0;x<3;++x)
