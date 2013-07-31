@@ -176,10 +176,24 @@ void getangleerrorfrompilotinput(fixedpointnum *angleerror)
          levelmodefraction=FIXEDPOINTONE-acromodefraction;
          }
       }
-
+      
    // combine level and acro modes
    angleerror[ROLLINDEX]=lib_fp_multiply(angleerror[ROLLINDEX], acromodefraction)+lib_fp_multiply(levelmoderollangleerror, levelmodefraction);
    angleerror[PITCHINDEX]=lib_fp_multiply(angleerror[PITCHINDEX], acromodefraction)+lib_fp_multiply(levelmodepitchangleerror, levelmodefraction);   
+
+//if (1) // auto banking (experimental)
+//   {
+//   static fixedpointnum accrollangle=0;
+//   
+//   // calculate the current roll angle
+//   
+//   fixedpointnum newrollangle=  lib_fp_atan2(global.acc_g_vector[XINDEX] , global.acc_g_vector[ZINDEX]);
+//
+//   lib_fp_lowpassfilter(&accrollangle,newrollangle,global.timesliver,FIXEDPOINTCONSTANT(8),TIMESLIVEREXTRASHIFT);
+//   angleerror[ROLLINDEX]-=accrollangle;
+//global.debugvalue[0]=newrollangle>>FIXEDPOINTSHIFT;
+//global.debugvalue[1]=accrollangle>>FIXEDPOINTSHIFT;
+//   }
    }
    
 /*

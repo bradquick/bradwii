@@ -234,7 +234,7 @@ void imucalculateestimatedattitude()
 #endif   
       
    // convert our vectors to euler angles
-      global.currentestimatedeulerattitude[ROLLINDEX]  =  lib_fp_atan2(global.estimateddownvector[XINDEX] , global.estimateddownvector[ZINDEX]) ;
+   global.currentestimatedeulerattitude[ROLLINDEX]  =  lib_fp_atan2(global.estimateddownvector[XINDEX] , global.estimateddownvector[ZINDEX]) ;
    if (lib_fp_abs(global.currentestimatedeulerattitude[ROLLINDEX])>FIXEDPOINT45 && lib_fp_abs(global.currentestimatedeulerattitude[ROLLINDEX])<FIXEDPOINT135) 
       global.currentestimatedeulerattitude[PITCHINDEX] = lib_fp_atan2(global.estimateddownvector[YINDEX] , lib_fp_abs(global.estimateddownvector[XINDEX]));
    else 

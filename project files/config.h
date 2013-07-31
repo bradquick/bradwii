@@ -133,8 +133,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // To adjust how agressive the tuning is, adjust the AUTOTUNEMAXOSCILLATION value.  A larger
 // value will result in more agressive tuning. A lower value will result in softer tuning.
 // It will rock back and forth between -AUTOTUNE_TARGET_ANGLE and AUTOTUNE_TARGET_ANGLE degrees
-#define AUTOTUNE_MAX_OSCILLATION 4.0
+// AUTOTUNE_D_MULTIPLIER is a multiplier that puts in a little extra D when autotuning is done. This helps damp
+// the wobbles after a quick angle change.
+// Always autotune on a full battery.
+#define AUTOTUNE_MAX_OSCILLATION 1.0
 #define AUTOTUNE_TARGET_ANGLE 20.0 
+#define AUTOTUNE_D_MULTIPLIER 1.2
 
 // Gyro low pass filter.
 // If your aircraft jumps around randomly, or it drifts from level over time when in level mode,

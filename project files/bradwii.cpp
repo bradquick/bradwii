@@ -119,6 +119,9 @@ int main(void)
    lib_timers_init();
    lib_i2c_init();
    
+   // pause a moment before initializing everything. To make sure everything is powered up
+   lib_timers_delaymilliseconds(100);
+   
    // initialize all other modules
    initrx();
    initoutputs();
