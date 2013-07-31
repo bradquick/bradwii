@@ -36,7 +36,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "gps.h"
 
 #define MSP_VERSION 0
-#define  VERSION  107 // version 1.07
+#define  VERSION  108 // version 1.08
 
 
 extern globalstruct global;
