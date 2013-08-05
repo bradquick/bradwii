@@ -252,7 +252,7 @@
 				DEVICE = atmega328p;
 				PATH = "$(PATH):$(PROJECT_DIR)/../Avr_Tools/bin";
 				PRODUCT_NAME = "compile and flash 328p2";
-				PROGRAMMER = "-c  arduino -P/dev/cu.usbserial-A601UWAV -b57600 -D";
+				PROGRAMMER = "-c  arduino -P/dev/cu.usbserial-A602UR5L -b57600 -D";
 			};
 			name = Release;
 		};

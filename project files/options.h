@@ -26,6 +26,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define CONTROL_BOARD_HK_POCKET_QUAD 4
 #define CONTROL_BOARD_SIRIUS_AIR 5
 #define CONTROL_BOARD_SIRIUS_AIR_GPS 6
+#define CONTROL_BOARD_SIRIUS_PARIS_V4 7
 
 // MICROCONTROLLER_TYPE's
 #define MEGA2560 0

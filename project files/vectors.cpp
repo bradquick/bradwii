@@ -64,9 +64,9 @@ void rotatevectorwithsmallangles(fixedpointnum *v,fixedpointnum rolldeltaangle,f
    fixedpointnum v_tmp_z=v[ZINDEX];
 
    // remember that our delta angles are shifted left by TIMESLIVEREXTRASHIFT for resolution.  Take it out here
-   v[XINDEX] += (lib_fp_multiply(rolldeltaangle ,v_tmp_z) - lib_fp_multiply(yawdeltaangle,v_tmp_y))>>TIMESLIVEREXTRASHIFT;
-   v[YINDEX] += (lib_fp_multiply(pitchdeltaangle,v_tmp_z) + lib_fp_multiply(yawdeltaangle ,v_tmp_x))>>TIMESLIVEREXTRASHIFT; 
-   v[ZINDEX] -= (lib_fp_multiply(rolldeltaangle,v_tmp_x) + lib_fp_multiply(pitchdeltaangle ,v_tmp_y))>>TIMESLIVEREXTRASHIFT;
+   v[XINDEX] += (lib_fp_multiply(rolldeltaangle ,v_tmp_z) - lib_fp_multiply(yawdeltaangle,v_tmp_y))>>(TIMESLIVEREXTRASHIFT);
+   v[YINDEX] += (lib_fp_multiply(pitchdeltaangle,v_tmp_z) + lib_fp_multiply(yawdeltaangle ,v_tmp_x))>>(TIMESLIVEREXTRASHIFT);
+   v[ZINDEX] -= (lib_fp_multiply(rolldeltaangle,v_tmp_x) + lib_fp_multiply(pitchdeltaangle ,v_tmp_y))>>(TIMESLIVEREXTRASHIFT);
    }
 
 // some extra vector functions that aren't currently used.

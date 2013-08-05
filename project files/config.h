@@ -30,6 +30,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //#define CONTROL_BOARD_TYPE CONTROL_BOARD_HK_POCKET_QUAD
 //#define CONTROL_BOARD_TYPE CONTROL_BOARD_SIRIUS_AIR
 //#define CONTROL_BOARD_TYPE CONTROL_BOARD_SIRIUS_AIR_GPS
+//#define CONTROL_BOARD_TYPE CONTROL_BOARD_SIRIUS_PARIS_V4
 
 // Choose the type of r/c reciever that will be used
 #define RX_TYPE RX_NORMAL
@@ -94,10 +95,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // Choose output ranges (in microseconds)
 #define MIN_MOTOR_OUTPUT 1000
 #define MAX_MOTOR_OUTPUT 2000
-#define FAILSAFE_MOTOR_OUTPUT 1150 // throttle setting for bringing the aircraft down at a safe speed
+#define FAILSAFE_MOTOR_OUTPUT 1200 // throttle setting for bringing the aircraft down at a safe speed
 
 // set the minimum motor output when armed. If not set, 1067 will be used as a default
 //#define ARMED_MIN_MOTOR_OUTPUT 1067 // motors spin slowly when armed
+//#define ARMED_MIN_MOTOR_OUTPUT 1170 // motors spin slowly when armed (for blheli flashed q-brain)
 
 // Optionally set an offset from RX Input to ESC output.  Usually used to make sure
 // the throttle can go to zero.

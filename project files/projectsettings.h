@@ -125,6 +125,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 	#define USEPWM2
 	#define USEDIGITALPORTB
 	#define USEDIGITALPORTD
+   #if (RXNUMCHANNELS>6)
+      #define USEDIGITALPORTC
+   #endif
 
 #elif (MICROCONTROLLER_TYPE==MEGA32U4)
 	#define USEPWM1
