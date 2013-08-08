@@ -125,6 +125,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
    #ifndef MOTORS_STOP
       #define MOTORS_STOP YES // allow the motors to stop when armed if not in acro or semi acro mode
    #endif
+   #ifndef GYRO_LOW_PASS_FILTER
+      #define GYRO_LOW_PASS_FILTER 2
+   #endif
 
 #elif (CONTROL_BOARD_TYPE==CONTROL_BOARD_SIRIUS_AIR || CONTROL_BOARD_TYPE==CONTROL_BOARD_SIRIUS_AIR_GPS)
    #define MICROCONTROLLER_TYPE MEGA32U4
@@ -353,4 +356,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // by default don't allow the motors to stop when armed if not in acro or semi acro mode
 #ifndef MOTORS_STOP
    #define MOTORS_STOP NO 
+#endif
+
+// default low pass filter
+#ifndef GYRO_LOW_PASS_FILTER
+   #define GYRO_LOW_PASS_FILTER 0
 #endif

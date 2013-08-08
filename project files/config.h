@@ -136,6 +136,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 // un-comment if you don't want to include autotune code
 //#define NO_AUTOTUNE
+
 // To adjust how agressive the tuning is, adjust the AUTOTUNEMAXOSCILLATION value.  A larger
 // value will result in more agressive tuning. A lower value will result in softer tuning.
 // It will rock back and forth between -AUTOTUNE_TARGET_ANGLE and AUTOTUNE_TARGET_ANGLE degrees
@@ -151,7 +152,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // then you are probably getting vibration feeding from your motors to your gyros.
 // The first step is to isolate the control board from the frame of the aircraft (google Sorbothane).  If all else fails,
 // increase the GYRO_LOW_PASS_FILTER from 0 through 10.  The lowest value that works correctly is the one you should use.
-#define GYRO_LOW_PASS_FILTER 0
+// Leave comment to use the default value.
+//#define GYRO_LOW_PASS_FILTER 0
 
 #define UNCRAHSABLE_MAX_ALTITUDE_OFFSET 30.0 // 30 meters above where uncrashability was enabled
 #define UNCRAHSABLE_RADIUS 50.0 // 50 meter radius
