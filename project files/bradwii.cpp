@@ -429,13 +429,23 @@ int main(void)
 
       lib_fp_constrain(&throttleoutput,0,FIXEDPOINTONE);
 
-      // mix the outputs to create motor values
-#if (AIRCRAFT_CONFIGURATION==QUADX)
-      setmotoroutput(0,MOTOR_0_CHANNEL,throttleoutput-pidoutput[ROLLINDEX]+pidoutput[PITCHINDEX]-pidoutput[YAWINDEX]);
-      setmotoroutput(1,MOTOR_1_CHANNEL,throttleoutput-pidoutput[ROLLINDEX]-pidoutput[PITCHINDEX]+pidoutput[YAWINDEX]);
-      setmotoroutput(2,MOTOR_2_CHANNEL,throttleoutput+pidoutput[ROLLINDEX]+pidoutput[PITCHINDEX]+pidoutput[YAWINDEX]);
-      setmotoroutput(3,MOTOR_3_CHANNEL,throttleoutput+pidoutput[ROLLINDEX]-pidoutput[PITCHINDEX]-pidoutput[YAWINDEX]);
+      // set the final motor outputs
+      // if we aren't armed, or if we desire to have the motors stop, 
+      if (!global.armed
+#if (MOTORS_STOP==YES)
+         || (global.rxvalues[THROTTLEINDEX]<FPSTICKLOW && !(global.activecheckboxitems & (CHECKBOXMASKFULLACRO | CHECKBOXMASKSEMIACRO)))
 #endif
+         ) setallmotoroutputs(MIN_MOTOR_OUTPUT);
+      else
+         {
+         // mix the outputs to create motor values
+#if (AIRCRAFT_CONFIGURATION==QUADX)
+         setmotoroutput(0,MOTOR_0_CHANNEL,throttleoutput-pidoutput[ROLLINDEX]+pidoutput[PITCHINDEX]-pidoutput[YAWINDEX]);
+         setmotoroutput(1,MOTOR_1_CHANNEL,throttleoutput-pidoutput[ROLLINDEX]-pidoutput[PITCHINDEX]+pidoutput[YAWINDEX]);
+         setmotoroutput(2,MOTOR_2_CHANNEL,throttleoutput+pidoutput[ROLLINDEX]+pidoutput[PITCHINDEX]+pidoutput[YAWINDEX]);
+         setmotoroutput(3,MOTOR_3_CHANNEL,throttleoutput+pidoutput[ROLLINDEX]-pidoutput[PITCHINDEX]-pidoutput[YAWINDEX]);
+#endif
+         }
       }
       
    return 0;   /* never reached */

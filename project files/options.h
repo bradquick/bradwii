@@ -98,3 +98,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define STICK_COMMAND_YAW_LOW (1<<4)
 #define STICK_COMMAND_YAW_HIGH (1<<5)
 
+// general yes/no (used for MOTOR_STOP)
+#define YES 1
+#define NO 0

@@ -115,12 +115,15 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
       #define RXNUMCHANNELS 5
    #elif ((RX_TYPE==RX_DSM2_1024 || RX_TYPE==RX_DSM2_2048) && !defined(RX_DSM2_SERIAL_PORT))
       #define RX_DSM2_SERIAL_PORT 1
+   #endif
    #ifndef ARMED_MIN_MOTOR_OUTPUT
       #define ARMED_MIN_MOTOR_OUTPUT 1000 // motors don't spin slowly when armed
    #endif
    #ifndef THROTTLE_TO_MOTOR_OFFSET
       #define THROTTLE_TO_MOTOR_OFFSET -60 // allow the motors to stop when armed
    #endif
+   #ifndef MOTORS_STOP
+      #define MOTORS_STOP YES // allow the motors to stop when armed if not in acro or semi acro mode
    #endif
 
 #elif (CONTROL_BOARD_TYPE==CONTROL_BOARD_SIRIUS_AIR || CONTROL_BOARD_TYPE==CONTROL_BOARD_SIRIUS_AIR_GPS)
@@ -345,4 +348,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #endif
 #ifndef THROTTLE_TO_MOTOR_OFFSET
    #define THROTTLE_TO_MOTOR_OFFSET 0 // motors spin slowly when armed
+#endif
+
+// by default don't allow the motors to stop when armed if not in acro or semi acro mode
+#ifndef MOTORS_STOP
+   #define MOTORS_STOP NO 
 #endif

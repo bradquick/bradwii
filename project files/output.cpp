@@ -91,8 +91,7 @@ void setmotoroutput(unsigned char motornum, unsigned char motorchannel,fixedpoin
    // convert from fixedpoint 0 to 1 into int 1000 to 2000
    int value=1000+((fpvalue*1000L)>>FIXEDPOINTSHIFT);
    
-   if (!global.armed) value=MIN_MOTOR_OUTPUT;
-   else if (value<ARMED_MIN_MOTOR_OUTPUT) value=ARMED_MIN_MOTOR_OUTPUT;
+   if (value<ARMED_MIN_MOTOR_OUTPUT) value=ARMED_MIN_MOTOR_OUTPUT;
    if (value>MAX_MOTOR_OUTPUT) value=MAX_MOTOR_OUTPUT;
    global.motoroutputvalue[motornum]=value;
    setoutput(motorchannel,value);
