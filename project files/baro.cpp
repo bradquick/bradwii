@@ -175,5 +175,175 @@ char readbaro()
       }
    return(0);
    }
-   
+
+#elif BAROMETER_TYPE==MS5611
+
+#define MS561101BA_ADDRESS 0x77 //CBR=0 0xEE I2C address when pin CSB is connected to LOW (GND)
+
+// ************************************************************************************************************
+// I2C Barometer MS561101BA
+// ************************************************************************************************************
+//
+// specs are here: http://www.meas-spec.com/downloads/MS5611-01BA03.pdf
+// useful info on pages 7 -> 12
+
+// registers of the device
+#define MS561101BA_PRESSURE    0x40
+#define MS561101BA_TEMPERATURE 0x50
+#define MS561101BA_RESET       0x1E
+
+// OSR (Over Sampling Ratio) constants
+#define MS561101BA_OSR_256  0x00
+#define MS561101BA_OSR_512  0x02
+#define MS561101BA_OSR_1024 0x04
+#define MS561101BA_OSR_2048 0x06
+#define MS561101BA_OSR_4096 0x08
+
+#define OSR MS561101BA_OSR_4096
+
+long baroTemperature;
+
+static struct
+   {
+   // sensor registers from the MS561101BA datasheet
+   unsigned int c[7];
+   union {unsigned long val; unsigned char raw[4]; } ut; //uncompensated T
+   union {unsigned long val; unsigned char raw[4]; } up; //uncompensated P
+   unsigned char  state;
+   unsigned long barotimer;
+   } ms561101ba_ctx;
+
+void i2c_MS561101BA_reset()
+   {
+   lib_i2c_writereg(MS561101BA_ADDRESS, MS561101BA_RESET, 0);
+   }
+
+void i2c_MS561101BA_readCalibration()
+   {
+   union {unsigned int val; unsigned char raw[2]; } data;
+   for(unsigned char i=0;i<6;i++)
+      {
+      lib_i2c_rep_start(MS561101BA_ADDRESS<<1);
+      lib_i2c_write(0xA2+2*i);
+      lib_timers_delaymilliseconds(10);
+      lib_i2c_rep_start((MS561101BA_ADDRESS<<1) | 1);//I2C read direction => 1
+      lib_timers_delaymilliseconds(10);
+      data.raw[1] = lib_i2c_readack();  // read a 16 bit register
+      data.raw[0] = lib_i2c_readnak();
+      ms561101ba_ctx.c[i+1] = data.val;
+      }
+   }
+
+// read uncompensated temperature value: send command first
+void i2c_MS561101BA_UT_Start()
+   {
+   lib_i2c_rep_start(MS561101BA_ADDRESS<<1);      // I2C write direction
+   lib_i2c_write(MS561101BA_TEMPERATURE + OSR);  // register selection
+   lib_i2c_stop();
+   }
+
+// read uncompensated pressure value: send command first
+void i2c_MS561101BA_UP_Start ()
+   {
+   lib_i2c_rep_start(MS561101BA_ADDRESS<<1);      // I2C write direction
+   lib_i2c_write(MS561101BA_PRESSURE + OSR);     // register selection
+   lib_i2c_stop();
+   }
+
+// read uncompensated pressure value: read result bytes
+void i2c_MS561101BA_UP_Read ()
+   {
+   lib_i2c_rep_start(MS561101BA_ADDRESS<<1);
+   lib_i2c_write(0);
+   lib_i2c_rep_start((MS561101BA_ADDRESS<<1) | 1);
+   ms561101ba_ctx.up.raw[2] = lib_i2c_readack();
+   ms561101ba_ctx.up.raw[1] = lib_i2c_readack();
+   ms561101ba_ctx.up.raw[0] = lib_i2c_readnak();
+   }
+
+// read uncompensated temperature value: read result bytes
+void i2c_MS561101BA_UT_Read()
+   {
+   lib_i2c_rep_start(MS561101BA_ADDRESS<<1);
+   lib_i2c_write(0);
+   lib_i2c_rep_start((MS561101BA_ADDRESS<<1) | 1);
+   ms561101ba_ctx.ut.raw[2] = lib_i2c_readack();
+   ms561101ba_ctx.ut.raw[1] = lib_i2c_readack();
+   ms561101ba_ctx.ut.raw[0] = lib_i2c_readnak();
+   }
+
+void i2c_MS561101BA_Calculate()
+   {
+   long off2,sens2,delt;
+
+   long long dT       = (long)ms561101ba_ctx.ut.val - ((long)ms561101ba_ctx.c[5] << 8);
+   baroTemperature  = 2000 + ((dT * ms561101ba_ctx.c[6])>>23);
+   long long off      = ((unsigned long)ms561101ba_ctx.c[2] <<16) + ((dT * ms561101ba_ctx.c[4]) >> 7);
+   long long sens     = ((unsigned long)ms561101ba_ctx.c[1] <<15) + ((dT * ms561101ba_ctx.c[3]) >> 8);
+
+   if (baroTemperature < 2000)
+      { // temperature lower than 20st.C
+      delt = baroTemperature-2000;
+      delt  = 5*delt*delt;
+      off2  = delt>>1;
+      sens2 = delt>>2;
+      if (baroTemperature < -1500)
+         { // temperature lower than -15st.C
+         delt  = baroTemperature+1500;
+         delt  = delt*delt;
+         off2  += 7 * delt;
+         sens2 += (11 * delt)>>1;
+         }
+      off  -= off2; 
+      sens -= sens2;
+      }
+
+   long pressure     = (( (ms561101ba_ctx.up.val * sens ) >> 21) - off) >> 15;
+
+   //   global.barorawaltitude=(1.0f - pow(pressure/101325.0f, 0.190295f)) * 4433000.0f; // this is the real formula (in centimeters)
+   // estimate meters as a linear formula so we don't have to do all of the expensive math
+   // meters=10351-.1024*p << close enough
+   // 439804651L is .1024 << 16 << 16 (an extra 16 to convert pressure to a fixedpointnum)
+   global.barorawaltitude=(10351L<<FIXEDPOINTSHIFT)-lib_fp_multiply(pressure,439804651L);
+   }
+
+void initbaro()
+   {
+   lib_timers_delaymilliseconds(10);
+   i2c_MS561101BA_reset();
+   lib_timers_delaymilliseconds(100);
+   i2c_MS561101BA_readCalibration();
+   lib_timers_delaymilliseconds(10);
+   i2c_MS561101BA_UT_Start(); 
+   ms561101ba_ctx.barotimer = lib_timers_starttimer();
+   }
+
+char readbaro()
+   {                            
+   //return 0: no new data available, no computation ;  1: new value available
+   // first UT conversion is started in init procedure      
+   if (lib_timers_gettimermicroseconds(ms561101ba_ctx.barotimer) < 10000)
+      return 0;
+
+   // reset the timer for the next reading
+   ms561101ba_ctx.barotimer = lib_timers_starttimer();  // UT and UP conversion take 8.5ms so we do next reading after 10ms
+
+   // either the temperature or pressure reading has finished.  Which one?
+   if (ms561101ba_ctx.state == 0)
+      {
+      i2c_MS561101BA_UT_Read(); 
+      i2c_MS561101BA_UP_Start(); 
+      ms561101ba_ctx.state = 1;
+      return 0;
+      }
+   else
+      {
+      i2c_MS561101BA_UP_Read();
+      i2c_MS561101BA_UT_Start(); 
+      i2c_MS561101BA_Calculate();
+      ms561101ba_ctx.state = 0; 
+      return 1;
+      }
+   }
+
 #endif

@@ -107,7 +107,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #endif
 
-#if (MICROCONTROLLER_TYPE==MEGA5620)
+#if (MICROCONTROLLER_TYPE==MEGA2560)
 	#define USEPWM3
 	#define USEPWM4
 	#define USEDIGITALPORTB

@@ -27,6 +27,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define CONTROL_BOARD_SIRIUS_AIR 5
 #define CONTROL_BOARD_SIRIUS_AIR_GPS 6
 #define CONTROL_BOARD_SIRIUS_PARIS_V4 7
+#define CONTROL_BOARD_RFQ_FLIP 8
+#define CONTROL_BOARD_RFQ_MULTIWII_PRO_2 9
+#define CONTROL_BOARD_RFQ_MULTIWII_PRO_2_GPS 10
 
 // MICROCONTROLLER_TYPE's
 #define MEGA2560 0
@@ -69,11 +72,14 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // COMPASS_TYPE's
 #define NO_COMPASS 0
 #define HMC5883 1
-#define HMC5843 2
+#define HMC5883_VIA_MPU6050 2
+#define HMC5843 3
+#define MAG3110 4
 
 // BAROMETER_TYPE's
 #define NO_BAROMETER 0
 #define BMP085 1
+#define MS5611 2
 
 // MULTIWII_CONFIG_SERIAL_PORTS
 // These can be added (or or'ed together) to choose muliple ports

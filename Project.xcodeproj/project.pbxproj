@@ -149,17 +149,31 @@
 			passBuildSettingsInEnvironment = 1;
 			productName = "Build All";
 		};
-		A2851D78175EB4B700A602D7 /* compile and flash 328p2 */ = {
+		A27F037017B99087008046B7 /* compile and flash 328p Flip */ = {
 			isa = PBXLegacyTarget;
 			buildArgumentsString = install;
-			buildConfigurationList = A2851D79175EB4B700A602D7 /* Build configuration list for PBXLegacyTarget "compile and flash 328p2" */;
+			buildConfigurationList = A27F037117B99087008046B7 /* Build configuration list for PBXLegacyTarget "compile and flash 328p Flip" */;
 			buildPhases = (
 			);
 			buildToolPath = make;
 			buildWorkingDirectory = "project files";
 			dependencies = (
 			);
-			name = "compile and flash 328p2";
+			name = "compile and flash 328p Flip";
+			passBuildSettingsInEnvironment = 1;
+			productName = "Build All";
+		};
+		A2851D78175EB4B700A602D7 /* compile and flash 328p ext. */ = {
+			isa = PBXLegacyTarget;
+			buildArgumentsString = install;
+			buildConfigurationList = A2851D79175EB4B700A602D7 /* Build configuration list for PBXLegacyTarget "compile and flash 328p ext." */;
+			buildPhases = (
+			);
+			buildToolPath = make;
+			buildWorkingDirectory = "project files";
+			dependencies = (
+			);
+			name = "compile and flash 328p ext.";
 			passBuildSettingsInEnvironment = 1;
 			productName = "Build All";
 		};
@@ -225,7 +239,8 @@
 				A2A8B4CA14D8D32C00FBBCCD /* compile and flash 2560 */,
 				A2D5C1F417079CBD00130BA2 /* compile and flash 328p */,
 				A2D5C78E171B1EDB000E4300 /* compile and flash 32u4 */,
-				A2851D78175EB4B700A602D7 /* compile and flash 328p2 */,
+				A2851D78175EB4B700A602D7 /* compile and flash 328p ext. */,
+				A27F037017B99087008046B7 /* compile and flash 328p Flip */,
 			);
 		};
 /* End PBXProject section */
@@ -243,6 +258,16 @@
 			buildSettings = {
 				DEVICE = atmega2560;
 				PATH = "$(PATH):$(PROJECT_DIR)/../Avr_Tools/bin:$(PROJECT_DIR)'/../Avr Libraries':$(PROJECT_DIR)";
+			};
+			name = Release;
+		};
+		A27F037217B99087008046B7 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				DEVICE = atmega328p;
+				PATH = "$(PATH):$(PROJECT_DIR)/../Avr_Tools/bin";
+				PRODUCT_NAME = "compile and flash 328p copy";
+				PROGRAMMER = "-carduino -P/dev/cu.SLAB_USBtoUART -b57600 -D";
 			};
 			name = Release;
 		};
@@ -302,7 +327,15 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		A2851D79175EB4B700A602D7 /* Build configuration list for PBXLegacyTarget "compile and flash 328p2" */ = {
+		A27F037117B99087008046B7 /* Build configuration list for PBXLegacyTarget "compile and flash 328p Flip" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				A27F037217B99087008046B7 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		A2851D79175EB4B700A602D7 /* Build configuration list for PBXLegacyTarget "compile and flash 328p ext." */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				A2851D7A175EB4B700A602D7 /* Release */,

@@ -91,7 +91,7 @@ char readgps()
    while (lib_serial_numcharsavailable(GPS_SERIAL_PORT))
       {
       char c=lib_serial_getchar(GPS_SERIAL_PORT);
-   
+
       if (c=='$') // start of a new message
          {
          gpsparameternumber=0;

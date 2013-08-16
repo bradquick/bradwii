@@ -27,16 +27,18 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //#define CONTROL_BOARD_TYPE CONTROL_BOARD_HK_MULTIWII_PRO_2
 //#define CONTROL_BOARD_TYPE CONTROL_BOARD_HK_MULTIWII_328P
 //#define CONTROL_BOARD_TYPE CONTROL_BOARD_HK_NANOWII
-#define CONTROL_BOARD_TYPE CONTROL_BOARD_HK_POCKET_QUAD
+//#define CONTROL_BOARD_TYPE CONTROL_BOARD_HK_POCKET_QUAD
 //#define CONTROL_BOARD_TYPE CONTROL_BOARD_SIRIUS_AIR
 //#define CONTROL_BOARD_TYPE CONTROL_BOARD_SIRIUS_AIR_GPS
 //#define CONTROL_BOARD_TYPE CONTROL_BOARD_SIRIUS_PARIS_V4
-
+//#define CONTROL_BOARD_TYPE CONTROL_BOARD_RFQ_FLIP
+//#define CONTROL_BOARD_TYPE CONTROL_BOARD_RFQ_MULTIWII_PRO_2
+#define CONTROL_BOARD_TYPE CONTROL_BOARD_RFQ_MULTIWII_PRO_2_GPS
 // Choose the type of r/c reciever that will be used
-//#define RX_TYPE RX_NORMAL
+#define RX_TYPE RX_NORMAL
 //#define RX_TYPE RX_CPPM
 //#define RX_TYPE RX_DSM2_1024
-#define RX_TYPE RX_DSM2_2048
+//#define RX_TYPE RX_DSM2_2048
 //#define RX_DSM2_SERIAL_PORT 1
 
 // Choose a channel order if you don't like the default for your receiver type selected above
@@ -103,7 +105,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 // set the minimum motor output when armed. If not set, 1067 will be used as a default
 //#define ARMED_MIN_MOTOR_OUTPUT 1067 // motors spin slowly when armed
-//#define ARMED_MIN_MOTOR_OUTPUT 1170 // motors spin slowly when armed (for blheli flashed q-brain)
+#define ARMED_MIN_MOTOR_OUTPUT 1170 // motors spin slowly when armed (for blheli flashed q-brain)
 
 // Optionally set an offset from RX Input to ESC output.  Usually used to make sure
 // the throttle can go to zero.
@@ -119,6 +121,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 // un-comment if you don't want to include code for a compass, otherwise it will default to what the control board has on it
 //#define COMPASS_TYPE NO_COMPASS
+//#define COMPASS_TYPE HMC5883
+//#define COMPASS_TYPE HMC5843
+//#define COMPASS_TYPE MAG3110
+//#define COMPASS_ORIENTATION(VALUES,X, Y, Z) {VALUES[ROLLINDEX]  =  X; VALUES[PITCHINDEX]  = Y; VALUES[YAWINDEX]  = -Z;}
 
 // un-comment if you don't want to include code for a barometer, otherwise it will default to what the control board has on it
 //#define BAROMETER_TYPE NO_BAROMETER
@@ -153,13 +159,15 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // The first step is to isolate the control board from the frame of the aircraft (google Sorbothane).  If all else fails,
 // increase the GYRO_LOW_PASS_FILTER from 0 through 10.  The lowest value that works correctly is the one you should use.
 // Leave comment to use the default value.
-//#define GYRO_LOW_PASS_FILTER 0
+//#define GYRO_LOW_PASS_FILTER 2
 
 #define UNCRAHSABLE_MAX_ALTITUDE_OFFSET 30.0 // 30 meters above where uncrashability was enabled
 #define UNCRAHSABLE_RADIUS 50.0 // 50 meter radius
 
 // Uncomment the following line if you want to turn off gain scheduling.  Gain scheduling adjusts the PID gains
 // depending on the level of throttle.  It attempts to eliminate the wobbles while decending under low throttle.
+// A value of zero is no gain scheduling.  A value of 1.0 results in 50% gains at zero throttle, 100% gains at mid
+// throttle, and 150% gains at full throttle.
 #define GAIN_SCHEDULING_FACTOR 1.0
 
 // Uncomment if using DC motors

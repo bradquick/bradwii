@@ -118,7 +118,7 @@ int main(void)
    //initialize the libraries that require initialization
    lib_timers_init();
    lib_i2c_init();
-   
+
    // pause a moment before initializing everything. To make sure everything is powered up
    lib_timers_delaymilliseconds(100);
    
@@ -205,7 +205,7 @@ int main(void)
       
       // turn on the LED when we are stable and the gps has 5 satelites or more
       #if (GPS_TYPE==NO_GPS)
-         lib_digitalio_setoutput(LED1_OUTPUT, (!global.stable)==LED1_ON);
+         lib_digitalio_setoutput(LED1_OUTPUT, (global.stable==0)==LED1_ON);
       #else
          lib_digitalio_setoutput(LED1_OUTPUT, (!(global.stable && global.gps_num_satelites>=5))==LED1_ON);
       #endif
