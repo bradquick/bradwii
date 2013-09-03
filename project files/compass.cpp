@@ -32,6 +32,18 @@ extern usersettingsstruct usersettings;
 //                     // A unit vector good, but the length of the vector really isn't that important.  
 //                     // We are more concerned with the direction of the vector.
 
+fixedpointnum compassfilteredrawvalues[3]={0};
+
+void compassfilterrawvalues(int *rawvalues)
+   {
+   for (int x=0;x<3;++x)
+      {
+      lib_fp_lowpassfilter(&compassfilteredrawvalues[x],rawvalues[x],FIXEDPOINTCONSTANT(.07),FIXEDPOINTCONSTANT(1.0/.125),0);
+//global.debugvalue[x]=compassfilteredrawvalues[x];
+      }
+   }
+
+
 
 #if (COMPASS_TYPE==NO_COMPASS)
 
@@ -78,6 +90,10 @@ void compassreadrawvalues(int *compassrawvalues)
                      ((data[4]<<8) | data[5]) ,
                      ((data[2]<<8) | data[3]) );
 #endif
+
+   // apply a low pass filter to the raw values.  They won't be raw anymore.
+   
+   
    // set the timer so we know when we can take our next reading
    compasstimer=lib_timers_starttimer();
    }
@@ -102,9 +118,10 @@ char readcompass()
       int compassrawvalues[3];
       compassreadrawvalues(compassrawvalues);
 
+      compassfilterrawvalues(compassrawvalues);
       // convert the raw values into a unit vector
       for (int x=0;x<3;++x)
-         global.compassvector[x]=lib_fp_multiply(((fixedpointnum)(compassrawvalues[x]-usersettings.compasszerooffset[x]))<<7,usersettings.compasscalibrationmultiplier[x]);
+         global.compassvector[x]=lib_fp_multiply(((fixedpointnum)(compassfilteredrawvalues[x]-usersettings.compasszerooffset[x]))<<7,usersettings.compasscalibrationmultiplier[x]);
       return(1);
       }
    else return(0);
@@ -175,11 +192,12 @@ char readcompass()
       {
       int compassrawvalues[3];
       compassreadrawvalues(compassrawvalues);
+      compassfilterrawvalues(compassrawvalues);
 
       // convert the raw values into a unit vector
       for (int axis=0;axis<3;++axis)
          {
-         a = (compassrawvalues[axis] - usersettings.compasszerooffset[axis]) << 7;
+         a = (compassfilteredrawvalues[axis] - usersettings.compasszerooffset[axis]) << 7;
          b = usersettings.compasscalibrationmultiplier[axis];
 
          global.compassvector[axis] = lib_fp_multiply(a,b);
@@ -245,15 +263,16 @@ void compassreadrawvalues(int *compassrawvalues)
    }
 
 char readcompass()
-   { // returns 1 if we actually read something, zero otherwise.  Sets global.compassnorthvector to a unit vector (approximately)
+   { // returns 1 if we actually read something, zero otherwise.  Sets global.compassvector to a unit vector (approximately)
    if (lib_timers_gettimermicroseconds(compasstimer)>=70000L)
       {
       int compassrawvalues[3];
       compassreadrawvalues(compassrawvalues);
+      compassfilterrawvalues(compassrawvalues);
 
       // convert the raw values into a unit vector
       for (int x=0;x<3;++x)
-         global.compassvector[x]=lib_fp_multiply(((fixedpointnum)(compassrawvalues[x]-usersettings.compasszerooffset[x]))<<7,usersettings.compasscalibrationmultiplier[x]);
+         global.compassvector[x]=lib_fp_multiply(((fixedpointnum)(compassfilteredrawvalues[x]-usersettings.compasszerooffset[x]))<<7,usersettings.compasscalibrationmultiplier[x]);
 
       return(1);
       }
@@ -283,12 +302,13 @@ void calibratecompass()
       // wait until a new reading is ready
       while (lib_timers_gettimermicroseconds(compasstimer)<70000L) {}
       compassreadrawvalues(rawvalues);
+      compassfilterrawvalues(rawvalues);
       // the compass vectors that we gather should represent a sphere.  The problem is that the
       // center of the sphere may not be at 0,0,0 so we need to find out what they are
       for (int x=0;x<3;++x)
          {
-         if (rawvalues[x]<minvalues[x]) minvalues[x]=rawvalues[x];
-         if (rawvalues[x]>maxvalues[x]) maxvalues[x]=rawvalues[x];
+         if (compassfilteredrawvalues[x]<minvalues[x]) minvalues[x]=compassfilteredrawvalues[x];
+         if (compassfilteredrawvalues[x]>maxvalues[x]) maxvalues[x]=compassfilteredrawvalues[x];
          }
       }
       

@@ -93,12 +93,16 @@ void setmotoroutput(unsigned char motornum, unsigned char motorchannel,fixedpoin
    
    if (value<ARMED_MIN_MOTOR_OUTPUT) value=ARMED_MIN_MOTOR_OUTPUT;
    if (value>MAX_MOTOR_OUTPUT) value=MAX_MOTOR_OUTPUT;
-   global.motoroutputvalue[motornum]=value;
    setoutput(motorchannel,value);
+   
+   global.motoroutputvalue[motornum]=value;
    }
    
 void setallmotoroutputs(int value)
    {
+   for (int x=0;x<NUMMOTORS;++x)
+      global.motoroutputvalue[x]=value;
+
    setoutput(MOTOR_0_CHANNEL,value);
    setoutput(MOTOR_1_CHANNEL,value);
    setoutput(MOTOR_2_CHANNEL,value);

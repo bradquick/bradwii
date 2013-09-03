@@ -105,12 +105,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //#define MOTORS_STOP YES
 
 // set the minimum motor output when armed. If not set, 1067 will be used as a default
-//#define ARMED_MIN_MOTOR_OUTPUT 1067 // motors spin slowly when armed
-#define ARMED_MIN_MOTOR_OUTPUT 1170 // motors spin slowly when armed (for blheli flashed q-brain)
+#define ARMED_MIN_MOTOR_OUTPUT 1067 // motors spin slowly when armed
+//#define ARMED_MIN_MOTOR_OUTPUT 1170 // motors spin slowly when armed (for blheli flashed q-brain)
 
 // Optionally set an offset from RX Input to ESC output.  Usually used to make sure
 // the throttle can go to zero.
-//#define THROTTLE_TO_MOTOR_OFFSET 0 // motors spin slowly when armed
+//#define THROTTLE_TO_MOTOR_OFFSET 0
 
 // Divide the Aux inputs into low, medium, and high using the following divisions
 #define AUX_MID_RANGE_LOW 1300
@@ -165,11 +165,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define UNCRAHSABLE_MAX_ALTITUDE_OFFSET 30.0 // 30 meters above where uncrashability was enabled
 #define UNCRAHSABLE_RADIUS 50.0 // 50 meter radius
 
-// Uncomment the following line if you want to turn off gain scheduling.  Gain scheduling adjusts the PID gains
+// Uncomment the following line if you want to modify gain scheduling.  Gain scheduling adjusts the PID gains
 // depending on the level of throttle.  It attempts to eliminate the wobbles while decending under low throttle.
-// A value of zero is no gain scheduling.  A value of 1.0 results in 50% gains at zero throttle, 100% gains at mid
+// A value of zero is no gain scheduling.  A value of 1.0 (the default) results in 50% gains at zero throttle, 100% gains at mid
 // throttle, and 150% gains at full throttle.
-#define GAIN_SCHEDULING_FACTOR 1.0
+// Range is 0 to 2.0
+//#define GAIN_SCHEDULING_FACTOR 1.0
 
 // Uncomment if using DC motors
 //#define DC_MOTORS

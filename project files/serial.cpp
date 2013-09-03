@@ -77,6 +77,8 @@ void serialinit()
 #define SERIALSTATEGOTCOMMAND 5
 #define SERIALSTAGEGOTPAYLOAD 6
 
+#define CAPABILITES 1 | ((BAROMETER_TYPE!=NO_BAROMETER)<<1) | ((COMPASS_TYPE!=NO_COMPASS)<<2) | ((GPS_TYPE!=NO_GPS)<<3)
+
 // datagram format is $M<[data size][command][data...][checksum]
 // response format is $M>[data size][command][data...][checksum]
 //                 or $M![data size][command][data...][checksum] on error
@@ -202,7 +204,7 @@ void evaluatecommand(char portnumber,unsigned char *data)
       sendgoodheader(portnumber,10);
       sendandchecksumint(portnumber,(global.timesliver*15)>>8); // convert from fixedpointnum to microseconds
       sendandchecksumint(portnumber,lib_i2c_error_count); // i2c error count
-      sendandchecksumint(portnumber,0); // baro mag, gps, sonar
+      sendandchecksumint(portnumber,CAPABILITES); // baro mag, gps, sonar
       sendandchecksumdata(portnumber,(unsigned char *)&global.activecheckboxitems,4); // options1
       }
    else if (command==MSP_MOTOR)

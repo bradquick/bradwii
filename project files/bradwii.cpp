@@ -149,7 +149,7 @@ int main(void)
       serialcheckforaction();   
       
       calculatetimesliver();
-
+      
       // run the imu to estimate the current attitude of the aircraft
       imucalculateestimatedattitude();
 
@@ -201,7 +201,6 @@ int main(void)
       
       // read the receiver
       readrx();
-
       
       // turn on the LED when we are stable and the gps has 5 satelites or more
       #if (GPS_TYPE==NO_GPS)

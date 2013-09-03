@@ -71,21 +71,47 @@ unsigned char hextochar(unsigned char n)
    else return(n-'0');
    }
 
+//fixedpointnum gpsstringtoangle(char *string)
+//   { // takes a gps string and converts it to a fixedpointnum angle
+//   // "4807.123" means 48 degrees, 7.123 minutes, south
+//   // how many digits are there before the decimal point?
+//   int index=0;
+//   while (string[index]>='0' && string[index]<='9') ++index;
+//   
+//   // convert the minutes part
+//   fixedpointnum minutes=lib_fp_stringtofixedpointnum(&string[index-2]);
+//
+//   string[index-2]='\0';
+//   fixedpointnum degrees=lib_fp_stringtofixedpointnum(string);
+//   return((degrees<<LATLONGEXTRASHIFT)+lib_fp_multiply(minutes,69905L));  // 69905L is (1/60) * 2^16 * 2^6
+//   }
+
 fixedpointnum gpsstringtoangle(char *string)
    { // takes a gps string and converts it to a fixedpointnum angle
    // "4807.123" means 48 degrees, 7.123 minutes, south
    // how many digits are there before the decimal point?
    int index=0;
    while (string[index]>='0' && string[index]<='9') ++index;
-   
-   // convert the minutes part
-   fixedpointnum minutes=lib_fp_stringtofixedpointnum(&string[index-2]);
 
+   // convert the minutes part.  Use two digits before the decimal and 7 digits after
+   fixedpointnum minutes=0;
+   char *ptr=&string[index]-2;
+   for (int count=0;count<10;++count)
+      {
+      if (*ptr=='.') ++ptr;
+      else
+         {
+         minutes*=10;
+         if (*ptr) minutes+=(*ptr++) - '0';
+         }
+      }
    string[index-2]='\0';
-   fixedpointnum degrees=lib_fp_stringtofixedpointnum(string);
-   return((degrees<<LATLONGEXTRASHIFT)+lib_fp_multiply(minutes,69905L));  // 69905L is (1/60) * 2^16 * 2^6
+   fixedpointnum degrees=lib_fp_stringtolong(string);
+
+   return((degrees<<(FIXEDPOINTSHIFT+LATLONGEXTRASHIFT))+(lib_fp_multiply(minutes,117281L)>>8));  // 29318L is (2^16 * 2^6 * 2^16 * 2^6)/(60 * 10^7)
    }
-   
+
+
 char readgps()
    {
    while (lib_serial_numcharsavailable(GPS_SERIAL_PORT))
@@ -155,7 +181,7 @@ char readgps()
                }
             
             ++gpsparameternumber;
-            gpsdataindex = 0; // get read for the next parameter
+            gpsdataindex = 0; // get ready for the next parameter
             if (c == '*') gpsfinalchecksum=gpschecksum;
             }
          else if (c == '\r' || c == '\n') 

@@ -127,6 +127,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
    #ifndef GYRO_LOW_PASS_FILTER
       #define GYRO_LOW_PASS_FILTER 2
    #endif
+   #ifndef GAIN_SCHEDULING_FACTOR
+      #define GAIN_SCHEDULING_FACTOR 0
+   #endif
+
 
 #elif (CONTROL_BOARD_TYPE==CONTROL_BOARD_SIRIUS_AIR || CONTROL_BOARD_TYPE==CONTROL_BOARD_SIRIUS_AIR_GPS)
    #define MICROCONTROLLER_TYPE MEGA32U4
@@ -166,7 +170,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
       #define MULTIWII_CONFIG_SERIAL_PORTS SERIALPORT0
    #endif
 
-#elif (CONTROL_BOARD_TYPE==CONTROL_BOARD_FLIP)
+#elif (CONTROL_BOARD_TYPE==CONTROL_BOARD_WITESPY_FLIP)
    #define MICROCONTROLLER_TYPE MEGA328P
    #define GYRO_TYPE MPU6050 // gyro
    #define GYRO_ORIENTATION(VALUES,X, Y, Z) {VALUES[ROLLINDEX] =  -Y; VALUES[PITCHINDEX] = X; VALUES[YAWINDEX] = -Z;}

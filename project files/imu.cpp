@@ -113,7 +113,12 @@ void initimu()
    lastbarorawaltitude=global.altitude=global.barorawaltitude;      
 
    global.altitudevelocity=0;
+   
    }
+
+//fixedpointnum totalrate[3]={0};
+//fixedpointnum timesincezerocrossing[3]={0};
+//char gyropositive[3]={0};
 
 void imucalculateestimatedattitude()
    {
@@ -141,7 +146,7 @@ void imucalculateestimatedattitude()
 
    rotatevectorwithsmallangles(global.estimateddownvector,rolldeltaangle,pitchdeltaangle,yawdeltaangle);
    rotatevectorwithsmallangles(global.estimatedwestvector,rolldeltaangle,pitchdeltaangle,yawdeltaangle);
-   
+
    // if the accellerometer's gravity vector is close to one G, use a complimentary filter
    // to gently adjust our estimated g vector so that it stays in line with the real one.
    // If the magnitude of the vector is not near one G, then it will be difficult to determine
