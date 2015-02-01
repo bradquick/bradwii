@@ -94,11 +94,16 @@ fixedpointnum gpsstringtoangle(char *string)
    while (string[index]>='0' && string[index]<='9') ++index;
 
    // convert the minutes part.  Use two digits before the decimal and 7 digits after
+   // with the decimal point, this gives 10 characters to look at.
+   // The largest raw minute value we should get will be 600,000,000 (9 total digits)
    fixedpointnum minutes=0;
-   char *ptr=&string[index]-2;
+   char *ptr=&string[index-2];
+   
+//if (*(ptr-1)=='3') global.debugvalue[2]=lib_fp_stringtolong(&string[index+1]);
+//else global.debugvalue[3]=lib_fp_stringtolong(&string[index+1]);
    for (int count=0;count<10;++count)
       {
-      if (*ptr=='.') ++ptr;
+      if (*ptr=='.') ++ptr; // ignore the decimal point
       else
          {
          minutes*=10;
@@ -108,9 +113,8 @@ fixedpointnum gpsstringtoangle(char *string)
    string[index-2]='\0';
    fixedpointnum degrees=lib_fp_stringtolong(string);
 
-   return((degrees<<(FIXEDPOINTSHIFT+LATLONGEXTRASHIFT))+(lib_fp_multiply(minutes,117281L)>>8));  // 29318L is (2^16 * 2^6 * 2^16 * 2^6)/(60 * 10^7)
+   return((degrees<<(FIXEDPOINTSHIFT+LATLONGEXTRASHIFT))+(lib_fp_multiply(minutes,117281L)>>8));  // 117281L is (2^16 * 2^6 * 2^16 * 2^8)/(60 * 10^7)
    }
-
 
 char readgps()
    {

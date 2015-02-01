@@ -88,6 +88,7 @@ m
 #include "navigation.h"
 #include "pilotcontrol.h"
 #include "autotune.h"
+#include "telemetry.h"
 
 globalstruct global; // global variables
 usersettingsstruct usersettings; // user editable variables
@@ -132,6 +133,7 @@ int main(void)
    initcompass();   
    initgps();
    initimu();
+   inittelemetry();
    
    // set the default i2c speed to 400 Mhz.  If a device needs to slow it down, it can, but it should set it back.
    lib_i2c_setclockspeed(I2C_400_KHZ);
@@ -148,6 +150,10 @@ int main(void)
       // check for config program activity
       serialcheckforaction();   
       
+      // check to see if it's time to send telemetry data
+      checktelemetryforaction();
+      
+      // calculate how long it's taken since the last time through this main loop
       calculatetimesliver();
       
       // run the imu to estimate the current attitude of the aircraft
@@ -173,29 +179,28 @@ int main(void)
 
       #if (GPS_TYPE!=NO_GPS)
       // turn on or off navigation when appropriate
-      if (global.navigationmode==NAVIGATIONMODEOFF)
+      if (global.activecheckboxitems & CHECKBOXMASKRETURNTOHOME) // return to home switch turned on
          {
-         if (global.activecheckboxitems & CHECKBOXMASKRETURNTOHOME) // return to home switch turned on
+         if (global.navigationmode!=NAVIGATIONMODERETURNTOHOME)
             {
             navigation_set_destination(global.gps_home_latitude,global.gps_home_longitude);
             global.navigationmode=NAVIGATIONMODERETURNTOHOME;
             }
-         else if (global.activecheckboxitems & CHECKBOXMASKPOSITIONHOLD) // position hold turned on
+         }
+      else if (global.activecheckboxitems & CHECKBOXMASKPOSITIONHOLD)
+         {
+         if (global.navigationmode!=NAVIGATIONMODEPOSITIONHOLD)
             {
             navigation_set_destination(global.gps_current_latitude,global.gps_current_longitude);
             global.navigationmode=NAVIGATIONMODEPOSITIONHOLD;
             }
          }
-      else // we are currently navigating
-         { // turn off navigation if desired
-         if ((global.navigationmode==NAVIGATIONMODERETURNTOHOME && !(global.activecheckboxitems & CHECKBOXMASKRETURNTOHOME))
-            || (global.navigationmode==NAVIGATIONMODEPOSITIONHOLD && !(global.activecheckboxitems & CHECKBOXMASKPOSITIONHOLD)))
-            {
-            global.navigationmode=NAVIGATIONMODEOFF;
-            
-            // we will be turning control back over to the pilot.
-            resetpilotcontrol();
-            }
+      else if (global.navigationmode!=NAVIGATIONMODEOFF)
+         {
+         global.navigationmode=NAVIGATIONMODEOFF;
+         
+         // we will be turning control back over to the pilot.
+         resetpilotcontrol();
          }
       #endif
       

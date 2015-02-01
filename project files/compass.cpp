@@ -121,7 +121,9 @@ char readcompass()
       compassfilterrawvalues(compassrawvalues);
       // convert the raw values into a unit vector
       for (int x=0;x<3;++x)
+         {
          global.compassvector[x]=lib_fp_multiply(((fixedpointnum)(compassfilteredrawvalues[x]-usersettings.compasszerooffset[x]))<<7,usersettings.compasscalibrationmultiplier[x]);
+         }
       return(1);
       }
    else return(0);
@@ -284,9 +286,16 @@ char readcompass()
 
 void calibratecompass()
    {
-   int minvalues[3]={0};
-   int maxvalues[3]={0};
+   int minvalues[3];
+   int maxvalues[3];
    int rawvalues[3];
+   
+   for (int x=0;x<3;++x)
+      {
+      minvalues[x]=9999;
+      maxvalues[x]=-9999;
+      }
+      
    // find the zero offsets for the raw compass readings.  Assume that someone is flipping
    // the copter in all directions for the next 30 seconds
    

@@ -304,7 +304,7 @@ void evaluatecommand(char portnumber,unsigned char *data)
    else if (command==MSP_RAW_GPS)
       { // reset user settings
       sendgoodheader(portnumber,14);
-      sendandchecksumcharacter(portnumber,0); // gps fix
+      sendandchecksumcharacter(portnumber,global.gps_num_satelites>5); // gps fix
       sendandchecksumcharacter(portnumber, global.gps_num_satelites);
       sendandchecksumlong(portnumber,lib_fp_multiply(global.gps_current_latitude,156250L)); //156250L is 10,000,000L>>LATLONGEXTRASHIFT); 
       sendandchecksumlong(portnumber,lib_fp_multiply(global.gps_current_longitude,156250L)); 

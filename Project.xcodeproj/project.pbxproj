@@ -17,6 +17,8 @@
 		A242CC6A14DB64CA00605F36 /* lib_i2c.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = lib_i2c.cpp; path = "../Avr Libraries/lib_i2c.cpp"; sourceTree = SOURCE_ROOT; };
 		A242CC7114DB66B100605F36 /* lib_timers.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = lib_timers.cpp; path = "../Avr Libraries/lib_timers.cpp"; sourceTree = SOURCE_ROOT; };
 		A242CCA214DB68BC00605F36 /* lib_digitalio.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = lib_digitalio.cpp; path = "../Avr Libraries/lib_digitalio.cpp"; sourceTree = SOURCE_ROOT; };
+		A262B8C51A62D22C004DFB3E /* telemetry.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = telemetry.cpp; sourceTree = "<group>"; };
+		A262B8C61A62D22C004DFB3E /* telemetry.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = telemetry.h; sourceTree = "<group>"; };
 		A27328C114D9F0BB00E39B15 /* bradwii.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = bradwii.cpp; sourceTree = "<group>"; };
 		A27328C514D9F0BB00E39B15 /* Makefile */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.make; path = Makefile; sourceTree = "<group>"; };
 		A276EDB616CD2E05001CADD5 /* defs.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = defs.h; sourceTree = "<group>"; };
@@ -128,6 +130,8 @@
 				A216479A174312660043F3D3 /* autotune.h */,
 				A216479B174312660043F3D3 /* autotune.cpp */,
 				A27328C514D9F0BB00E39B15 /* Makefile */,
+				A262B8C51A62D22C004DFB3E /* telemetry.cpp */,
+				A262B8C61A62D22C004DFB3E /* telemetry.h */,
 			);
 			path = "project files";
 			sourceTree = "<group>";
@@ -224,6 +228,8 @@
 /* Begin PBXProject section */
 		4079523D0CEA382200E202DC /* Project object */ = {
 			isa = PBXProject;
+			attributes = {
+			};
 			buildConfigurationList = 4079523E0CEA382200E202DC /* Build configuration list for PBXProject "Project" */;
 			compatibilityVersion = "Xcode 2.4";
 			developmentRegion = English;
@@ -304,7 +310,7 @@
 			buildSettings = {
 				DEVICE = atmega32u4;
 				PATH = "$(PATH):$(PROJECT_DIR)/../Avr_Tools/bin";
-				PROGRAMMER = "-cavr109 -P/dev/cu.usbmodem1421 -b57600 -D";
+				PROGRAMMER = "-cavr109 -P/dev/cu.usbmodem1411 -b57600 -D";
 			};
 			name = Release;
 		};

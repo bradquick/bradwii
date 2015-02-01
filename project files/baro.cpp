@@ -309,6 +309,8 @@ void i2c_MS561101BA_Calculate()
 
 void initbaro()
    {
+   global.altitude=0; // new line -- altitude equal zero
+
    lib_timers_delaymilliseconds(10);
    i2c_MS561101BA_reset();
    lib_timers_delaymilliseconds(100);

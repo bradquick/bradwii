@@ -31,13 +31,14 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //#define CONTROL_BOARD_TYPE CONTROL_BOARD_SIRIUS_AIR
 //#define CONTROL_BOARD_TYPE CONTROL_BOARD_SIRIUS_AIR_GPS
 //#define CONTROL_BOARD_TYPE CONTROL_BOARD_SIRIUS_PARIS_V4
+//#define CONTROL_BOARD_TYPE CONTROL_BOARD_SIRIUS_PARIS_V4_GPS
 //#define CONTROL_BOARD_TYPE CONTROL_BOARD_WITESPY_FLIP
 //#define CONTROL_BOARD_TYPE CONTROL_BOARD_WITESPY_MULTIWII_PRO_2
 //#define CONTROL_BOARD_TYPE CONTROL_BOARD_WITESPY_MULTIWII_PRO_2_GPS
 
 // Choose the type of r/c reciever that will be used
-#define RX_TYPE RX_NORMAL
-//#define RX_TYPE RX_CPPM
+//#define RX_TYPE RX_NORMAL
+#define RX_TYPE RX_CPPM
 //#define RX_TYPE RX_DSM2_1024
 //#define RX_TYPE RX_DSM2_2048
 //#define RX_DSM2_SERIAL_PORT 1
@@ -175,3 +176,4 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // Uncomment if using DC motors
 //#define DC_MOTORS
 
+#define TELEMETRY_SERIAL_PORT 1

@@ -18,7 +18,7 @@
 CLOCK      = 16000000
 #PROGRAMMER = -c stk500v2 -P/dev/cu.SLAB_USBtoUART
 #PROGRAMMER = -c arduino -P/dev/cu.SLAB_USBtoUART
-OBJECTS    = bradwii.o lib_usb.o rx.o serial.o output.o gyro.o accelerometer.o imu.o baro.o checkboxes.o compass.o autotune.o pilotcontrol.o eeprom.o gps.o navigation.o vectors.o lib_pwm.o lib_digitalio.o lib_timers.o lib_i2c.o lib_serial.o lib_fp.o
+OBJECTS    = bradwii.o lib_usb.o rx.o serial.o output.o gyro.o telemetry.o accelerometer.o imu.o baro.o checkboxes.o compass.o autotune.o pilotcontrol.o eeprom.o gps.o navigation.o vectors.o lib_pwm.o lib_digitalio.o lib_timers.o lib_i2c.o lib_serial.o lib_fp.o
 # to run at 8mhz:
 #FUSES      = -U hfuse:w:0xdf:m -U lfuse:w:0xe2:m
 
@@ -48,6 +48,7 @@ all:
 	$(COMPILE) -c vectors.cpp -o vectors.o
 	$(COMPILE) -c pilotcontrol.cpp -o pilotcontrol.o
 	$(COMPILE) -c autotune.cpp -o autotune.o
+	$(COMPILE) -c telemetry.cpp -o telemetry.o
 	$(COMPILE) -c $(LIBRARYPATH)lib_pwm.cpp -o lib_pwm.o
 #	$(COMPILE) -c $(LIBRARYPATH)analogio.cpp -o analogio.o
 	$(COMPILE) -c $(LIBRARYPATH)lib_digitalio.cpp -o lib_digitalio.o
