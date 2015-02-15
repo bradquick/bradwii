@@ -69,6 +69,7 @@ typedef struct
    unsigned long previousactivecheckboxitems;      // The previous state of these bits so we can tell when they turn on and off
    unsigned char armed;                              // A flag indicating that the aircraft is armed
    unsigned char gps_num_satelites;                  // How many satelites do we currently see?
+   unsigned char gps_fix;                           // set to 1 if we have a gps fix
    fixedpointnum gps_home_latitude;                  // The latitude when the aircraft was armed
    fixedpointnum gps_home_longitude;               // The longitude when the aircraft was armed
    fixedpointnum gps_current_latitude;               // The current GPS latitude

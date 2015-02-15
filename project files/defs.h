@@ -41,8 +41,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
    #ifndef GPS_TYPE
       #define GPS_TYPE SERIAL_GPS
    #endif
-   #if ((RX_TYPE==RX_DSM2_1024 || RX_TYPE==RX_DSM2_2048) && !defined(RX_DSM2_SERIAL_PORT))
-      #define RX_DSM2_SERIAL_PORT 1
+   #if ((RX_TYPE==RX_DSM2_1024 || RX_TYPE==RX_DSM2_2048) && !defined(RX_SERIAL_PORT))
+      #define RX_SERIAL_PORT 1
    #endif
    
 #elif (CONTROL_BOARD_TYPE==CONTROL_BOARD_HK_MULTIWII_328P)
@@ -64,8 +64,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
    #ifndef GPS_TYPE
       #define GPS_TYPE NO_GPS
    #endif
-   #if ((RX_TYPE==RX_DSM2_1024 || RX_TYPE==RX_DSM2_2048) && !defined(RX_DSM2_SERIAL_PORT))
-      #define RX_DSM2_SERIAL_PORT 0
+   #if ((RX_TYPE==RX_DSM2_1024 || RX_TYPE==RX_DSM2_2048) && !defined(RX_SERIAL_PORT))
+      #define RX_SERIAL_PORT 0
    #endif
 
 #elif (CONTROL_BOARD_TYPE==CONTROL_BOARD_HK_NANOWII)
@@ -86,8 +86,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
    #ifndef GPS_TYPE
       #define GPS_TYPE NO_GPS
    #endif
-   #if ((RX_TYPE==RX_DSM2_1024 || RX_TYPE==RX_DSM2_2048) && !defined(RX_DSM2_SERIAL_PORT))
-      #define RX_DSM2_SERIAL_PORT 1
+   #if ((RX_TYPE==RX_DSM2_1024 || RX_TYPE==RX_DSM2_2048) && !defined(RX_SERIAL_PORT))
+      #define RX_SERIAL_PORT 1
    #endif
 
 #elif (CONTROL_BOARD_TYPE==CONTROL_BOARD_HK_POCKET_QUAD)
@@ -112,8 +112,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
    #endif
    #if (RX_TYPE==RX_NORMAL)
       #define RXNUMCHANNELS 5
-   #elif ((RX_TYPE==RX_DSM2_1024 || RX_TYPE==RX_DSM2_2048) && !defined(RX_DSM2_SERIAL_PORT))
-      #define RX_DSM2_SERIAL_PORT 1
+   #elif ((RX_TYPE==RX_DSM2_1024 || RX_TYPE==RX_DSM2_2048) && !defined(RX_SERIAL_PORT))
+      #define RX_SERIAL_PORT 1
    #endif
    #ifndef ARMED_MIN_MOTOR_OUTPUT
       #define ARMED_MIN_MOTOR_OUTPUT 1000 // motors don't spin slowly when armed
@@ -213,8 +213,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
    #ifndef GPS_TYPE
       #define GPS_TYPE NO_GPS
    #endif
-   #if ((RX_TYPE==RX_DSM2_1024 || RX_TYPE==RX_DSM2_2048) && !defined(RX_DSM2_SERIAL_PORT))
-      #define RX_DSM2_SERIAL_PORT 0
+   #if ((RX_TYPE==RX_DSM2_1024 || RX_TYPE==RX_DSM2_2048) && !defined(RX_SERIAL_PORT))
+      #define RX_SERIAL_PORT 0
    #endif
    #define AUX2_RX_INPUT (DIGITALPORTB | 4)
    #define PCINTERRUPT4PORTANDPIN AUX2_RX_INPUT
@@ -244,8 +244,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
          #define GPS_BAUD 115200
       #endif
    #endif
-   #if ((RX_TYPE==RX_DSM2_1024 || RX_TYPE==RX_DSM2_2048) && !defined(RX_DSM2_SERIAL_PORT))
-      #define RX_DSM2_SERIAL_PORT 1
+   #if ((RX_TYPE==RX_DSM2_1024 || RX_TYPE==RX_DSM2_2048) && !defined(RX_SERIAL_PORT))
+      #define RX_SERIAL_PORT 1
    #endif
 
 
@@ -254,11 +254,16 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #endif
 
 #ifndef RXNUMCHANNELS
-   #if (RX_TYPE==RX_DSM2_1024 || RX_TYPE==RX_DSM2_2048 || RX_TYPE==RX_CPPM)
+   #if (RX_TYPE==RX_DSM2_1024 || RX_TYPE==RX_DSM2_2048 || RX_TYPE==RX_CPPM || RX_TYPE==RX_SBUS)
       #define RXNUMCHANNELS 8
    #else
       #define RXNUMCHANNELS 6
    #endif
+#endif
+
+// if no channel order was chosen, choose one
+#ifndef RX_CHANNEL_ORDER
+   #define RX_CHANNEL_ORDER THROTTLEINDEX,ROLLINDEX,PITCHINDEX,YAWINDEX,AUX1INDEX,AUX2INDEX,AUX3INDEX,AUX4INDEX,8,9,10,11 //For Graupner/Spektrum
 #endif
 
 // set microcontroller dependant defines here

@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXFileReference section */
+		A20C88B31A8FCAC10048BEF0 /* lib_prg_mem.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = lib_prg_mem.cpp; path = "../Avr Libraries/lib_prg_mem.cpp"; sourceTree = "<group>"; };
+		A20C88B41A8FCAC10048BEF0 /* lib_prg_mem.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = lib_prg_mem.h; path = "../Avr Libraries/lib_prg_mem.h"; sourceTree = "<group>"; };
 		A2110E4314F140A700842B0E /* lib_serial.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = lib_serial.cpp; path = "../Avr Libraries/lib_serial.cpp"; sourceTree = SOURCE_ROOT; };
 		A2110E7014F1431700842B0E /* lib_timers.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = lib_timers.h; path = "../Avr Libraries/lib_timers.h"; sourceTree = SOURCE_ROOT; };
 		A2110E8114F1442800842B0E /* lib_digitalio.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = lib_digitalio.h; path = "../Avr Libraries/lib_digitalio.h"; sourceTree = SOURCE_ROOT; };
@@ -86,6 +88,8 @@
 				A2E82EAD1690A20D00E4FE71 /* lib_fp.h */,
 				A2E82EAE1690A20D00E4FE71 /* lib_fp.cpp */,
 				A2D5C8E1171C2A92000E4300 /* lib_usb.cpp */,
+				A20C88B31A8FCAC10048BEF0 /* lib_prg_mem.cpp */,
+				A20C88B41A8FCAC10048BEF0 /* lib_prg_mem.h */,
 			);
 			name = Libraries;
 			sourceTree = "<group>";

@@ -38,10 +38,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 // Choose the type of r/c reciever that will be used
 //#define RX_TYPE RX_NORMAL
-#define RX_TYPE RX_CPPM
+//#define RX_TYPE RX_CPPM
+#define RX_TYPE RX_SBUS
 //#define RX_TYPE RX_DSM2_1024
 //#define RX_TYPE RX_DSM2_2048
-//#define RX_DSM2_SERIAL_PORT 1
+#define RX_SERIAL_PORT 3
 
 // Choose a channel order if you don't like the default for your receiver type selected above
 //#define RX_CHANNEL_ORDER         THROTTLEINDEX,ROLLINDEX,PITCHINDEX,YAWINDEX,AUX1INDEX,AUX2INDEX,AUX3INDEX,AUX4INDEX,8,9,10,11 //For Graupner/Spektrum
@@ -71,6 +72,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // note: two examples are given below, but any combination of ports can be added together.
 
 //#define MULTIWII_CONFIG_SERIAL_PORTS NOSERIALPORT
+#define MULTIWII_CONFIG_SERIAL_PORTS SERIALPORT0
 //#define MULTIWII_CONFIG_SERIAL_PORTS SERIALPORT1
 //#define MULTIWII_CONFIG_SERIAL_PORTS SERIALPORT1+SERIALPORT3
 
@@ -79,18 +81,21 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //#define SERIAL_2_BAUD 9600
 //#define SERIAL_3_BAUD 115200
 
-// Choose whether to include code for a GPS and set parameters for the GPS, otherwise it will default o what the control board come with
+// Choose whether to include code for a GPS and set parameters for the GPS, otherwise it will default to what the control board comes with
 //#define GPS_TYPE NO_GPS // select if no GPS is going to be used
 //#define GPS_TYPE I2C_GPS // select if an i2c gps is going to be used
 //#define GPS_TYPE SERIAL_GPS   // select if a serial GPS (NMEA) is going to be used
-//#define GPS_SERIAL_PORT 2
+#define GPS_TYPE UBLOX_GPS   // select if a UBlox GPS (binary) is going to be used
+#define GPS_SERIAL_PORT 2
 //#define GPS_BAUD 115200
+#define GPS_BAUD 57600
 
 // Choose a multiplier for high rotation rates when in acro mode
 #define HIGH_RATES_MULTILIER 2.0
 
 // Choose maximum tilt angles when in level mode
 #define LEVEL_MODE_MAX_TILT 55 // 55 degrees
+
 #define LEVEL_MODE_MAX_TILT_HIGH_ANGLE 80 // 80 degrees when high angle checkbox active
 
 // Choose maximum tilt angles owhile navigating. This will determine how fast it moves from point to point.
@@ -175,5 +180,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 // Uncomment if using DC motors
 //#define DC_MOTORS
+
+//#define TELEMETRYMODE NOTELEMETRY
+#define TELEMETRYMODE TELEMETRYFRSKYSERIAL
+//#define TELEMETRYMODE TELEMETRYFRSKYSMARTPORT
 
 #define TELEMETRY_SERIAL_PORT 1

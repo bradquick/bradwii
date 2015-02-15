@@ -18,7 +18,7 @@
 CLOCK      = 16000000
 #PROGRAMMER = -c stk500v2 -P/dev/cu.SLAB_USBtoUART
 #PROGRAMMER = -c arduino -P/dev/cu.SLAB_USBtoUART
-OBJECTS    = bradwii.o lib_usb.o rx.o serial.o output.o gyro.o telemetry.o accelerometer.o imu.o baro.o checkboxes.o compass.o autotune.o pilotcontrol.o eeprom.o gps.o navigation.o vectors.o lib_pwm.o lib_digitalio.o lib_timers.o lib_i2c.o lib_serial.o lib_fp.o
+OBJECTS    = bradwii.o lib_usb.o lib_prg_mem.o rx.o serial.o output.o gyro.o telemetry.o accelerometer.o imu.o baro.o checkboxes.o compass.o autotune.o pilotcontrol.o eeprom.o gps.o navigation.o vectors.o lib_pwm.o lib_digitalio.o lib_timers.o lib_i2c.o lib_serial.o lib_fp.o
 # to run at 8mhz:
 #FUSES      = -U hfuse:w:0xdf:m -U lfuse:w:0xe2:m
 
@@ -57,6 +57,7 @@ all:
 	$(COMPILE) -c $(LIBRARYPATH)lib_serial.cpp -o lib_serial.o
 	$(COMPILE) -c $(LIBRARYPATH)lib_fp.cpp -o lib_fp.o
 	$(COMPILE) -c $(LIBRARYPATH)lib_usb.cpp -o lib_usb.o
+	$(COMPILE) -c $(LIBRARYPATH)lib_prg_mem.cpp -o lib_prg_mem.o
 	$(COMPILE) -o bradwii.elf -Wl,--gc-sections $(OBJECTS)
 	avr-size bradwii.elf
 	rm -f bradwii.hex

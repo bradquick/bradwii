@@ -156,10 +156,6 @@ void readrx()
 #define DSM2STATE_WAITINGFORFIRSTCHAR 1
 #define DSM2STATE_WAITINGFORSECONDCHAR 2
 
-#ifndef RX_CHANNEL_ORDER
-   #define RX_CHANNEL_ORDER         THROTTLEINDEX,ROLLINDEX,PITCHINDEX,YAWINDEX,AUX1INDEX,AUX2INDEX,AUX3INDEX,AUX4INDEX,8,9,10,11 //For Graupner/Spektrum
-#endif
-
 volatile unsigned int rxrawvalues[RXNUMCHANNELS];
 unsigned long dsm2timer;
 unsigned char dsm2state;
@@ -205,8 +201,8 @@ void initrx()
    {
    dsm2timer=lib_timers_starttimer();
    
-   lib_serial_initport(RX_DSM2_SERIAL_PORT,DSM2_BAUD);
-   lib_serial_setrxcallback(RX_DSM2_SERIAL_PORT,dsm2serialcallback);
+   lib_serial_initport(RX_SERIAL_PORT,DSM2_BAUD);
+   lib_serial_setrxcallback(RX_SERIAL_PORT,dsm2serialcallback);
    }   
 
 void readrx()
@@ -226,10 +222,6 @@ void readrx()
 
 #elif (RX_TYPE==RX_CPPM)
 
-#ifndef RX_CHANNEL_ORDER
-   #define RX_CHANNEL_ORDER         THROTTLEINDEX,ROLLINDEX,PITCHINDEX,YAWINDEX,AUX1INDEX,AUX2INDEX,AUX3INDEX,AUX4INDEX,8,9,10,11 //For Graupner/Spektrum
-#endif
-
 unsigned char channelindex[]={RX_CHANNEL_ORDER};
 volatile unsigned int rxrawvalues[RXNUMCHANNELS];
 
@@ -238,7 +230,6 @@ void serialsumcallback(unsigned char interruptnumber, unsigned char newstate)
    static unsigned long starttime = 0;
    static unsigned char chan = 0;
    unsigned int width;
-   static unsigned int glitches=0;
   
    if (newstate)
       {
@@ -280,6 +271,130 @@ void initrx()
       
    lib_digitalio_initpin(THROTTLE_RX_INPUT,DIGITALINPUT);
    lib_digitalio_setinterruptcallback(THROTTLE_RX_INPUT, serialsumcallback);   
+   }
+
+#elif (RX_TYPE==RX_SBUS)
+
+#define SBUS_FRAME_BEGIN_BYTE 0x0F
+#define SBUS_FRAME_END_BYTE 0x00
+
+#define SBUS_FLAG_RESERVED_1        (1 << 0)
+#define SBUS_FLAG_RESERVED_2        (1 << 1)
+#define SBUS_FLAG_SIGNAL_LOSS       (1 << 2)
+#define SBUS_FLAG_FAILSAFE_ACTIVE   (1 << 3)
+
+// this is the s bus data format:
+//struct sbusFrame_s {
+//    uint8_t syncByte;
+//    // 176 bits of data (11 bits per channel * 16 channels) = 22 bytes.
+//    unsigned int chan0 : 11;
+//    unsigned int chan1 : 11;
+//    unsigned int chan2 : 11;
+//    unsigned int chan3 : 11;
+//    unsigned int chan4 : 11;
+//    unsigned int chan5 : 11;
+//    unsigned int chan6 : 11;
+//    unsigned int chan7 : 11;
+//    unsigned int chan8 : 11;
+//    unsigned int chan9 : 11;
+//    unsigned int chan10 : 11;
+//    unsigned int chan11 : 11;
+//    unsigned int chan12 : 11;
+//    unsigned int chan13 : 11;
+//    unsigned int chan14 : 11;
+//    unsigned int chan15 : 11;
+//    uint8_t flags;
+//    uint8_t endByte;
+//} __attribute__ ((__packed__));
+
+unsigned char sbuschannelorder[]={RX_CHANNEL_ORDER};
+unsigned long sbustimer;
+unsigned char numframebytesreceived; // should cycle from zero through 24.  We won't save the 25th byte (end)
+unsigned char rawframedata[24];
+unsigned char goodframedata[24];
+unsigned char gotnewpacketflag;
+
+// this callback will get called whenever we receive a character on our sbus serial port
+void sbusserialcallback(unsigned char c)
+   {
+   // if we haven't received any characters for 2500 microseconds, we may be out of sync. Start over.
+   unsigned long microsecondssincelastchar=lib_timers_gettimermicrosecondsandreset(&sbustimer);
+   if (microsecondssincelastchar>2500)
+      numframebytesreceived=0;
+      
+   if (numframebytesreceived==0) // we are waiting for the sync byte
+      {
+      if (c!=SBUS_FRAME_BEGIN_BYTE) return;
+      }
+   
+   else if (numframebytesreceived==24) // this byte should be the end byte
+      {
+      if (c==SBUS_FRAME_END_BYTE && gotnewpacketflag!=2)
+         {
+         // save this packet
+         gotnewpacketflag=0; // keep main thread from processing the packet as we copy it
+         for (int x=0;x<24;++x)
+            goodframedata[x]=rawframedata[x];
+
+         gotnewpacketflag=1;
+         }
+
+      numframebytesreceived=0; // start over
+      return;
+      }
+
+   rawframedata[numframebytesreceived++]=c;
+   }
+
+
+void initrx()
+   {
+   numframebytesreceived=0;
+   gotnewpacketflag=0;
+   
+   sbustimer=lib_timers_starttimer();
+
+   lib_serial_initport(RX_SERIAL_PORT,100000); // don't seem to need to set the parity to E and stop bits to 2
+   lib_serial_setrxcallback(RX_SERIAL_PORT,sbusserialcallback);
+   }   
+
+void readrx()
+   {
+   // only update the values if we have new, verified data
+   if (gotnewpacketflag)
+      {
+      gotnewpacketflag=2; // we are processing it.  Don't let the interrupt change it.
+      
+      // read the good frame data and set the values
+      // convert from 0-2048 range to -1 to 1 fixedpointnum range
+      global.rxvalues[sbuschannelorder[0]]  = (((fixedpointnum)(goodframedata[1] | goodframedata[2]<< 8) & 0x07FF)-1010)<<6;
+      global.rxvalues[sbuschannelorder[1]]  = (((fixedpointnum)(goodframedata[2]>>3 | goodframedata[3]<<5) & 0x07FF)-1010)<<6;
+      global.rxvalues[sbuschannelorder[2]]  = (((fixedpointnum)(goodframedata[3]>>6|goodframedata[4]<<2 | goodframedata[5]<<10) & 0x07FF)-1010)<<6;
+      global.rxvalues[sbuschannelorder[3]]  = (((fixedpointnum)(goodframedata[5]>>1|goodframedata[6]<<7) & 0x07FF)-1010)<<6;
+#if (RXNUMCHANNELS>4)
+      global.rxvalues[sbuschannelorder[4]]  = (((fixedpointnum)(goodframedata[6]>>4|goodframedata[7]<<4) & 0x07FF)-1010)<<6;;
+      global.rxvalues[sbuschannelorder[5]]  = (((fixedpointnum)(goodframedata[7]>>7|goodframedata[8]<<1|goodframedata[9]<<9) & 0x07FF)-1010)<<6;
+#endif
+#if (RXNUMCHANNELS>6)
+      global.rxvalues[sbuschannelorder[6]]  = (((fixedpointnum)(goodframedata[9]>>2|goodframedata[10]<<6) & 0x07FF)-1010)<<6;
+      global.rxvalues[sbuschannelorder[7]]  = (((fixedpointnum)(goodframedata[10]>>5|goodframedata[11]<<3) & 0x07FF)-1010)<<6;
+#endif
+#if (RXNUMCHANNELS==16)
+      global.rxvalues[sbuschannelorder[8]]  = (((fixedpointnum)(goodframedata[12]|goodframedata[13]<< 8) & 0x07FF)-1010)<<6;
+      global.rxvalues[sbuschannelorder[9]]  = (((fixedpointnum)(goodframedata[13]>>3|goodframedata[14]<<5) & 0x07FF)-1010)<<6;
+      global.rxvalues[sbuschannelorder[10]] = (((fixedpointnum)(goodframedata[14]>>6|goodframedata[15]<<2|goodframedata[16]<<10) & 0x07FF)-1010)<<6;
+      global.rxvalues[sbuschannelorder[11]] = (((fixedpointnum)(goodframedata[16]>>1|goodframedata[17]<<7) & 0x07FF)-1010)<<6;
+      global.rxvalues[sbuschannelorder[12]] = (((fixedpointnum)(goodframedata[17]>>4|goodframedata[18]<<4) & 0x07FF)-1010)<<6;
+      global.rxvalues[sbuschannelorder[13]] = (((fixedpointnum)(goodframedata[18]>>7|goodframedata[19]<<1|goodframedata[20]<<9) & 0x07FF)-1010)<<6;
+      global.rxvalues[sbuschannelorder[14]] = (((fixedpointnum)(goodframedata[20]>>2|goodframedata[21]<<6) & 0x07FF)-1010)<<6;
+      global.rxvalues[sbuschannelorder[15]] = (((fixedpointnum)(goodframedata[21]>>5|goodframedata[22]<<3) & 0x07FF)-1010)<<6;
+#endif
+
+      if (!(goodframedata[23] & SBUS_FLAG_FAILSAFE_ACTIVE))
+         global.failsafetimer=lib_timers_starttimer();  // reset the failsafe timer
+         
+      gotnewpacketflag=0; // ready for a new one
+      }
    }
 
 #endif
