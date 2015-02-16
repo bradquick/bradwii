@@ -71,6 +71,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define I2C_GPS 2
 #define UBLOX_GPS 3
 
+// GPS_SBAS_TYPE
+#define SBAS_AUTO 0
+#define SBAS_EGNOS 1
+#define SBAS_WAAS 2
+#define SBAS_MSAS 3
+#define SBAS_GAGAN 4
+
 // COMPASS_TYPE's
 #define NO_COMPASS 0
 #define HMC5883 1

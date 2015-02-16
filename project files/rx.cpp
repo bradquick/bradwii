@@ -273,6 +273,7 @@ void initrx()
    lib_digitalio_setinterruptcallback(THROTTLE_RX_INPUT, serialsumcallback);   
    }
 
+
 #elif (RX_TYPE==RX_SBUS)
 
 #define SBUS_FRAME_BEGIN_BYTE 0x0F
@@ -348,7 +349,7 @@ void sbusserialcallback(unsigned char c)
 
 
 void initrx()
-   {
+   { // initialize the serial port for receiving sbus
    numframebytesreceived=0;
    gotnewpacketflag=0;
    

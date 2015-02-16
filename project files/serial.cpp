@@ -128,7 +128,9 @@ void senderrorheader(char portnumber)
    serialchecksum[portnumber]=0;
    sendandchecksumcharacter(portnumber,serialcommand[portnumber]);
    }
-   
+
+extern fixedpointnum longitude8;
+
 void evaluatecommand(char portnumber,unsigned char *data)
    {
    unsigned char command=serialcommand[portnumber];
@@ -306,8 +308,8 @@ void evaluatecommand(char portnumber,unsigned char *data)
       sendgoodheader(portnumber,14);
       sendandchecksumcharacter(portnumber,global.gps_num_satelites>5); // gps fix
       sendandchecksumcharacter(portnumber, global.gps_num_satelites);
-      sendandchecksumlong(portnumber,lib_fp_multiply(global.gps_current_latitude,156250L)); //156250L is 10,000,000L>>LATLONGEXTRASHIFT); 
-      sendandchecksumlong(portnumber,lib_fp_multiply(global.gps_current_longitude,156250L)); 
+      sendandchecksumlong(portnumber,lib_fp_multiply(global.gps_current_latitude,156250L)); //156250L is 10,000,000L>>LATLONGEXTRASHIFT);
+      sendandchecksumlong(portnumber,lib_fp_multiply(global.gps_current_longitude,156250L));
       sendandchecksumint(portnumber,global.gps_current_altitude>>FIXEDPOINTSHIFT); // gps altitude
       sendandchecksumint(portnumber,(global.gps_current_speed*100)>>FIXEDPOINTSHIFT); // gps speed
       }

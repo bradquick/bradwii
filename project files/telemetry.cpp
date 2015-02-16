@@ -103,7 +103,7 @@ void sendfixedpointnum(unsigned char bpId, unsigned char apId, fixedpointnum val
 
 void sendlatitudeorlongitude(unsigned char bpId, unsigned char apId, fixedpointnum value)
    {
-   // convert from decimal degrees to ddmm.mmmmm format
+   // convert from fixedpointnum degrees to ddmm.mmmmm format
    fixedpointnum degrees=(value>>LATLONGEXTRASHIFT) & 0xFFFF0000;
    fixedpointnum minutes=((value - (degrees<<LATLONGEXTRASHIFT))*60L)>>LATLONGEXTRASHIFT;
    
@@ -185,6 +185,7 @@ void checktelemetryforaction()
    }
 #endif
 
+
 #if (TELEMETRYMODE==TELEMETRYFRSKYSMARTPORT)
 
 //const unsigned int frSkyDataIdTable[] = {
@@ -213,10 +214,7 @@ void checktelemetryforaction()
 //};
 
 #define SMARTPORT_BAUD 57600
-#define SMARTPORT_SERVICE_DELAY_MS 5 // telemetry requests comes in at roughly 12 ms intervals, keep this under that
-#define SMARTPORT_NOT_CONNECTED_TIMEOUT_MS 7000
 
-unsigned long telemetrytimer;
 unsigned char telemetrycount;
 unsigned char smartportstate;
 
@@ -224,9 +222,8 @@ unsigned char smartportstate;
 #define SMARTPORTGOTSTART 1
 
 void inittelemetry()
-   {
+   { // set up the serial port for smart port communication
    lib_serial_initport(TELEMETRY_SERIAL_PORT,57600);
-   telemetrytimer=lib_timers_starttimer();
    telemetrycount=0;
    smartportstate=SMARTPORTIDLE;
    }
@@ -258,11 +255,11 @@ void inittelemetry()
 void sendnextsmartportdata();
 
 void checktelemetryforaction()
-   {
+   { // wait to receive a START_STOP byte followed by a request byte
    if (lib_serial_numcharsavailable(TELEMETRY_SERIAL_PORT))
       {
       char c=lib_serial_getchar(TELEMETRY_SERIAL_PORT);
-      
+
       if (smartportstate==SMARTPORTIDLE)
          {
          if (c==FSSP_START_STOP)
@@ -284,10 +281,9 @@ void checktelemetryforaction()
       }
    }
 
-   lib_serial_sendchar(TELEMETRY_SERIAL_PORT,Data);
 
-static void smartPortSendByte(unsigned char c, unsigned int *crcp)
-   {
+static void sendsmartportbyte(unsigned char c, unsigned int *crcp)
+   { // send a byte of smart port data.  If crcp is not zero, keep track of the crc
    // smart port escape sequence
    if (c == 0x7D || c == 0x7E)
       {
@@ -297,7 +293,7 @@ static void smartPortSendByte(unsigned char c, unsigned int *crcp)
 
    lib_serial_sendchar(TELEMETRY_SERIAL_PORT, c);
 
-   if (crcp == NULL) return;
+   if (crcp == 0) return;
 
    // update the checksum
    unsigned int crc = *crcp;
@@ -307,156 +303,184 @@ static void smartPortSendByte(unsigned char c, unsigned int *crcp)
    *crcp = crc;
    }
 
-static void smartPortSendPackage(unsigned int id, unsigned long val)
-   {
+static void sendsmartportpaket(unsigned int id, unsigned long val)
+   {  // send the id and value as a smart port packet
    unsigned int crc = 0;
-   smartPortSendByte(FSSP_DATA_FRAME, &crc);
+   sendsmartportbyte(FSSP_DATA_FRAME, &crc);
    unsigned char *u8p = (unsigned char*)&id;
-   smartPortSendByte(u8p[0], &crc);
-   smartPortSendByte(u8p[1], &crc);
+   sendsmartportbyte(u8p[0], &crc);
+   sendsmartportbyte(u8p[1], &crc);
    u8p = (unsigned char*)&val;
-   smartPortSendByte(u8p[0], &crc);
-   smartPortSendByte(u8p[1], &crc);
-   smartPortSendByte(u8p[2], &crc);
-   smartPortSendByte(u8p[3], &crc);
-   smartPortSendByte(0xFF - (unsigned char)crc, NULL);
+   sendsmartportbyte(u8p[0], &crc);
+   sendsmartportbyte(u8p[1], &crc);
+   sendsmartportbyte(u8p[2], &crc);
+   sendsmartportbyte(u8p[3], &crc);
+   sendsmartportbyte(0xFF - (unsigned char)crc, 0);
+   }
+
+void sendsmartportlatlongvalue(fixedpointnum value,unsigned char thisislongitude)
+   {
+   // the same ID is sent twice, one for longitude, one for latitude
+   // the MSB of the sent unsigned long helps FrSky keep track
+ 
+   // units=10000 minutes
+   // =(ourvalue*60*10000)>>(6+16)
+   // =(ourvalue*1.1444091796875)>>3;
+   
+   value=lib_fp_multiply(value,FIXEDPOINTCONSTANT(1.1444091796875))>>3;
+   unsigned long unsignedvalue;
+   long signedvalue;
+
+   unsignedvalue = signedvalue = value;
+   if (signedvalue < 0)
+      {
+      unsignedvalue = -signedvalue;
+      unsignedvalue |= 0x40000000;
+      }
+   if (thisislongitude) unsignedvalue |= 0x80000000;
+   sendsmartportpaket(FSSP_DATAID_LATLONG, unsignedvalue);
    }
 
 void sendnextsmartportdata()
    {
-   long signedvalue;
-   unsigned long unsignedvalue;
-
    switch(++telemetrycount)
       {
       case 1:
-         // GPS Speed
-         if (sensors(SENSOR_GPS) && STATE(GPS_FIX))
-            {
-//            // send the gps speed. Convert from meters per second to km/h
-//            sendfixedpointnum(ID_GPS_speed_bp,ID_GPS_speed_ap,lib_fp_multiply(global.gps_current_speed,FIXEDPOINTCONSTANT(3.6)),0); // zero after decimal point?
-            unsignedvalue = lib_fp_multiply(global.gps_current_speed,FIXEDPOINTCONSTANT(3.6))>>FIXEDPOINTSHIFT;
-            
-            smartPortSendPackage(FSSP_DATAID_SPEED, unsignedvalue); //  in KM/H?
-            }
-          break;
-      case 2:
-//          smartPortSendPackage(FSSP_DATAID_VFAS, vbat * 83); // supposedly given in 0.1V, unknown requested unit
-          // multiplying by 83 seems to make Taranis read correctly
-          break;
-      case 3:
-//          smartPortSendPackage(FSSP_DATAID_CURRENT, amperage); // given in 10mA steps, unknown requested unit
-          break;
-      //case FSSP_DATAID_RPM        :
-      case 4: // altitude
-          smartPortSendPackage(FSSP_DATAID_ALTITUDE, (global.altitude*100)>>FIXEDPOINTSHIFT); // unknown given unit, requested 100 = 1 meter
-          break;
-      case 5:
-//          smartPortSendPackage(FSSP_DATAID_FUEL, mAhDrawn); // given in mAh, unknown requested unit
-          break;
-      //case FSSP_DATAID_ADC1       :
-      //case FSSP_DATAID_ADC2       :
-      case 6:
-         // the same ID is sent twice, one for longitude, one for latitude
-         // the MSB of the sent unsigned long helps FrSky keep track
-         // the even/odd bit of our counter helps us keep track
-            unsignedvalue = signedvalue = GPS_coord[LON];
-            if (signedvalue < 0)
-               {
-               unsignedvalue = -signedvalue;
-               unsignedvalue |= 0x40000000;
-               }
-            unsignedvalue |= 0x80000000;
-            smartPortSendPackage(FSSP_DATAID_LATLONG, unsignedvalue);
-            }
+         // send the gps speed. Convert from meters per second to km/h
+         sendsmartportpaket(FSSP_DATAID_SPEED, lib_fp_multiply(global.gps_current_speed,FIXEDPOINTCONSTANT(3.6))>>FIXEDPOINTSHIFT); //  in KM/H?
          break;
+      case 2:
+         // send the number of satelites as RPM
+         sendsmartportpaket(FSSP_DATAID_RPM, global.gps_num_satelites*60);
+         break;
+      case 3: // altitude
+         sendsmartportpaket(FSSP_DATAID_ALTITUDE, (global.altitude*100)>>FIXEDPOINTSHIFT); // unknown given unit, requested 100 = 1 meter
+         break;
+      case 4:
+         sendsmartportlatlongvalue(global.gps_current_longitude,1);
+         break;
+      case 5:
+         sendsmartportlatlongvalue(global.gps_current_latitude,0);
+         break;
+      case 6:
+          sendsmartportpaket(FSSP_DATAID_VARIO, (global.altitudevelocity*100L)>>FIXEDPOINTSHIFT); // requested in 100 = 1m/s
+          break;
       case 7:
-            unsignedvalue = signedvalue = GPS_coord[LAT];
-            if (signedvalue < 0)
-               {
-               unsignedvalue = -signedvalue;
-               unsignedvalue |= 0x40000000;
-               }
-            smartPortSendPackage(FSSP_DATAID_LATLONG, unsignedvalue);
-            break;
-      //case FSSP_DATAID_CAP_USED   :
+          if (global.currentestimatedeulerattitude[YAWINDEX]<0)
+            sendsmartportpaket(FSSP_DATAID_HEADING, ((global.currentestimatedeulerattitude[YAWINDEX]+FIXEDPOINTCONSTANT(360.0))*100L)>>FIXEDPOINTSHIFT);
+          else
+            sendsmartportpaket(FSSP_DATAID_HEADING, (global.currentestimatedeulerattitude[YAWINDEX]*100L)>>FIXEDPOINTSHIFT);
+          break;
       case 8:
-          smartPortSendPackage(FSSP_DATAID_VARIO, vario); // unknown given unit but requested in 100 = 1m/s
+          sendsmartportpaket(FSSP_DATAID_ACCX, global.acc_g_vector[XINDEX]>>6);
           break;
       case 9:
-          smartPortSendPackage(FSSP_DATAID_HEADING, heading * 100); // given in deg, requested in 10000 = 100 deg
+          sendsmartportpaket(FSSP_DATAID_ACCY, global.acc_g_vector[YINDEX]>>6);
           break;
       case 10:
-          smartPortSendPackage(FSSP_DATAID_ACCX, accSmooth[X] / 44);
-          // unknown input and unknown output unit
-          // we can only show 00.00 format, another digit won't display right on Taranis
-          // dividing by roughly 44 will give acceleration in G units
+          sendsmartportpaket(FSSP_DATAID_ACCZ, global.acc_g_vector[ZINDEX]>>6);
           break;
-      case 11:
-          smartPortSendPackage(FSSP_DATAID_ACCY, accSmooth[Y] / 44);
-          break;
-      case 12:
-          smartPortSendPackage(FSSP_DATAID_ACCZ, accSmooth[Z] / 44);
-          break;
+      case 11: // gps altitude
+         sendsmartportpaket(FSSP_DATAID_GPS_ALT, (global.gps_current_altitude*100)>>FIXEDPOINTSHIFT); // requested 100 = 1 meter
+         break;
+      case 12: // gps speed
+         sendsmartportpaket(FSSP_DATAID_GPS_SPEED, lib_fp_multiply(global.gps_current_speed,FIXEDPOINTCONSTANT(1.94384)));
+         break;
       case 13:
-          // we send all the flags as decimal digits for easy reading
-
-          // the t1Cnt simply allows the telemetry view to show at least some changes
-          t1Cnt++;
-          if (t1Cnt >= 4) {
-              t1Cnt = 1;
-          }
-          signedvalue = t1Cnt * 10000; // start off with at least one digit so the most significant 0 won't be cut off
-          // the Taranis seems to be able to fit 5 digits on the screen
-          // the Taranis seems to consider this number a signed 16 bit integer
-
-          if (ARMING_FLAG(OK_TO_ARM))
-              signedvalue += 1;
-          if (ARMING_FLAG(PREVENT_ARMING))
-              signedvalue += 2;
-          if (ARMING_FLAG(ARMED))
-              signedvalue += 4;
-
-          if (FLIGHT_MODE(ANGLE_MODE))
-              signedvalue += 10;
-          if (FLIGHT_MODE(HORIZON_MODE))
-              signedvalue += 20;
-          if (FLIGHT_MODE(AUTOTUNE_MODE))
-              signedvalue += 40;
-          if (FLIGHT_MODE(PASSTHRU_MODE))
-              signedvalue += 40;
-
-          if (FLIGHT_MODE(MAG_MODE))
-              signedvalue += 100;
-          if (FLIGHT_MODE(BARO_MODE))
-              signedvalue += 200;
-          if (FLIGHT_MODE(SONAR_MODE))
-              signedvalue += 400;
-
-          if (FLIGHT_MODE(GPS_HOLD_MODE))
-              signedvalue += 1000;
-          if (FLIGHT_MODE(GPS_HOME_MODE))
-              signedvalue += 2000;
-          if (FLIGHT_MODE(HEADFREE_MODE))
-              signedvalue += 4000;
-
-          smartPortSendPackage(FSSP_DATAID_T1, (unsigned long)signedvalue);
-          break;
+         // send the navigation distance in Temperature1
+         sendsmartportpaket(FSSP_DATAID_T1, global.navigation_distance>>FIXEDPOINTSHIFT);
+         break;
       case 14:
-          if (sensors(SENSOR_GPS)) {
-              // provide GPS lock status
-              smartPortSendPackage(id, (STATE(GPS_FIX) ? 1000 : 0) + (STATE(GPS_FIX_HOME) ? 2000 : 0) + GPS_numSat);
-          }
-          else {
-              smartPortSendPackage(FSSP_DATAID_T2, 0);
-          }
-          break;
-      case 15:
-          if (sensors(SENSOR_GPS) && STATE(GPS_FIX)) {
-              smartPortSendPackage(FSSP_DATAID_GPS_ALT, GPS_altitude * 1000); // given in 0.1m , requested in 100 = 1m
-          }
+         // send the navigation bearing in Temperature2
+         sendsmartportpaket(FSSP_DATAID_T2, global.navigation_bearing>>FIXEDPOINTSHIFT);
+         break;
+
+
+      default:
           telemetrycount=0; // start over
           break;
+          
+          
+          
+          
+          
+//      case 8:
+////          sendsmartportpaket(FSSP_DATAID_ACCX, accSmooth[X] / 44);
+//          // unknown input and unknown output unit
+//          // we can only show 00.00 format, another digit won't display right on Taranis
+//          // dividing by roughly 44 will give acceleration in G units
+//          break;
+//      case 3:
+////          sendsmartportpaket(FSSP_DATAID_CURRENT, amperage); // given in 10mA steps, unknown requested unit
+//          break;
+//      case 11:
+//          sendsmartportpaket(FSSP_DATAID_ACCY, accSmooth[Y] / 44);
+//          break;
+//      case 12:
+//          sendsmartportpaket(FSSP_DATAID_ACCZ, accSmooth[Z] / 44);
+//          break;
+//      case 13:
+//          // we send all the flags as decimal digits for easy reading
+//
+//          // the t1Cnt simply allows the telemetry view to show at least some changes
+//          t1Cnt++;
+//          if (t1Cnt >= 4) {
+//              t1Cnt = 1;
+//          }
+//          signedvalue = t1Cnt * 10000; // start off with at least one digit so the most significant 0 won't be cut off
+//          // the Taranis seems to be able to fit 5 digits on the screen
+//          // the Taranis seems to consider this number a signed 16 bit integer
+//
+//          if (ARMING_FLAG(OK_TO_ARM))
+//              signedvalue += 1;
+//          if (ARMING_FLAG(PREVENT_ARMING))
+//              signedvalue += 2;
+//          if (ARMING_FLAG(ARMED))
+//              signedvalue += 4;
+//
+//          if (FLIGHT_MODE(ANGLE_MODE))
+//              signedvalue += 10;
+//          if (FLIGHT_MODE(HORIZON_MODE))
+//              signedvalue += 20;
+//          if (FLIGHT_MODE(AUTOTUNE_MODE))
+//              signedvalue += 40;
+//          if (FLIGHT_MODE(PASSTHRU_MODE))
+//              signedvalue += 40;
+//
+//          if (FLIGHT_MODE(MAG_MODE))
+//              signedvalue += 100;
+//          if (FLIGHT_MODE(BARO_MODE))
+//              signedvalue += 200;
+//          if (FLIGHT_MODE(SONAR_MODE))
+//              signedvalue += 400;
+//
+//          if (FLIGHT_MODE(GPS_HOLD_MODE))
+//              signedvalue += 1000;
+//          if (FLIGHT_MODE(GPS_HOME_MODE))
+//              signedvalue += 2000;
+//          if (FLIGHT_MODE(HEADFREE_MODE))
+//              signedvalue += 4000;
+//
+//          sendsmartportpaket(FSSP_DATAID_T1, (unsigned long)signedvalue);
+//          break;
+//      case 14:
+//          if (sensors(SENSOR_GPS)) {
+//              // provide GPS lock status
+//              sendsmartportpaket(id, (STATE(GPS_FIX) ? 1000 : 0) + (STATE(GPS_FIX_HOME) ? 2000 : 0) + GPS_numSat);
+//          }
+//          else {
+//              sendsmartportpaket(FSSP_DATAID_T2, 0);
+//          }
+//          break;
+//      case 15:
+//          if (sensors(SENSOR_GPS) && STATE(GPS_FIX)) {
+//              sendsmartportpaket(FSSP_DATAID_GPS_ALT, GPS_altitude * 1000); // given in 0.1m , requested in 100 = 1m
+//          }
+//          telemetrycount=0; // start over
+//          break;
+//      case 4:
+////          sendsmartportpaket(FSSP_DATAID_FUEL, mAhDrawn); // given in mAh, unknown requested unit
+//          break;
       }
    }
 

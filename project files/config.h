@@ -90,6 +90,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //#define GPS_BAUD 115200
 #define GPS_BAUD 57600
 
+#define GPS_SBAS_TYPE SBAS_WAAS
+
+
 // Choose a multiplier for high rotation rates when in acro mode
 #define HIGH_RATES_MULTILIER 2.0
 
@@ -182,7 +185,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //#define DC_MOTORS
 
 //#define TELEMETRYMODE NOTELEMETRY
-#define TELEMETRYMODE TELEMETRYFRSKYSERIAL
-//#define TELEMETRYMODE TELEMETRYFRSKYSMARTPORT
+//#define TELEMETRYMODE TELEMETRYFRSKYSERIAL
+#define TELEMETRYMODE TELEMETRYFRSKYSMARTPORT
 
 #define TELEMETRY_SERIAL_PORT 1
