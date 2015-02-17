@@ -455,8 +455,13 @@ char handlepacket()
       case MSG_POSLLH:
          if (gotfix)
             { // .4194304 is 10^-7 *2^16 *2^6 to convert from degrees *10^-7 to fixedpointnum degrees<<LATLONGEXTRASHIFT
-            global.gps_current_longitude = lib_fp_multiply(gps_data.posllh.longitude, FIXEDPOINTCONSTANT(.4194304));
-            global.gps_current_latitude = lib_fp_multiply(gps_data.posllh.latitude, FIXEDPOINTCONSTANT(.4194304));
+// *2^8
+            // to maximize precision, we want the two things being multiplied to have the same number of significant digits.
+            // so we shift the raw value left and the multiplier right.
+//            global.gps_current_longitude = lib_fp_multiply(gps_data.posllh.longitude, FIXEDPOINTCONSTANT(.4194304));
+            global.gps_current_longitude = lib_fp_multiply(gps_data.posllh.longitude>>7, FIXEDPOINTCONSTANT(214.7483648))>>2;
+            global.gps_current_latitude = lib_fp_multiply(gps_data.posllh.latitude>>7, FIXEDPOINTCONSTANT(214.7483648))>>2;
+//            global.gps_current_latitude = lib_fp_multiply(gps_data.posllh.latitude, FIXEDPOINTCONSTANT(.4194304));
             global.gps_current_altitude = lib_fp_multiply(gps_data.posllh.altitude_msl,FIXEDPOINTCONSTANT(65.536)); // convert from mm to fixedpointnum meters.  65.536 is .001 * 2^16
             }
          global.gps_fix = gotfix;
