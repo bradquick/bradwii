@@ -27,7 +27,7 @@ extern usersettingsstruct usersettings;
 #define FP_LEVEL_MODE_MAX_TILT FIXEDPOINTCONSTANT(LEVEL_MODE_MAX_TILT)
 #define FP_LEVEL_MODE_MAX_TILT_HIGH_ANGLE FIXEDPOINTCONSTANT(LEVEL_MODE_MAX_TILT_HIGH_ANGLE)
 // convert high rate multiplier into fixed point
-#define FP_HIGH_RATES_MULTILIER FIXEDPOINTCONSTANT(HIGH_RATES_MULTILIER)
+#define FP_HIGH_RATES_MULTIPLIER FIXEDPOINTCONSTANT(HIGH_RATES_MULTIPLIER)
 
 // When the yaw stick is centered, allow compass hold.  This defines what centered is:
 #define YAWCOMPASSRXDEADBAND FIXEDPOINTCONSTANT(.125) // 1/8 of the range
@@ -43,8 +43,8 @@ void resetpilotcontrol()
    desiredcompassheading=global.currentestimatedeulerattitude[YAWINDEX];
    
    // calculate our max rotation rates based on usersettings
-   highyawrate=lib_fp_multiply(usersettings.maxyawrate, FP_HIGH_RATES_MULTILIER);
-   highpitchandrollrate=lib_fp_multiply(usersettings.maxpitchandrollrate, FP_HIGH_RATES_MULTILIER);
+   highyawrate=lib_fp_multiply(usersettings.maxyawrate, FP_HIGH_RATES_MULTIPLIER);
+   highpitchandrollrate=lib_fp_multiply(usersettings.maxpitchandrollrate, FP_HIGH_RATES_MULTIPLIER);
    }
 
 void getangleerrorfrompilotinput(fixedpointnum *angleerror)

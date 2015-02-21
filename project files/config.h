@@ -99,7 +99,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //#define GPS_SBAS_TYPE SBAS_GAGAN
 
 // Choose a multiplier for high rotation rates when in acro mode
-#define HIGH_RATES_MULTILIER 2.0
+#define HIGH_RATES_MULTIPLIER 2.0
 
 // Choose maximum tilt angles when in level mode
 #define LEVEL_MODE_MAX_TILT 55 // 55 degrees
