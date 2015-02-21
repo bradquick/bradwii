@@ -70,10 +70,10 @@ typedef struct
    unsigned char armed;                              // A flag indicating that the aircraft is armed
    unsigned char gps_num_satelites;                  // How many satelites do we currently see?
    unsigned char gps_fix;                           // set to 1 if we have a gps fix
-   fixedpointnum gps_home_latitude;                  // The latitude when the aircraft was armed
-   fixedpointnum gps_home_longitude;               // The longitude when the aircraft was armed
-   fixedpointnum gps_current_latitude;               // The current GPS latitude
-   fixedpointnum gps_current_longitude;            // The current GPS longitude
+   long gps_home_latitude;                  // The latitude when the aircraft was armed in 10,000,000 degrees
+   long gps_home_longitude;               // The longitude when the aircraft was armed
+   long gps_current_latitude;               // The current GPS latitude
+   long gps_current_longitude;            // The current GPS longitude
    fixedpointnum gps_current_altitude;               // The current GPS altitude
    fixedpointnum gps_current_speed;                  // The current GPS speed
    fixedpointnum navigation_distance;               // The distance to to the navigation destination in meters (I think)

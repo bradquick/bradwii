@@ -244,11 +244,6 @@ void serialsumcallback(unsigned char interruptnumber, unsigned char newstate)
          {
          if (width>900 && width<2050)
             rxrawvalues[chan] = width;
-//         else
-//            {
-//            global.debugvalue[1] = width;
-//            global.debugvalue[0] = ++glitches;
-//            }
           
          chan++;
          }

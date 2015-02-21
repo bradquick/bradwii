@@ -29,33 +29,79 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 extern globalstruct global;
 extern usersettingsstruct usersettings;
 
-fixedpointnum navigation_getdistanceandbearing(fixedpointnum lat1,fixedpointnum lon1,fixedpointnum lat2,fixedpointnum lon2,fixedpointnum *bearing)
+fixedpointnum navigation_getdistanceandbearing(long lat1,long lon1,long lat2,long lon2,fixedpointnum *bearing)
    { // returns fixedpointnum distance in meters and bearing in fixedpointnum degrees from point 1 to point 2
-   fixedpointnum latdiff=lat2-lat1;
-   fixedpointnum londiff=lib_fp_multiply(lon2-lon1,lib_fp_cosine(lat1>>LATLONGEXTRASHIFT));
+   // convert lat1 from 10,000,000 degrees to fixedpointnum degrees
+   // = lat1*10^-7*2^16
+   // = lat1 * 0.0065536
+   // = lat1 * (.0065536<<14)>>14
+   // = lat1>>6 * (.0065536<<14)>>8
+   // = (lat1>>6 * 107.3741824) >>8
+   fixedpointnum lat1indegrees=lib_fp_multiply(lat1>>6,FIXEDPOINTCONSTANT(107.3741824))>>8;
+   long latdiff=lat2-lat1;
+   long londiff=lon2-lon1;
+   
+   // shift latdiff and londiff so that they are around 22 bits long so that they can be squared by fp_multiply without
+   // overflowing and maintain maximum precision.  Keep track of how much we shifted in extrashift.
+   long largest=lib_fp_abs(latdiff);
+   if (lib_fp_abs(londiff)>largest) largest=lib_fp_abs(londiff);
+   
+   if (largest==0)
+      {
+      *bearing=0;
+      return(0);
+      }
+      
+   int extrashift=0;
+
+   while (largest<(1L<<22))
+      {
+      largest=largest<<1;
+      ++extrashift;
+      }
+   while (largest>(1L<<23))
+      {
+      largest=largest>>1;
+      --extrashift;
+      }
+   
+   if (extrashift>0)
+      {
+      latdiff=latdiff<<extrashift;
+      londiff=londiff<<extrashift;
+      }
+   else
+      {
+      latdiff=latdiff>>extrashift;
+      londiff=londiff>>extrashift;
+      }
+
+   // as the latitude decreases, the distance between longitude lines gets shorter
+   londiff=lib_fp_multiply(londiff,lib_fp_cosine(lat1indegrees));
       
    *bearing = FIXEDPOINT90 + lib_fp_atan2(-latdiff, londiff);
    if (*bearing >FIXEDPOINT180) *bearing -= FIXEDPOINT360;
    
-   // distance is 111319 meters per degree. This factor needs to be shifted 16 to make it a fixedpointnum.
-   // Since lat and lon are already shifted by 6,
-   // we will shift by 10 more total.  Shift lat and long by 8 and the constant by 2 to get the extra 10.
-   // The squaring will overflow our fixedpointnum at distances greater than 1000 meters or so, so test for size and shift accordingly
-   if (lib_fp_abs(latdiff)+lib_fp_abs(londiff)>40000L)
-      { // for big distances, don't shift lat and long.  Instead shift the constant by 10.
-      // this will get us to 32 kilometers at which point our fixedpoingnum can't hold a larger distance.
-      return(lib_fp_multiply(lib_fp_sqrt(lib_fp_multiply(latdiff,latdiff)+lib_fp_multiply(londiff,londiff)),113990656L));
-      }
+   long diff=lib_fp_sqrt(lib_fp_multiply(latdiff,latdiff)+lib_fp_multiply(londiff,londiff));
+   
+   // distance is 111319 meters per degree.
+   // diff is about 22 bits long
+   // dist = diff * 10^-7 * 111319  shifted with extra shifts
+   // = diff * .0111319        shifted with extra shifts
+   // to convert to fixedpointnum, <<16
+   // = (diff * .0111319<<14)>>14 <<16 >> extrashift
+   // = (diff * .0111319<<14)<< (extrashift-2)
+   diff=lib_fp_multiply(diff,FIXEDPOINTCONSTANT(182.3850496));
+   extrashift-=2;
+   
+   if (extrashift>0)
+      return(diff>>extrashift);
    else
-      {
-      latdiff=latdiff<<8;
-      londiff=londiff<<8;
-      return(lib_fp_multiply(lib_fp_sqrt(lib_fp_multiply(latdiff,latdiff)+lib_fp_multiply(londiff,londiff)),445276L));
-      }
+      return(diff<<(-extrashift));
    }
 
-fixedpointnum target_latitude;
-fixedpointnum target_longitude;
+long target_latitude;
+long target_longitude;
 fixedpointnum navigation_starttodestbearing;
 fixedpointnum navigation_last_crosstrack_distance;
 fixedpointnum navigation_last_ontrack_distance;
@@ -88,7 +134,7 @@ void navigation_sethometocurrentlocation()
    global.gps_home_longitude=global.gps_current_longitude;
    }
    
-void navigation_set_destination(fixedpointnum latitude,fixedpointnum longitude)
+void navigation_set_destination(long latitude,long longitude)
    { // sets a new destination to navigate towards.  Assumes we are navigating from our current location.
    target_latitude=latitude;
    target_longitude=longitude;

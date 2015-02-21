@@ -35,16 +35,57 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
    #ifndef BAROMETER_TYPE
       #define BAROMETER_TYPE BMP085 // baro
    #endif
+   #if (TELEMETRYMODE!=NOTELEMTRY && !defined(TELEMETRY_SERIAL_PORT))
+      #define TELEMETRY_SERIAL_PORT 3
+   #endif
    #ifndef MULTIWII_CONFIG_SERIAL_PORTS
-      #define MULTIWII_CONFIG_SERIAL_PORTS SERIALPORT0+SERIALPORT3
+      #if (TELEMETRY_SERIAL_PORT==3)
+         #define MULTIWII_CONFIG_SERIAL_PORTS SERIALPORT0
+      #else
+         #define MULTIWII_CONFIG_SERIAL_PORTS SERIALPORT0+SERIALPORT3
+      #endif
    #endif
    #ifndef GPS_TYPE
       #define GPS_TYPE SERIAL_GPS
    #endif
-   #if ((RX_TYPE==RX_DSM2_1024 || RX_TYPE==RX_DSM2_2048) && !defined(RX_SERIAL_PORT))
+   #if ((RX_TYPE==RX_DSM2_1024 || RX_TYPE==RX_DSM2_2048 || RX_TYPE==RX_SBUS) && !defined(RX_SERIAL_PORT))
       #define RX_SERIAL_PORT 1
    #endif
-   
+
+#elif (CONTROL_BOARD_TYPE==CONTROL_BOARD_WITESPY_MULTIWII_PRO_2 || CONTROL_BOARD_TYPE==CONTROL_BOARD_WITESPY_MULTIWII_PRO_2_GPS)
+   #define MICROCONTROLLER_TYPE MEGA2560
+   #define GYRO_TYPE MPU6050 // gyro
+   #define GYRO_ORIENTATION(VALUES,X, Y, Z) {VALUES[ROLLINDEX] =  Y; VALUES[PITCHINDEX] = -X; VALUES[YAWINDEX] = -Z;}
+   #define ACCELEROMETER_TYPE MPU6050 // accelerometer
+   #define ACC_ORIENTATION(VALUES,X, Y, Z)  {VALUES[ROLLINDEX]  = -X; VALUES[PITCHINDEX]  = -Y; VALUES[YAWINDEX]  =  Z;}
+   #ifndef COMPASS_TYPE
+      #define COMPASS_TYPE HMC5883 // compass
+   #endif
+   #define COMPASS_ORIENTATION(VALUES,X, Y, Z)  {VALUES[ROLLINDEX]  =  X; VALUES[PITCHINDEX]  = Y; VALUES[YAWINDEX]  = -Z;}
+   #ifndef BAROMETER_TYPE
+      #define BAROMETER_TYPE MS5611
+   #endif
+   #if (TELEMETRYMODE!=NOTELEMTRY && !defined(TELEMETRY_SERIAL_PORT))
+      #define TELEMETRY_SERIAL_PORT 3
+   #endif
+   #ifndef MULTIWII_CONFIG_SERIAL_PORTS
+      #if (TELEMETRY_SERIAL_PORT==3)
+         #define MULTIWII_CONFIG_SERIAL_PORTS SERIALPORT0
+      #else
+         #define MULTIWII_CONFIG_SERIAL_PORTS SERIALPORT0+SERIALPORT3
+      #endif
+   #endif
+   #ifndef GPS_TYPE
+      #if (CONTROL_BOARD_TYPE==CONTROL_BOARD_WITESPY_MULTIWII_PRO_2)
+         #define GPS_TYPE NO_GPS
+      #else
+         #define GPS_TYPE UBLOX_GPS
+      #endif
+   #endif
+   #if ((RX_TYPE==RX_DSM2_1024 || RX_TYPE==RX_DSM2_2048 || RX_TYPE==RX_SBUS) && !defined(RX_SERIAL_PORT))
+      #define RX_SERIAL_PORT 1
+   #endif
+
 #elif (CONTROL_BOARD_TYPE==CONTROL_BOARD_HK_MULTIWII_328P)
    #define MICROCONTROLLER_TYPE MEGA328P
    #define GYRO_TYPE ITG3200 // gyro
@@ -64,7 +105,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
    #ifndef GPS_TYPE
       #define GPS_TYPE NO_GPS
    #endif
-   #if ((RX_TYPE==RX_DSM2_1024 || RX_TYPE==RX_DSM2_2048) && !defined(RX_SERIAL_PORT))
+   #if ((RX_TYPE==RX_DSM2_1024 || RX_TYPE==RX_DSM2_2048 || RX_TYPE==RX_SBUS) && !defined(RX_SERIAL_PORT))
       #define RX_SERIAL_PORT 0
    #endif
 
@@ -86,7 +127,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
    #ifndef GPS_TYPE
       #define GPS_TYPE NO_GPS
    #endif
-   #if ((RX_TYPE==RX_DSM2_1024 || RX_TYPE==RX_DSM2_2048) && !defined(RX_SERIAL_PORT))
+   #if ((RX_TYPE==RX_DSM2_1024 || RX_TYPE==RX_DSM2_2048 || RX_TYPE==RX_SBUS) && !defined(RX_SERIAL_PORT))
       #define RX_SERIAL_PORT 1
    #endif
 
@@ -112,7 +153,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
    #endif
    #if (RX_TYPE==RX_NORMAL)
       #define RXNUMCHANNELS 5
-   #elif ((RX_TYPE==RX_DSM2_1024 || RX_TYPE==RX_DSM2_2048) && !defined(RX_SERIAL_PORT))
+   #elif ((RX_TYPE==RX_DSM2_1024 || RX_TYPE==RX_DSM2_2048 || RX_TYPE==RX_SBUS) && !defined(RX_SERIAL_PORT))
       #define RX_SERIAL_PORT 1
    #endif
    #ifndef ARMED_MIN_MOTOR_OUTPUT
@@ -204,7 +245,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
       #define BAROMETER_TYPE NO_BAROMETER // baro
    #endif
    #ifndef MULTIWII_CONFIG_SERIAL_PORTS
-      #if (RX_TYPE!=RX_DSM2_1024 && RX_TYPE!=RX_DSM2_2048)
+      #if (RX_TYPE!=RX_DSM2_1024 && RX_TYPE!=RX_DSM2_2048 && RX_TYPE!=RX_SBUS)
          #define MULTIWII_CONFIG_SERIAL_PORTS SERIALPORT0
       #else
          #define MULTIWII_CONFIG_SERIAL_PORTS NOSERIALPORT
@@ -213,40 +254,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
    #ifndef GPS_TYPE
       #define GPS_TYPE NO_GPS
    #endif
-   #if ((RX_TYPE==RX_DSM2_1024 || RX_TYPE==RX_DSM2_2048) && !defined(RX_SERIAL_PORT))
+   #if ((RX_TYPE==RX_DSM2_1024 || RX_TYPE==RX_DSM2_2048 || RX_TYPE==RX_SBUS) && !defined(RX_SERIAL_PORT))
       #define RX_SERIAL_PORT 0
    #endif
    #define AUX2_RX_INPUT (DIGITALPORTB | 4)
    #define PCINTERRUPT4PORTANDPIN AUX2_RX_INPUT
-
-#elif (CONTROL_BOARD_TYPE==CONTROL_BOARD_WITESPY_MULTIWII_PRO_2 || CONTROL_BOARD_TYPE==CONTROL_BOARD_WITESPY_MULTIWII_PRO_2_GPS)
-   #define MICROCONTROLLER_TYPE MEGA2560
-   #define GYRO_TYPE MPU6050 // gyro
-   #define GYRO_ORIENTATION(VALUES,X, Y, Z) {VALUES[ROLLINDEX] =  Y; VALUES[PITCHINDEX] = -X; VALUES[YAWINDEX] = -Z;}
-   #define ACCELEROMETER_TYPE MPU6050 // accelerometer
-   #define ACC_ORIENTATION(VALUES,X, Y, Z)  {VALUES[ROLLINDEX]  = -X; VALUES[PITCHINDEX]  = -Y; VALUES[YAWINDEX]  =  Z;}
-   #ifndef COMPASS_TYPE
-      #define COMPASS_TYPE HMC5883_VIA_MPU6050 // compass
-   #endif
-   #define COMPASS_ORIENTATION(VALUES,X, Y, Z)  {VALUES[ROLLINDEX]  =  X; VALUES[PITCHINDEX]  = Y; VALUES[YAWINDEX]  = -Z;}
-   #ifndef BAROMETER_TYPE
-      #define BAROMETER_TYPE MS5611
-   #endif
-   #ifndef MULTIWII_CONFIG_SERIAL_PORTS
-      #define MULTIWII_CONFIG_SERIAL_PORTS SERIALPORT0+SERIALPORT3
-   #endif
-   #ifndef GPS_TYPE
-      #if (CONTROL_BOARD_TYPE==CONTROL_BOARD_WITESPY_MULTIWII_PRO_2)
-         #define GPS_TYPE NO_GPS
-      #else
-         #define GPS_TYPE SERIAL_GPS   // select if a serial GPS (NMEA) is going to be used
-         #define GPS_SERIAL_PORT 2
-         #define GPS_BAUD 115200
-      #endif
-   #endif
-   #if ((RX_TYPE==RX_DSM2_1024 || RX_TYPE==RX_DSM2_2048) && !defined(RX_SERIAL_PORT))
-      #define RX_SERIAL_PORT 1
-   #endif
 
 
 #else
@@ -431,6 +443,15 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
    #endif
    #ifndef GPS_BAUD
       #define GPS_BAUD 115200
+   #endif
+#endif
+
+#if (GPS_TYPE==UBLOX_GPS)
+   #ifndef GPS_SERIAL_PORT
+      #define GPS_SERIAL_PORT 2
+   #endif
+   #ifndef GPS_BAUD
+      #define GPS_BAUD 57600
    #endif
 #endif
 

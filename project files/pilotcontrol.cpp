@@ -191,8 +191,6 @@ void getangleerrorfrompilotinput(fixedpointnum *angleerror)
 //
 //   lib_fp_lowpassfilter(&accrollangle,newrollangle,global.timesliver,FIXEDPOINTCONSTANT(8),TIMESLIVEREXTRASHIFT);
 //   angleerror[ROLLINDEX]-=accrollangle;
-//global.debugvalue[0]=newrollangle>>FIXEDPOINTSHIFT;
-//global.debugvalue[1]=accrollangle>>FIXEDPOINTSHIFT;
 //   }
    }
    

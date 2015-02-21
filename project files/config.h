@@ -33,16 +33,19 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //#define CONTROL_BOARD_TYPE CONTROL_BOARD_SIRIUS_PARIS_V4
 //#define CONTROL_BOARD_TYPE CONTROL_BOARD_SIRIUS_PARIS_V4_GPS
 //#define CONTROL_BOARD_TYPE CONTROL_BOARD_WITESPY_FLIP
+// Note: the Readytoflyquads.com Multiwii Pro 2.0 board I recently received did not have the sensors advertized
+// on their web site.  I had to configure it as a CONTROL_BOARD_HK_MULTIWII_PRO_2 to get it to work.
 //#define CONTROL_BOARD_TYPE CONTROL_BOARD_WITESPY_MULTIWII_PRO_2
 //#define CONTROL_BOARD_TYPE CONTROL_BOARD_WITESPY_MULTIWII_PRO_2_GPS
 
 // Choose the type of r/c reciever that will be used
-//#define RX_TYPE RX_NORMAL
+#define RX_TYPE RX_NORMAL
 //#define RX_TYPE RX_CPPM
-#define RX_TYPE RX_SBUS
+//#define RX_TYPE RX_SBUS
 //#define RX_TYPE RX_DSM2_1024
 //#define RX_TYPE RX_DSM2_2048
-#define RX_SERIAL_PORT 3
+// set the receiver serial port if you don't want to use the default
+//#define RX_SERIAL_PORT 3
 
 // Choose a channel order if you don't like the default for your receiver type selected above
 //#define RX_CHANNEL_ORDER         THROTTLEINDEX,ROLLINDEX,PITCHINDEX,YAWINDEX,AUX1INDEX,AUX2INDEX,AUX3INDEX,AUX4INDEX,8,9,10,11 //For Graupner/Spektrum
@@ -72,7 +75,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // note: two examples are given below, but any combination of ports can be added together.
 
 //#define MULTIWII_CONFIG_SERIAL_PORTS NOSERIALPORT
-#define MULTIWII_CONFIG_SERIAL_PORTS SERIALPORT0
+//#define MULTIWII_CONFIG_SERIAL_PORTS SERIALPORT0
 //#define MULTIWII_CONFIG_SERIAL_PORTS SERIALPORT1
 //#define MULTIWII_CONFIG_SERIAL_PORTS SERIALPORT1+SERIALPORT3
 
@@ -85,13 +88,15 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //#define GPS_TYPE NO_GPS // select if no GPS is going to be used
 //#define GPS_TYPE I2C_GPS // select if an i2c gps is going to be used
 //#define GPS_TYPE SERIAL_GPS   // select if a serial GPS (NMEA) is going to be used
-#define GPS_TYPE UBLOX_GPS   // select if a UBlox GPS (binary) is going to be used
-#define GPS_SERIAL_PORT 2
+//#define GPS_TYPE UBLOX_GPS   // select if a UBlox GPS (binary) is going to be used
+//#define GPS_SERIAL_PORT 2
 //#define GPS_BAUD 115200
-#define GPS_BAUD 57600
-
+//#define GPS_BAUD 57600
+//#define GPS_SBAS_TYPE SBAS_AUTO
+//#define GPS_SBAS_TYPE SBAS_EGNOS
 #define GPS_SBAS_TYPE SBAS_WAAS
-
+//#define GPS_SBAS_TYPE SBAS_MSAS
+//#define GPS_SBAS_TYPE SBAS_GAGAN
 
 // Choose a multiplier for high rotation rates when in acro mode
 #define HIGH_RATES_MULTILIER 2.0
@@ -138,6 +143,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 // un-comment if you don't want to include code for a barometer, otherwise it will default to what the control board has on it
 //#define BAROMETER_TYPE NO_BAROMETER
+//#define BAROMETER_TYPE BMP085
+//#define BAROMETER_TYPE MS5611
 
 // Get your magnetic decliniation from here : http://magnetic-declination.com/
 #define MAG_DECLINATION_DEGREES  -13.4 // for Hyde Park, NY
@@ -186,6 +193,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 //#define TELEMETRYMODE NOTELEMETRY
 //#define TELEMETRYMODE TELEMETRYFRSKYSERIAL
-#define TELEMETRYMODE TELEMETRYFRSKYSMARTPORT
+//#define TELEMETRYMODE TELEMETRYFRSKYSMARTPORT
 
-#define TELEMETRY_SERIAL_PORT 1
+//#define TELEMETRY_SERIAL_PORT 3

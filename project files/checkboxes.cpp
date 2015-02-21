@@ -39,42 +39,50 @@ char checkboxnames[]/* PROGMEM */= // names for dynamic generation of config GUI
    "HF"
    ;
 
+fixedpointnum slowrxvalues[RXNUMCHANNELS]={0};
+
 // each checkbox item has a checkboxvalue.  The bits in this value represent low, medium, and high checkboxes
 // for each of the aux switches, just as they show up in most config programs.
 void checkcheckboxitems()
    {
+   // use low pass filters to slow down the changes in radio signals so we don't respond to unintended glitches
+   for (int x=0;x<RXNUMCHANNELS;++x)
+      {
+      lib_fp_lowpassfilter(&slowrxvalues[x],global.rxvalues[x],global.timesliver>>TIMESLIVEREXTRASHIFT,FIXEDPOINTONEOVERONESIXTEENTH,0);
+      }
+      
    global.previousactivecheckboxitems=global.activecheckboxitems;
    global.activecheckboxitems=0;
    
    unsigned int mask=0; // a mask of what aux states are true
 #if (RXNUMCHANNELS>4)
-   if (global.rxvalues[AUX1INDEX]<FPAUXMIDRANGELOW) // low
+   if (slowrxvalues[AUX1INDEX]<FPAUXMIDRANGELOW) // low
       mask |= (1<<0);
-   else if (global.rxvalues[AUX1INDEX]>FPAUXMIDRANGEHIGH) // high
+   else if (slowrxvalues[AUX1INDEX]>FPAUXMIDRANGEHIGH) // high
       mask |= (1<<2);
    else mask |=(1<<1); // mid
 #endif
 
 #if (RXNUMCHANNELS>5)
-   if (global.rxvalues[AUX2INDEX]<FPAUXMIDRANGELOW) // low
+   if (slowrxvalues[AUX2INDEX]<FPAUXMIDRANGELOW) // low
       mask |= (1<<3);
-   else if (global.rxvalues[AUX2INDEX]>FPAUXMIDRANGEHIGH) // high
+   else if (slowrxvalues[AUX2INDEX]>FPAUXMIDRANGEHIGH) // high
       mask |= (1<<5);
    else mask |=(1<<4); //mid
 #endif
 
 #if (RXNUMCHANNELS>6)
-   if (global.rxvalues[AUX3INDEX]<FPAUXMIDRANGELOW) // low
+   if (slowrxvalues[AUX3INDEX]<FPAUXMIDRANGELOW) // low
       mask |= (1<<6);
-   else if (global.rxvalues[AUX3INDEX]>FPAUXMIDRANGEHIGH) // high
+   else if (slowrxvalues[AUX3INDEX]>FPAUXMIDRANGEHIGH) // high
       mask |= (1<<8);
    else mask |=(1<<7); //mid
 #endif
 
 #if (RXNUMCHANNELS>7)
-   if (global.rxvalues[AUX4INDEX]<FPAUXMIDRANGELOW) // low
+   if (slowrxvalues[AUX4INDEX]<FPAUXMIDRANGELOW) // low
       mask |= (1<<9);
-   else if (global.rxvalues[AUX4INDEX]>FPAUXMIDRANGEHIGH) // high
+   else if (slowrxvalues[AUX4INDEX]>FPAUXMIDRANGEHIGH) // high
       mask |= (1<<11);
    else mask |=(1<<10); //mid
 #endif
@@ -87,14 +95,14 @@ void checkcheckboxitems()
 #if (defined(STICK_ARM) | defined (STICK_DISARM))
    // figure out where the sticks are
    unsigned int stickmask=0;
-   if (global.rxvalues[ROLLINDEX]<FPSTICKLOW) stickmask |= STICK_COMMAND_ROLL_LOW;
-   else if (global.rxvalues[ROLLINDEX]>FPSTICKHIGH) stickmask |= STICK_COMMAND_ROLL_HIGH;
+   if (slowrxvalues[ROLLINDEX]<FPSTICKLOW) stickmask |= STICK_COMMAND_ROLL_LOW;
+   else if (slowrxvalues[ROLLINDEX]>FPSTICKHIGH) stickmask |= STICK_COMMAND_ROLL_HIGH;
 
-   if (global.rxvalues[PITCHINDEX]<FPSTICKLOW) stickmask |= STICK_COMMAND_PITCH_LOW;
-   else if (global.rxvalues[PITCHINDEX]>FPSTICKHIGH) stickmask |= STICK_COMMAND_PITCH_HIGH;
+   if (slowrxvalues[PITCHINDEX]<FPSTICKLOW) stickmask |= STICK_COMMAND_PITCH_LOW;
+   else if (slowrxvalues[PITCHINDEX]>FPSTICKHIGH) stickmask |= STICK_COMMAND_PITCH_HIGH;
 
-   if (global.rxvalues[YAWINDEX]<FPSTICKLOW) stickmask |= STICK_COMMAND_YAW_LOW;
-   else if (global.rxvalues[YAWINDEX]>FPSTICKHIGH) stickmask |= STICK_COMMAND_YAW_HIGH;
+   if (slowrxvalues[YAWINDEX]<FPSTICKLOW) stickmask |= STICK_COMMAND_YAW_LOW;
+   else if (slowrxvalues[YAWINDEX]>FPSTICKHIGH) stickmask |= STICK_COMMAND_YAW_HIGH;
 
 
    // If the sticks are in the right positions, set the arm or disarm checkbox value

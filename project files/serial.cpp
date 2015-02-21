@@ -36,7 +36,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "gps.h"
 
 #define MSP_VERSION 0
-#define  VERSION  112 // version 1.12
+#define  VERSION  113 // version 1.13
 
 
 extern globalstruct global;
@@ -308,8 +308,8 @@ void evaluatecommand(char portnumber,unsigned char *data)
       sendgoodheader(portnumber,14);
       sendandchecksumcharacter(portnumber,global.gps_num_satelites>5); // gps fix
       sendandchecksumcharacter(portnumber, global.gps_num_satelites);
-      sendandchecksumlong(portnumber,lib_fp_multiply(global.gps_current_latitude,156250L)); //156250L is 10,000,000L>>LATLONGEXTRASHIFT);
-      sendandchecksumlong(portnumber,lib_fp_multiply(global.gps_current_longitude,156250L));
+      sendandchecksumlong(portnumber,global.gps_current_latitude);
+      sendandchecksumlong(portnumber,global.gps_current_longitude);
       sendandchecksumint(portnumber,global.gps_current_altitude>>FIXEDPOINTSHIFT); // gps altitude
       sendandchecksumint(portnumber,(global.gps_current_speed*100)>>FIXEDPOINTSHIFT); // gps speed
       }

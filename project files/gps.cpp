@@ -24,10 +24,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 // when adding GPS's, the following functions must be included:
 // initgps()  // does any initialization of the gps
-// readgps()  // sets global.gps_current_latitude in fixedpointnum degrees shifted left by LATLONGEXTRASHIFT
-//                    global.gps_current_longitude in fixedpointnum degrees shifted left by LATLONGEXTRASHIFT
+// readgps()  // sets global.gps_current_latitude in 10,000,000 degrees
+//                    global.gps_current_longitude in 10,000,000 degrees
 //                    global.gps_num_satelites,global.gps_current_altitude in fixedpointnum meters
-//                      returns 1 if a new fix is acquired, 0 otherwise.
+//                      returns 1 if a new location is acquired, 0 otherwise.
 
 extern globalstruct global;
 
@@ -86,9 +86,9 @@ unsigned char hextochar(unsigned char n)
 //   return((degrees<<LATLONGEXTRASHIFT)+lib_fp_multiply(minutes,69905L));  // 69905L is (1/60) * 2^16 * 2^6
 //   }
 
-fixedpointnum gpsstringtoangle(char *string)
-   { // takes a gps string and converts it to a fixedpointnum angle
-   // "4807.123" means 48 degrees, 7.123 minutes, south
+long gpsstringtoangle(char *string)
+   { // takes a gps string and converts it to a long in 10,000,000 degrees
+   // "4807.12300" means 48 degrees, 7.123 minutes, south
    // how many digits are there before the decimal point?
    int index=0;
    while (string[index]>='0' && string[index]<='9') ++index;
@@ -96,11 +96,9 @@ fixedpointnum gpsstringtoangle(char *string)
    // convert the minutes part.  Use two digits before the decimal and 5 digits after
    // with the decimal point, this gives 10 characters to look at.
    // The largest raw minute value we should get will be 6,000,000 (7 total digits)
-   fixedpointnum minutes=0;
+   long minutes=0;
    char *ptr=&string[index-2];
    
-//if (*(ptr-1)=='3') global.debugvalue[2]=lib_fp_stringtolong(&string[index+1]);
-//else global.debugvalue[3]=lib_fp_stringtolong(&string[index+1]);
    for (int count=0;count<8;++count)
       {
       if (*ptr=='.') ++ptr; // ignore the decimal point
@@ -110,10 +108,16 @@ fixedpointnum gpsstringtoangle(char *string)
          if (*ptr) minutes+=(*ptr++) - '0';
          }
       }
+   // convert minutes from 100,000 minutes to 10,000,000 degrees
+   // = minutes/60 *100;
+   // = minutes * 1.6666666667;
+   // = (minutes * 1.6666666667<<7)>>7;
+   
    string[index-2]='\0';
-   fixedpointnum degrees=lib_fp_stringtolong(string);
+   
+   long degrees=lib_fp_stringtolong(string);
 
-   return((degrees<<(FIXEDPOINTSHIFT+LATLONGEXTRASHIFT))+(lib_fp_multiply(minutes,11728124L)>>8));  // 11728124L is (2^16 * 2^6 * 2^16 * 2^8)/(60 * 10^5)
+   return(degrees*10000000L+(lib_fp_multiply(minutes,FIXEDPOINTCONSTANT(213.333333333333333))>>7));
    }
 
 char readgps()
@@ -134,6 +138,7 @@ char readgps()
          if (c==',' || c=='*')
             { // we just finished loading a parameter, interpret it
             gpsdata[gpsdataindex]='\0';
+global.debugvalue[0]=gpsparameternumber;
 
             if (gpsparameternumber == 0) 
                { //frame identification
@@ -311,7 +316,7 @@ char readgps()
       *ptr++ = lib_i2c_readack();
       *ptr = lib_i2c_readack();
 
-      global.gps_current_latitude=lib_fp_multiply(longvalue,27488L); // convert from 10,000,000 m to fixedpointnum
+      global.gps_current_latitude=longvalue; //lib_fp_multiply(longvalue,27488L); // convert from 10,000,000 m to fixedpointnum
       
       ptr=(unsigned char *)&longvalue;
       
@@ -320,7 +325,7 @@ char readgps()
       *ptr++ = lib_i2c_readack();
       *ptr = lib_i2c_readnak();
       
-      global.gps_current_longitude=lib_fp_multiply(longvalue,27488L); // convert from 10,000,000 m to fixedpointnum
+      global.gps_current_longitude=longvalue; //lib_fp_multiply(longvalue,27488L); // convert from 10,000,000 m to fixedpointnum
 
       int intvalue;
       ptr= (unsigned char *)&intvalue;
@@ -454,14 +459,9 @@ char handlepacket()
       {
       case MSG_POSLLH:
          if (gotfix)
-            { // .4194304 is 10^-7 *2^16 *2^6 to convert from degrees *10^-7 to fixedpointnum degrees<<LATLONGEXTRASHIFT
-// *2^8
-            // to maximize precision, we want the two things being multiplied to have the same number of significant digits.
-            // so we shift the raw value left and the multiplier right.
-//            global.gps_current_longitude = lib_fp_multiply(gps_data.posllh.longitude, FIXEDPOINTCONSTANT(.4194304));
-            global.gps_current_longitude = lib_fp_multiply(gps_data.posllh.longitude>>7, FIXEDPOINTCONSTANT(214.7483648))>>2;
-            global.gps_current_latitude = lib_fp_multiply(gps_data.posllh.latitude>>7, FIXEDPOINTCONSTANT(214.7483648))>>2;
-//            global.gps_current_latitude = lib_fp_multiply(gps_data.posllh.latitude, FIXEDPOINTCONSTANT(.4194304));
+            { // set lat and longitude in 10,000,000 degrees
+            global.gps_current_longitude = gps_data.posllh.longitude;
+            global.gps_current_latitude = gps_data.posllh.latitude;
             global.gps_current_altitude = lib_fp_multiply(gps_data.posllh.altitude_msl,FIXEDPOINTCONSTANT(65.536)); // convert from mm to fixedpointnum meters.  65.536 is .001 * 2^16
             }
          global.gps_fix = gotfix;

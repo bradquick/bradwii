@@ -116,7 +116,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 // telemetry modes
 #define NOTELEMETRY 0
-#define TELEMETRYFRSKYSERIAL 1
+#define TELEMETRYFRSKYHUB 1
 #define TELEMETRYFRSKYSMARTPORT 2
 
 // general yes/no (used for MOTOR_STOP)

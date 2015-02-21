@@ -39,7 +39,6 @@ void compassfilterrawvalues(int *rawvalues)
    for (int x=0;x<3;++x)
       {
       lib_fp_lowpassfilter(&compassfilteredrawvalues[x],rawvalues[x],FIXEDPOINTCONSTANT(.07),FIXEDPOINTCONSTANT(1.0/.125),0);
-//global.debugvalue[x]=compassfilteredrawvalues[x];
       }
    }
 

@@ -36,7 +36,7 @@ void checktelemetryforaction()
    }
 #endif
 
-#if (TELEMETRYMODE==TELEMETRYFRSKYSERIAL)
+#if (TELEMETRYMODE==TELEMETRYFRSKYHUB)
 
 unsigned long telemetrytimer;
 unsigned char telemetrycount;
@@ -103,15 +103,24 @@ void sendfixedpointnum(unsigned char bpId, unsigned char apId, fixedpointnum val
 
 void sendlatitudeorlongitude(unsigned char bpId, unsigned char apId, fixedpointnum value)
    {
-   // convert from fixedpointnum degrees to ddmm.mmmmm format
-   fixedpointnum degrees=(value>>LATLONGEXTRASHIFT) & 0xFFFF0000;
-   fixedpointnum minutes=((value - (degrees<<LATLONGEXTRASHIFT))*60L)>>LATLONGEXTRASHIFT;
+   // convert from 10,000,000 degrees to ddmm.mmmmm format
+   // degrees=value/10,000,000;
+   // = value*10^-7
+   // = value*(10^7<<23)>>23;
+   long degrees=lib_fp_multiply(value,FIXEDPOINTCONSTANT(0.8388608))>>23;
+   long remainder=value-degrees*10000000L;
+   // convert remainder to 10,000 minutes
+   // = remainder*60/1000;
+   // = remainder *.06
+   // = remainder * (.06<<11)>>11
+   remainder=lib_fp_multiply(remainder,FIXEDPOINTCONSTANT(122.88))>>11;
+   // minutes=remainder/10,000;
+   // = remainder*(10^-4<<22)>>22;
+   long minutes=lib_fp_multiply(remainder,FIXEDPOINTCONSTANT(419.4304))>>22;
+   remainder=remainder-minutes*10000L;
    
-   value=degrees*100+minutes;
-//global.debugvalue[1]=degrees>>FIXEDPOINTSHIFT;
-//global.debugvalue[2]=minutes>>FIXEDPOINTSHIFT;
-
-   sendfixedpointnum(bpId,apId,value,10000);
+   sendshortvalue(bpId,degrees*100+minutes);
+   sendshortvalue(apId,remainder);
    }
 
 void checktelemetryforaction()
@@ -119,9 +128,6 @@ void checktelemetryforaction()
    if (lib_timers_gettimermicroseconds(telemetrytimer)>=250000L)
       {
       // Data sent every 250ms
-//      sendshortvalue(ID_Ang_X,global.currentestimatedeulerattitude[ROLLINDEX]>>FIXEDPOINTSHIFT);
-//      sendshortvalue(ID_Ang_Y,global.currentestimatedeulerattitude[PITCHINDEX]>>FIXEDPOINTSHIFT);
-      
       // send altitude velocity in cm/sec
       sendshortvalue(ID_Vario,(global.altitudevelocity*100L)>>FIXEDPOINTSHIFT);
       
@@ -138,10 +144,6 @@ void checktelemetryforaction()
                sendfixedpointnum(ID_Course_bp,ID_Course_ap,global.currentestimatedeulerattitude[YAWINDEX]+FIXEDPOINTCONSTANT(360.0),100);
             else
                sendfixedpointnum(ID_Course_bp,ID_Course_ap,global.currentestimatedeulerattitude[YAWINDEX],100);
-//global.debugvalue[0]=global.currentestimatedeulerattitude[YAWINDEX]>>FIXEDPOINTSHIFT;
-
-//            // send the gps speed. Convert from meters per second to km/h
-//            sendfixedpointnum(ID_GPS_speed_bp,ID_GPS_speed_ap,lib_fp_multiply(global.gps_current_speed,FIXEDPOINTCONSTANT(3.6)),0); // zero after decimal point?
             // send the gps speed. Convert from meters per second to knots
             sendfixedpointnum(ID_GPS_speed_bp,ID_GPS_speed_ap,lib_fp_multiply(global.gps_current_speed,FIXEDPOINTCONSTANT(1.94384)),0); // zero after decimal point?
             break;
@@ -160,9 +162,6 @@ void checktelemetryforaction()
             sendshortvalue(ID_Acc_X,global.acc_g_vector[XINDEX]>>6);
             sendshortvalue(ID_Acc_Y,global.acc_g_vector[YINDEX]>>6);
             sendshortvalue(ID_Acc_Z,global.acc_g_vector[ZINDEX]>>6);
-//            sendshortvalue(ID_Gyro_X,global.gyrorate[XINDEX]>>8); // not sure of the scaling or units
-//            sendshortvalue(ID_Gyro_X,global.gyrorate[YINDEX]>>8);
-//            sendshortvalue(ID_Gyro_X,global.gyrorate[ZINDEX]>>8);
             break;
          case 4:
             // send the number of satelites as RPM
@@ -251,6 +250,9 @@ void inittelemetry()
 //   8XR (November 2013 firmware X8R_131105.frk) polling is observed to request data for 28 different sensor IDs in the following sequence:
 //
 //   7E A1 7E 22 7E 83 7E E4 7E 45 7E C6 7E 67 7E 48 7E E9 7E 6A 7E CB 7E AC 7E 0D 7E 8E 7E 2F 7E D0 7E 71 7E F2 7E 53 7E 34 7E 95 7E 16 7E B7 7E 98 7E 39 7E BA 7E 1B 7E 00
+//
+// The receiver doesn't seem to look at the response to make sure it is of the same type of data requested, so it
+// turns out that hte sensor can resond to any request from the receiver with any type of data.
 
 void sendnextsmartportdata();
 
@@ -318,16 +320,19 @@ static void sendsmartportpaket(unsigned int id, unsigned long val)
    sendsmartportbyte(0xFF - (unsigned char)crc, 0);
    }
 
-void sendsmartportlatlongvalue(fixedpointnum value,unsigned char thisislongitude)
+void sendsmartportlatlongvalue(long value,unsigned char thisislongitude)
    {
    // the same ID is sent twice, one for longitude, one for latitude
-   // the MSB of the sent unsigned long helps FrSky keep track
- 
+   // the MSB of the sent unsigned long tells which is which
+
+   // convert from 10,000,000 degrees to
    // units=10000 minutes
-   // =(ourvalue*60*10000)>>(6+16)
-   // =(ourvalue*1.1444091796875)>>3;
+   // =(value*60*10^-7*10^4)
+   // =(value*.06)
+   // =(value>>3 * .06<<7)>>4
+   // =(ourvalue>>3 * 1.1444091796875)>>3;
    
-   value=lib_fp_multiply(value,FIXEDPOINTCONSTANT(1.1444091796875))>>3;
+   value=lib_fp_multiply(value>>3,FIXEDPOINTCONSTANT(7.68))>>4;
    unsigned long unsignedvalue;
    long signedvalue;
 
@@ -341,6 +346,7 @@ void sendsmartportlatlongvalue(fixedpointnum value,unsigned char thisislongitude
    sendsmartportpaket(FSSP_DATAID_LATLONG, unsignedvalue);
    }
 
+// send the next packet in our list
 void sendnextsmartportdata()
    {
    switch(++telemetrycount)
@@ -350,28 +356,28 @@ void sendnextsmartportdata()
          sendsmartportpaket(FSSP_DATAID_SPEED, lib_fp_multiply(global.gps_current_speed,FIXEDPOINTCONSTANT(3.6))>>FIXEDPOINTSHIFT); //  in KM/H?
          break;
       case 2:
-         // send the number of satelites as RPM
+         // send the number of satelites as RPM.  Multiplying by 60 makes it compatible with the Hub format.
          sendsmartportpaket(FSSP_DATAID_RPM, global.gps_num_satelites*60);
          break;
       case 3: // altitude
          sendsmartportpaket(FSSP_DATAID_ALTITUDE, (global.altitude*100)>>FIXEDPOINTSHIFT); // unknown given unit, requested 100 = 1 meter
          break;
-      case 4:
+      case 4: // logitude
          sendsmartportlatlongvalue(global.gps_current_longitude,1);
          break;
-      case 5:
+      case 5: // latitude
          sendsmartportlatlongvalue(global.gps_current_latitude,0);
          break;
-      case 6:
+      case 6: // vario
           sendsmartportpaket(FSSP_DATAID_VARIO, (global.altitudevelocity*100L)>>FIXEDPOINTSHIFT); // requested in 100 = 1m/s
           break;
-      case 7:
+      case 7: // the current heading
           if (global.currentestimatedeulerattitude[YAWINDEX]<0)
-            sendsmartportpaket(FSSP_DATAID_HEADING, ((global.currentestimatedeulerattitude[YAWINDEX]+FIXEDPOINTCONSTANT(360.0))*100L)>>FIXEDPOINTSHIFT);
+            sendsmartportpaket(FSSP_DATAID_HEADING, ((global.currentestimatedeulerattitude[YAWINDEX]+FIXEDPOINTCONSTANT(360.0))*50L)>>(FIXEDPOINTSHIFT-1));
           else
-            sendsmartportpaket(FSSP_DATAID_HEADING, (global.currentestimatedeulerattitude[YAWINDEX]*100L)>>FIXEDPOINTSHIFT);
+            sendsmartportpaket(FSSP_DATAID_HEADING, (global.currentestimatedeulerattitude[YAWINDEX]*50L)>>(FIXEDPOINTSHIFT-1));
           break;
-      case 8:
+      case 8: // accelerometer data.  Not sure the units are correct
           sendsmartportpaket(FSSP_DATAID_ACCX, global.acc_g_vector[XINDEX]>>6);
           break;
       case 9:
@@ -386,12 +392,10 @@ void sendnextsmartportdata()
       case 12: // gps speed
          sendsmartportpaket(FSSP_DATAID_GPS_SPEED, lib_fp_multiply(global.gps_current_speed,FIXEDPOINTCONSTANT(1.94384)));
          break;
-      case 13:
-         // send the navigation distance in Temperature1
+      case 13: // send the navigation distance in Temperature1
          sendsmartportpaket(FSSP_DATAID_T1, global.navigation_distance>>FIXEDPOINTSHIFT);
          break;
-      case 14:
-         // send the navigation bearing in Temperature2
+      case 14: // send the navigation bearing in Temperature2
          sendsmartportpaket(FSSP_DATAID_T2, global.navigation_bearing>>FIXEDPOINTSHIFT);
          break;
 
@@ -399,88 +403,6 @@ void sendnextsmartportdata()
       default:
           telemetrycount=0; // start over
           break;
-          
-          
-          
-          
-          
-//      case 8:
-////          sendsmartportpaket(FSSP_DATAID_ACCX, accSmooth[X] / 44);
-//          // unknown input and unknown output unit
-//          // we can only show 00.00 format, another digit won't display right on Taranis
-//          // dividing by roughly 44 will give acceleration in G units
-//          break;
-//      case 3:
-////          sendsmartportpaket(FSSP_DATAID_CURRENT, amperage); // given in 10mA steps, unknown requested unit
-//          break;
-//      case 11:
-//          sendsmartportpaket(FSSP_DATAID_ACCY, accSmooth[Y] / 44);
-//          break;
-//      case 12:
-//          sendsmartportpaket(FSSP_DATAID_ACCZ, accSmooth[Z] / 44);
-//          break;
-//      case 13:
-//          // we send all the flags as decimal digits for easy reading
-//
-//          // the t1Cnt simply allows the telemetry view to show at least some changes
-//          t1Cnt++;
-//          if (t1Cnt >= 4) {
-//              t1Cnt = 1;
-//          }
-//          signedvalue = t1Cnt * 10000; // start off with at least one digit so the most significant 0 won't be cut off
-//          // the Taranis seems to be able to fit 5 digits on the screen
-//          // the Taranis seems to consider this number a signed 16 bit integer
-//
-//          if (ARMING_FLAG(OK_TO_ARM))
-//              signedvalue += 1;
-//          if (ARMING_FLAG(PREVENT_ARMING))
-//              signedvalue += 2;
-//          if (ARMING_FLAG(ARMED))
-//              signedvalue += 4;
-//
-//          if (FLIGHT_MODE(ANGLE_MODE))
-//              signedvalue += 10;
-//          if (FLIGHT_MODE(HORIZON_MODE))
-//              signedvalue += 20;
-//          if (FLIGHT_MODE(AUTOTUNE_MODE))
-//              signedvalue += 40;
-//          if (FLIGHT_MODE(PASSTHRU_MODE))
-//              signedvalue += 40;
-//
-//          if (FLIGHT_MODE(MAG_MODE))
-//              signedvalue += 100;
-//          if (FLIGHT_MODE(BARO_MODE))
-//              signedvalue += 200;
-//          if (FLIGHT_MODE(SONAR_MODE))
-//              signedvalue += 400;
-//
-//          if (FLIGHT_MODE(GPS_HOLD_MODE))
-//              signedvalue += 1000;
-//          if (FLIGHT_MODE(GPS_HOME_MODE))
-//              signedvalue += 2000;
-//          if (FLIGHT_MODE(HEADFREE_MODE))
-//              signedvalue += 4000;
-//
-//          sendsmartportpaket(FSSP_DATAID_T1, (unsigned long)signedvalue);
-//          break;
-//      case 14:
-//          if (sensors(SENSOR_GPS)) {
-//              // provide GPS lock status
-//              sendsmartportpaket(id, (STATE(GPS_FIX) ? 1000 : 0) + (STATE(GPS_FIX_HOME) ? 2000 : 0) + GPS_numSat);
-//          }
-//          else {
-//              sendsmartportpaket(FSSP_DATAID_T2, 0);
-//          }
-//          break;
-//      case 15:
-//          if (sensors(SENSOR_GPS) && STATE(GPS_FIX)) {
-//              sendsmartportpaket(FSSP_DATAID_GPS_ALT, GPS_altitude * 1000); // given in 0.1m , requested in 100 = 1m
-//          }
-//          telemetrycount=0; // start over
-//          break;
-//      case 4:
-////          sendsmartportpaket(FSSP_DATAID_FUEL, mAhDrawn); // given in mAh, unknown requested unit
-//          break;
       }
    }
 
